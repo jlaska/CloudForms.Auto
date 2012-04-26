@@ -127,7 +127,7 @@ class RolesTab(Base):
     _role_new_name_locator = (By.ID, "role_name")
     _role_new_description_locator = (By.ID, "role_description")
     _role_save_button_locator = (By.ID, "role_save")
-    _role_orgs_list_locator = (By.CSS_SELECTOR, "li.slide_link")
+    _role_orgs_list_locator = (By.CSS_SELECTOR, "div.simple_link")
 
     @property
     def is_permissions_visible(self):
@@ -203,7 +203,8 @@ class RolesTab(Base):
         return [self.RoleOrgs(self.testsetup, element) for element in self.selenium.find_elements(*self._role_orgs_list_locator)]
     
     class RoleOrgs(Page):
-        _name_locator = ()
+        
+        _name_locator = (By.CSS_SELECTOR, 'span.sort_attr')
         
         def __init__(self, testsetup, element):
             Page.__init__(self, testsetup)

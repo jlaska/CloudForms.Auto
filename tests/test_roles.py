@@ -152,12 +152,13 @@ class TestRoles:
     
     @pytest.mark.challenge    
     def test_datadriven_rbac(self, mozwebqa):
-        import data.rbac
+        from data.rbac import *
         
         sysapi = ApiTasks(mozwebqa)
         home_page = Home(mozwebqa)
         rolestab = RolesTab(mozwebqa)
         
+        role_name = "%s_%s_%s" % (PLIST['org'], PLIST['verb'], home_page.random_string())
         username = "roglobal%s" % home_page.random_string()
         email = username + "@example.com"
         password = home_page.random_string()
@@ -166,8 +167,14 @@ class TestRoles:
         
         home_page.login()
         home_page.tabs.click_tab("administration_tab")
-        rolestab.click_role_permissions()
+        home_page.tabs.click_tab("roles_administration")
         home_page.click_new()
+        rolestab.create_new_role(role_name)
+        rolestab.save_role()
         
+        rolestab.click_role_permissions()
+        print type(rolestab.role_org)
+        rolestab.role_org('Global Permissions').click()
+        time.sleep(10)
         
         

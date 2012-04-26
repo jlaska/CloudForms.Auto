@@ -6,7 +6,8 @@ PLIST: OrgName, ResourceType, AccessVerbs
 ALLOWEDLIST: UI capabilities that should pass
 DISALLOWEDLIST: UI capabilities that should fail
 '''
-PLIST = {'org': 'Global', 
+
+PLIST = {'org': 'Global Permission', 
          'perm_name': 'ReadOnlyOrg', 
          'permission_for': 'Organizations', 
          'verb': 'Read_Organization'}
