@@ -127,7 +127,7 @@ class RolesTab(Base):
     _role_new_name_locator = (By.ID, "role_name")
     _role_new_description_locator = (By.ID, "role_description")
     _role_save_button_locator = (By.ID, "role_save")
-    _role_orgs_list_locator = (By.CSS_SELECTOR, "div.simple_link")
+    _role_orgs_list_locator = (By.CSS_SELECTOR, "div.slider_two")
 
     @property
     def is_permissions_visible(self):
@@ -195,6 +195,7 @@ class RolesTab(Base):
     ####
     def role_org(self, value):
         for role_org in self.role_orgs:
+
             if value in role_org.name:
                 return role_org
         raise Exception("Organization %s not found" % value)
