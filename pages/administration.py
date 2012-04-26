@@ -170,7 +170,7 @@ class RolesTab(Base):
     # The roles that are / will be defined
     ###    
     def role(self, value):
-        for role in self.roles:
+        for role in self.roles():
             if value in role.name:
                 return role
         raise Exception('Role not found: %s' % value)
@@ -195,11 +195,11 @@ class RolesTab(Base):
     ####
     def role_org(self, value):
         for role_org in self.role_orgs:
-
             if value in role_org.name:
                 return role_org
         raise Exception("Organization %s not found" % value)
     
+    @property
     def role_orgs(self):
         return [self.RoleOrgs(self.testsetup, element) for element in self.selenium.find_elements(*self._role_orgs_list_locator)]
     

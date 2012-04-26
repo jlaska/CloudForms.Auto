@@ -174,7 +174,7 @@ class TestRoles:
         
         rolestab.click_role_permissions()
         print type(rolestab.role_org)
-        rolestab.role_org('Global Permissions').click()
+        rolestab.role_org(PLIST['org']).click()
         time.sleep(10)
         
         
