@@ -66,14 +66,12 @@ class Page(object):
         Constructor
         '''
         self.testsetup = testsetup
-        #if not os.environ.get("APP_SERVER"):
-        #    raise EnvironmentNotSetException('APP_SERVER environment variable not set!')
-            #sys.exit(-1)
-        #testsetup.base_url = os.environ.get("APP_SERVER")
+        
         self.base_url = testsetup.base_url
         self.selenium = testsetup.selenium
         self.timeout = testsetup.timeout
         self.project = testsetup.project
+
 
     @property
     def is_the_current_page(self):

@@ -197,5 +197,6 @@ class Base(Page):
                          'roles_administration' : (By.XPATH, "//a[.='Roles']"),}
         
         def click_tab(self, tab):
-            self.selenium.find_element(*self._tab_elements[tab]).click()
+            WebDriverWait(self.selenium, 20).until(lambda s: s.find_element(*self._tab_elements[tab])).click()
+            #self.selenium.find_element(*self._tab_elements[tab]).click()
             

@@ -149,4 +149,25 @@ class TestRoles:
         home_page.tabs.click_tab("roles_administration")
         home_page.jquery_wait(30)
         rolestab.click_role_permissions()
+    
+    @pytest.mark.challenge    
+    def test_datadriven_rbac(self, mozwebqa):
+        import data.rbac
+        
+        sysapi = ApiTasks(mozwebqa)
+        home_page = Home(mozwebqa)
+        rolestab = RolesTab(mozwebqa)
+        
+        username = "roglobal%s" % home_page.random_string()
+        email = username + "@example.com"
+        password = home_page.random_string()
+        
+        sysapi.create_user(username, password, email)
+        
+        home_page.login()
+        home_page.tabs.click_tab("administration_tab")
+        rolestab.click_role_permissions()
+        home_page.click_new()
+        
+        
         
