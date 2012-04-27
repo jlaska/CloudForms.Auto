@@ -173,8 +173,8 @@ class TestRoles:
         rolestab.save_role()
         
         rolestab.click_role_permissions()
-        print type(rolestab.role_org)
         rolestab.role_org(PLIST['org']).click()
+        rolestab.click_add_permission()
         time.sleep(10)
         
         

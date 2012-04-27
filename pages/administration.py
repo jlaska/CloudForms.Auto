@@ -128,6 +128,7 @@ class RolesTab(Base):
     _role_new_description_locator = (By.ID, "role_description")
     _role_save_button_locator = (By.ID, "role_save")
     _role_orgs_list_locator = (By.CSS_SELECTOR, "div.slider_two")
+    _roles_add_permission_locator = (By.ID, "add_permission_icon")
 
     @property
     def is_permissions_visible(self):
@@ -147,6 +148,9 @@ class RolesTab(Base):
         ActionChains(self.selenium).move_to_element(click_locator).\
             click().perform()
             
+    def click_add_permission(self):
+        self.click(*self._roles_add_permission_locator)
+        
     @property
     def is_remove_visible(self):
         return self.selenium.find_element(*self._role_user_remove_locator).is_displayed()

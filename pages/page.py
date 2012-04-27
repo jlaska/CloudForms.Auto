@@ -2,6 +2,7 @@
 
 
 from unittestzero import Assert
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -140,5 +141,10 @@ class Page(object):
         except NoSuchElementException, ElementNotVisibleException:
             return False
         
+    def click(self, *locator):
+        click_locator = self.selenium.find_element(*locator)
+        ActionChains(self.selenium).move_to_element(click_locator).\
+            click().perform()
+                
     def return_to_previous_page(self):
         self.selenium.back()
