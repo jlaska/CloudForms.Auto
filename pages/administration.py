@@ -129,6 +129,7 @@ class RolesTab(Base):
     _role_save_button_locator = (By.ID, "role_save")
     _role_orgs_list_locator = (By.CSS_SELECTOR, "div.slider_two")
     _roles_add_permission_locator = (By.ID, "add_permission_icon")
+    _roles_resource_type_locator = (By.ID, "resource_type")
 
     @property
     def is_permissions_visible(self):
@@ -150,6 +151,13 @@ class RolesTab(Base):
             
     def click_add_permission(self):
         self.click(*self._roles_add_permission_locator)
+    
+    #def click_resource_type(self):
+    #    self.click(*self._roles_resource_type_locator)
+        
+    def select_resource_type(self, resource):
+        resource = resource.lower()
+        self.select(resource)
         
     @property
     def is_remove_visible(self):

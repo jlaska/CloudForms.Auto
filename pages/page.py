@@ -4,6 +4,7 @@
 from unittestzero import Assert
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
@@ -145,6 +146,9 @@ class Page(object):
         click_locator = self.selenium.find_element(*locator)
         ActionChains(self.selenium).move_to_element(click_locator).\
             click().perform()
+            
+    def select(self, value):
+        Select(self.selenium.find_element_by_tag_name("select")).select_by_value(value)
                 
     def return_to_previous_page(self):
         self.selenium.back()

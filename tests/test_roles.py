@@ -175,6 +175,8 @@ class TestRoles:
         rolestab.click_role_permissions()
         rolestab.role_org(PLIST['org']).click()
         rolestab.click_add_permission()
+        #rolestab.click_resource_type()
+        time.sleep(2)
+        rolestab.select_resource_type(PLIST['resource'])
         time.sleep(10)
-        
         
