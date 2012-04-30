@@ -187,8 +187,13 @@ class TestRoles:
         Assert.true(home_page.is_successful)
         
         rolestab.click_root_roles()
+        home_page.jquery_wait(30)
         rolestab.click_role_users()
-        #rolestab.role_user(username).click()
-        time.sleep(10)
+        rolestab.role_user(username).add_user()
+        
+        home_page.header.click_logout()
+        home_page.login(username, password)
+        Assert.true(home_page.is_successful)
+        time.sleep(5)
         
 

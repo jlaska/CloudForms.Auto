@@ -28,10 +28,8 @@ class Home(Base):
     def login(self, user="admin", password="admin"):
         username_field = self.selenium.find_element(*self._username_text_field)
         username_field.send_keys(user)
-        
         password_field = self.selenium.find_element(*self._password_text_field)
         password_field.send_keys(password)
-        
         password_field.send_keys(Keys.RETURN)
             
             
