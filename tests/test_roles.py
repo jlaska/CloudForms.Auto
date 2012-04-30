@@ -181,7 +181,14 @@ class TestRoles:
         home_page.click_next()
         home_page.select('verbs', 'read')
         home_page.click_next()
-        time.sleep(10)
+        rolestab.enter_permission_name('readonly_all')
+        rolestab.enter_permission_desc('Added by QE test.')
+        rolestab.click_permission_done()
+        Assert.true(home_page.is_successful)
         
+        rolestab.click_root_roles()
+        rolestab.click_role_users()
+        #rolestab.role_user(username).click()
+        time.sleep(10)
         
 

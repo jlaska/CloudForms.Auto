@@ -146,10 +146,10 @@ class Page(object):
         click_locator = self.selenium.find_element(*locator)
         ActionChains(self.selenium).move_to_element(click_locator).\
             click().perform()
-            
-    def send_keys(self, *locator, value):
+    
+    def send_text(self, text, *locator):
         input_locator = self.selenium.find_element(*locator)
-        for c in value:
+        for c in text:
             input_locator.send_keys(c)
             
     def select(self, id, value):

@@ -130,6 +130,10 @@ class RolesTab(Base):
     _role_orgs_list_locator = (By.CSS_SELECTOR, "div.slider_two")
     _roles_add_permission_locator = (By.ID, "add_permission_icon")
     _roles_resource_type_locator = (By.ID, "resource_type")
+    _roles_permission_name_locator = (By.ID, "permission_name")
+    _roles_permission_done_locator = (By.ID, "save_permission_button")
+    _roles_permission_desc_locator = (By.ID, "description")
+    _roles_locator = (By.CSS_SELECTOR, "span#roles.one-line-ellipsis")
 
     @property
     def is_permissions_visible(self):
@@ -140,24 +144,35 @@ class RolesTab(Base):
         return WebDriverWait(self.selenium, 20).until(lambda s: s.find_element(*self._role_users_locator).is_displayed())
     
     def click_role_permissions(self):
-        click_locator = self.selenium.find_element(*self._role_permissions_locator)
-        ActionChains(self.selenium).move_to_element(click_locator).\
-            click().perform()
+        self.click(*self._role_permissions_locator)
+        #click_locator = self.selenium.find_element(*self._role_permissions_locator)
+        #ActionChains(self.selenium).move_to_element(click_locator).\
+        #    click().perform()
             
     def click_role_users(self):
-        click_locator = self.selenium.find_element(*self._role_users_locator)
-        ActionChains(self.selenium).move_to_element(click_locator).\
-            click().perform()
+        self.click(*self._role_users_locator)
+        #click_locator = self.selenium.find_element(*self._role_users_locator)
+        #ActionChains(self.selenium).move_to_element(click_locator).\
+        #    click().perform()
             
     def click_add_permission(self):
         self.click(*self._roles_add_permission_locator)
     
-    #def click_resource_type(self):
-    #    self.click(*self._roles_resource_type_locator)
+    def enter_permission_name(self, text):
+        self.send_text(text, *self._roles_permission_name_locator)
+    
+    def enter_permission_desc(self, text):
+        self.send_text(text, *self._roles_permission_desc_locator)
         
     def select_resource_type(self, resource):
         resource = resource.lower()
         self.select('resource_type', resource)
+        
+    def click_permission_done(self):
+        self.click(*self._roles_permission_done_locator)
+        
+    def click_root_roles(self):
+        self.click(*self._roles_locator)
         
     @property
     def is_remove_visible(self):
