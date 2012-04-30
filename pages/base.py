@@ -37,6 +37,7 @@ class Base(Page):
     _remove_item_locator = (By.CSS_SELECTOR, "a.remove_item")
     _close_item_locator = (By.CSS_SELECTOR, "a.close")
     _confirmation_yes_locator = (By.XPATH, "//span[@class='ui-button-text'][text()='Yes']")
+    _next_button_locator = (By.ID, "next_button")
     
     def random_string(self):
         chars = string.ascii_letters + string.digits
@@ -63,6 +64,9 @@ class Base(Page):
         search_input_locator.send_keys("\n")
         time.sleep(2)
     
+    def click_next(self):
+        self.click(*self._next_button_locator)
+        
     def click_close(self):
         self.selenium.find_element(*self._close_item_locator).click()
         

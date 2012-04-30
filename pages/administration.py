@@ -157,7 +157,7 @@ class RolesTab(Base):
         
     def select_resource_type(self, resource):
         resource = resource.lower()
-        self.select(resource)
+        self.select('resource_type', resource)
         
     @property
     def is_remove_visible(self):

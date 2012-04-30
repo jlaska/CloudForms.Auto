@@ -147,8 +147,13 @@ class Page(object):
         ActionChains(self.selenium).move_to_element(click_locator).\
             click().perform()
             
-    def select(self, value):
-        Select(self.selenium.find_element_by_tag_name("select")).select_by_value(value)
+    def send_keys(self, *locator, value):
+        input_locator = self.selenium.find_element(*locator)
+        for c in value:
+            input_locator.send_keys(c)
+            
+    def select(self, id, value):
+        Select(self.selenium.find_element_by_id(id)).select_by_value(value)
                 
     def return_to_previous_page(self):
         self.selenium.back()

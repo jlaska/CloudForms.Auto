@@ -178,4 +178,10 @@ class TestRoles:
         rolestab.role_org(PLIST['org']).click()
         rolestab.click_add_permission()
         rolestab.select_resource_type(PLIST['resource'])
+        home_page.click_next()
+        home_page.select('verbs', 'read')
+        home_page.click_next()
+        time.sleep(10)
+        
+        
 
