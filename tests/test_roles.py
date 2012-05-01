@@ -9,6 +9,7 @@ from pages.administration import RolesTab
 from api.api import ApiTasks
 import time
 
+
 xfail = pytest.mark.xfail
 
 class TestRoles:
@@ -160,40 +161,47 @@ class TestRoles:
         home_page = Home(mozwebqa)
         rolestab = RolesTab(mozwebqa)
         
-        role_name = "%s_%s_%s" % (PLIST['org'], PLIST['verb'], home_page.random_string())
-        username = "roglobal%s" % home_page.random_string()
-        email = username + "@example.com"
-        password = home_page.random_string()
-        
-        sysapi.create_user(username, password, email)
-        
-        home_page.login()
-        home_page.tabs.click_tab("administration_tab")
-        home_page.tabs.click_tab("roles_administration")
-        home_page.click_new()
-        rolestab.create_new_role(role_name)
-        rolestab.save_role()
-        
-        rolestab.click_role_permissions()
-        rolestab.role_org(PLIST['org']).click()
-        rolestab.click_add_permission()
-        rolestab.select_resource_type(PLIST['resource'])
-        home_page.click_next()
-        home_page.select('verbs', 'read')
-        home_page.click_next()
-        rolestab.enter_permission_name('readonly_all')
-        rolestab.enter_permission_desc('Added by QE test.')
-        rolestab.click_permission_done()
-        Assert.true(home_page.is_successful)
-        
-        rolestab.click_root_roles()
-        home_page.jquery_wait(30)
-        rolestab.click_role_users()
-        rolestab.role_user(username).add_user()
-        
-        home_page.header.click_logout()
-        home_page.login(username, password)
-        Assert.true(home_page.is_successful)
-        time.sleep(5)
+        for scenario, values in PLIST.items():
+            role_name = "%s%s" % (scenario, home_page.random_string())
+            username = "%s" % home_page.random_string()
+            email = username + "@example.com"
+            password = home_page.random_string()
+            
+            sysapi.create_user(username, password, email)
+            
+            if values['org'] != 'Global Permissions':
+                print "Creating our org"
+                sysapi.create_org(values['org'])
+                
+            home_page.login()
+            
+            home_page.tabs.click_tab("administration_tab")
+            home_page.tabs.click_tab("roles_administration")
+            home_page.click_new()
+            rolestab.create_new_role(role_name)
+            rolestab.save_role()
+            
+            rolestab.click_role_permissions()
+            rolestab.role_org(values['org']).click()
+            rolestab.click_add_permission()
+            rolestab.select_resource_type(values['resource'])
+            home_page.click_next()
+            home_page.select('verbs', values['verb'])
+            home_page.click_next()
+            rolestab.enter_permission_name(scenario)
+            rolestab.enter_permission_desc('Added by QE test.')
+            rolestab.click_permission_done()
+            Assert.true(home_page.is_successful)
+            
+            rolestab.click_root_roles()
+            time.sleep(2)
+            rolestab.click_role_users()
+            rolestab.role_user(username).add_user()
+            
+            home_page.header.click_logout()
+            home_page.login(username, password)
+            Assert.true(home_page.is_successful)
+            time.sleep(5)
+            home_page.header.click_logout()
         
 
