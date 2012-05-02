@@ -127,7 +127,7 @@ class RolesTab(Base):
     _role_new_name_locator = (By.ID, "role_name")
     _role_new_description_locator = (By.ID, "role_description")
     _role_save_button_locator = (By.ID, "role_save")
-    _role_orgs_list_locator = (By.CSS_SELECTOR, "div.slider_two")
+    _role_orgs_list_locator = (By.CSS_SELECTOR, "ul.filterable li.slide_link")
     _roles_add_permission_locator = (By.ID, "add_permission_icon")
     _roles_resource_type_locator = (By.ID, "resource_type")
     _roles_permission_name_locator = (By.ID, "permission_name")
@@ -232,7 +232,7 @@ class RolesTab(Base):
     
     class RoleOrgs(Page):
         
-        _name_locator = (By.CSS_SELECTOR, 'span.sort_attr')
+        _name_locator = (By.CLASS_NAME, 'sort_attr')
         
         def __init__(self, testsetup, element):
             Page.__init__(self, testsetup)
@@ -272,7 +272,7 @@ class RolesTab(Base):
             
     class RoleUsers(Page):
         
-        _name_locator = (By.CSS_SELECTOR, "span.sort_attr")
+        _name_locator = (By.CLASS_NAME, 'sort_attr')
         _add_locator = (By.CSS_SELECTOR, "a.fr.content_add_remove.add_user.st_button")
         
         def __init__(self, testsetup, element):

@@ -162,17 +162,17 @@ class TestRoles:
         rolestab = RolesTab(mozwebqa)
         
         for scenario, values in PLIST.items():
-            role_name = "%s%s" % (scenario, home_page.random_string())
-            username = "%s" % home_page.random_string()
+            role_name = "role_%s%s" % (scenario, home_page.random_string())
+            perm_name = "perm_%s" % (scenario)
+            username = "user%s" % home_page.random_string()
             email = username + "@example.com"
             password = home_page.random_string()
             
             sysapi.create_user(username, password, email)
             
-            if values['org'] != 'Global Permissions':
-                print "Creating our org"
+            if 'Global Permissions'not in values['org']:
                 sysapi.create_org(values['org'])
-                
+ 
             home_page.login()
             
             home_page.tabs.click_tab("administration_tab")
@@ -182,26 +182,27 @@ class TestRoles:
             rolestab.save_role()
             
             rolestab.click_role_permissions()
+            time.sleep(5)
+            home_page.jquery_wait()
             rolestab.role_org(values['org']).click()
             rolestab.click_add_permission()
             rolestab.select_resource_type(values['resource'])
             home_page.click_next()
             home_page.select('verbs', values['verb'])
             home_page.click_next()
-            rolestab.enter_permission_name(scenario)
+            rolestab.enter_permission_name(perm_name)
             rolestab.enter_permission_desc('Added by QE test.')
             rolestab.click_permission_done()
             Assert.true(home_page.is_successful)
             
             rolestab.click_root_roles()
-            time.sleep(2)
+            time.sleep(4)
             rolestab.click_role_users()
             rolestab.role_user(username).add_user()
             
             home_page.header.click_logout()
             home_page.login(username, password)
             Assert.true(home_page.is_successful)
-            time.sleep(5)
             home_page.header.click_logout()
         
 
