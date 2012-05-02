@@ -6,6 +6,7 @@ import pytest
 from unittestzero import Assert
 from pages.home import Home
 from pages.administration import RolesTab
+from pages.administration import AdministrationTab
 from api.api import ApiTasks
 import time
 
@@ -166,13 +167,10 @@ class TestRoles:
             perm_name = "perm_%s" % (scenario)
             username = "user%s" % home_page.random_string()
             email = username + "@example.com"
-            password = home_page.random_string()
+            password = "redhat%s" % (home_page.random_string())
             
             sysapi.create_user(username, password, email)
             
-            if 'Global Permissions'not in values['org']:
-                sysapi.create_org(values['org'])
- 
             home_page.login()
             
             home_page.tabs.click_tab("administration_tab")
@@ -183,21 +181,30 @@ class TestRoles:
             
             rolestab.click_role_permissions()
             time.sleep(5)
-            home_page.jquery_wait()
+
+            if not rolestab.role_org(values['org']):
+                sysapi.create_org(values['org'])
+                time.sleep(4)
+                
             rolestab.role_org(values['org']).click()
+            time.sleep(2)
             rolestab.click_add_permission()
+            
             rolestab.select_resource_type(values['resource'])
             home_page.click_next()
             home_page.select('verbs', values['verb'])
             home_page.click_next()
+            
             rolestab.enter_permission_name(perm_name)
             rolestab.enter_permission_desc('Added by QE test.')
             rolestab.click_permission_done()
             Assert.true(home_page.is_successful)
             
             rolestab.click_root_roles()
-            time.sleep(4)
+            time.sleep(5)
             rolestab.click_role_users()
+            time.sleep(5)
+                
             rolestab.role_user(username).add_user()
             
             home_page.header.click_logout()

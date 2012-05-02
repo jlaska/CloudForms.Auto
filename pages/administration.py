@@ -128,7 +128,7 @@ class RolesTab(Base):
     _role_new_description_locator = (By.ID, "role_description")
     _role_save_button_locator = (By.ID, "role_save")
     _role_orgs_list_locator = (By.CSS_SELECTOR, "ul.filterable li.slide_link")
-    _roles_add_permission_locator = (By.ID, "add_permission_icon")
+    _roles_add_permission_locator = (By.ID, "add_permission")
     _roles_resource_type_locator = (By.ID, "resource_type")
     _roles_permission_name_locator = (By.ID, "permission_name")
     _roles_permission_done_locator = (By.ID, "save_permission_button")
@@ -145,9 +145,6 @@ class RolesTab(Base):
     
     def click_role_permissions(self):
         self.click(*self._role_permissions_locator)
-        #click_locator = self.selenium.find_element(*self._role_permissions_locator)
-        #ActionChains(self.selenium).move_to_element(click_locator).\
-        #    click().perform()
             
     def click_role_users(self):
         self.click(*self._role_users_locator)

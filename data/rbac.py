@@ -43,7 +43,11 @@ DISALLOWED = {'Global_Read_Only': [Assert.false(should_fail),
                           'SOME_ORG_ADMIN': [....]}
 '''
 
-PLIST = {'Global_Read_Only': {'org': 'Global Permissions', 
+PLIST = {'ACME_Manage_Keys': {'org': 'ACME_Corporation',
+                              'perm_name': 'ManageAcmeCorp',
+                              'resource': 'activation_keys',
+                              'verb': 'manage_all'},
+         'Global_Read_Only': {'org': 'Global Permissions', 
                               'perm_name': 'ReadOnlyGlobal', 
                               'resource': 'organizations', 
                               'verb': 'read'},
