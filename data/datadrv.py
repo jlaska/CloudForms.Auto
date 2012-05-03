@@ -47,5 +47,7 @@ scenario1 = ('ACME_Manage_Keys', { 'org': 'ACME_Corporation',
 scenario2 = ('Global_Read_Only', { 'org': 'Global Permissions', 
                                    'perm_name': 'ReadOnlyGlobal', 
                                    'resource': 'organizations', 
-                                   'verbs': ('read','create')})
+                                   'verbs': ('read','create'),
+                                   'allowed': (},
+                                   'disallowed': ())
 
