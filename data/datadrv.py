@@ -1,4 +1,6 @@
 ''' DO NOT EDIT HERE '''
+import pytest
+
 def pytest_generate_tests(metafunc):
     idlist = []
     argvalues = []
@@ -13,9 +15,9 @@ def pytest_generate_tests(metafunc):
 scenario1 = ('ACME_Manage_Keys', { 'org': 'ACME_Corporation', 
                                    'perm_name': 'ManageAcmeCorp', 
                                    'resource': 'activation_keys',
-                                   'verb': 'manage_all'})
+                                   'verbs': ('manage_all',)})
 scenario2 = ('Global_Read_Only', { 'org': 'Global Permissions', 
                                    'perm_name': 'ReadOnlyGlobal', 
                                    'resource': 'organizations', 
-                                   'verb': 'read'})
+                                   'verbs': ('read','create')})
 

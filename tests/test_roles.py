@@ -15,6 +15,7 @@ from data.datadrv import *
 xfail = pytest.mark.xfail
 
 class TestRoles:
+    
     def test_confirm_default_roles(self, mozwebqa):
         roles = ["Administrator", "Read Everything"]
     
@@ -134,70 +135,3 @@ class TestRoles:
         home_page.jquery_wait(20)
         rolestab.save_role()
         Assert.true(home_page.is_failed)
-
-    @pytest.mark.challenge    
-    def test_datadriven_rbac(self, mozwebqa, org, perm_name, resource, verb):
-        
-        scenarios = [scenario1, scenario2]
-        '''
-        class TestSampleWithScenarios:
-            scenarios = [scenario1, scenario2]
-    
-            @pytest.mark.skip_selenium
-            def test_demo(self, org, perm_name, resource, verb):
-                assert isinstance(org, str)
-        '''
-        sysapi = ApiTasks(mozwebqa)
-        home_page = Home(mozwebqa)
-        rolestab = RolesTab(mozwebqa)
-        
-        role_name = "role_%s%s" % (scenario, home_page.random_string())
-        perm_name = "perm_%s" % (scenario)
-        username = "user%s" % home_page.random_string()
-        email = username + "@example.com"
-        password = "redhat%s" % (home_page.random_string())
-        
-        sysapi.create_user(username, password, email)
-        
-        home_page.login()
-        
-        home_page.tabs.click_tab("administration_tab")
-        home_page.tabs.click_tab("roles_administration")
-        home_page.click_new()
-        rolestab.create_new_role(role_name)
-        rolestab.save_role()
-        
-        rolestab.click_role_permissions()
-        time.sleep(5)
-
-        if not rolestab.role_org(values['org']):
-            sysapi.create_org(values['org'])
-            time.sleep(4)
-            
-        rolestab.role_org(values['org']).click()
-        time.sleep(2)
-        rolestab.click_add_permission()
-        
-        rolestab.select_resource_type(values['resource'])
-        home_page.click_next()
-        home_page.select('verbs', values['verb'])
-        home_page.click_next()
-        
-        rolestab.enter_permission_name(perm_name)
-        rolestab.enter_permission_desc('Added by QE test.')
-        rolestab.click_permission_done()
-        Assert.true(home_page.is_successful)
-        
-        rolestab.click_root_roles()
-        time.sleep(5)
-        rolestab.click_role_users()
-        time.sleep(5)
-            
-        rolestab.role_user(username).add_user()
-        
-        home_page.header.click_logout()
-        home_page.login(username, password)
-        Assert.true(home_page.is_successful)
-        home_page.header.click_logout()
-    
-
