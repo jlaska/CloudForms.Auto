@@ -7,7 +7,7 @@ import logging
 class TestHomePage(object):
 
     def test_verify_page_title(self, mozwebqa):
-        katello = apps.getProductClass(mozwebqa.project)(mozwebqa)
+        katello = apps.initializeProduct(mozwebqa)
         home_page = katello.load_page('Home')
         assert home_page.is_the_current_page
 
@@ -15,13 +15,13 @@ class TestHomePage(object):
         '''
         Test whether the username and password fields exist
         '''
-        katello = apps.getProductClass(mozwebqa.project)(mozwebqa)
+        katello = apps.initializeProduct(mozwebqa)
         home_page = katello.load_page('Home')
         assert home_page.is_username_field_present
         assert home_page.is_password_field_present
 
     def test_admin_login_logout(self, mozwebqa):
-        katello = apps.getProductClass(mozwebqa.project)(mozwebqa)
+        katello = apps.initializeProduct(mozwebqa)
         home_page = katello.load_page('Home')
 
         # login
@@ -41,7 +41,7 @@ class TestHomePage(object):
         assert home_page.is_password_field_present
 
     def test_invalid_login(self, mozwebqa):
-        katello = apps.getProductClass(mozwebqa.project)(mozwebqa)
+        katello = apps.initializeProduct(mozwebqa)
         home_page = katello.load_page('Home')
         home_page.login("admin", "badpassword")
         assert home_page.is_failed
