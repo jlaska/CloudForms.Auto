@@ -3,20 +3,20 @@
 import pytest
 import apps
 
+def setup_module(module):
+    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
+    module.TestAeolus.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 class TestAeolus(object):
 
     @pytest.mark.demo
-    def test_login_and_nav(self, mozwebqa):
+    def test_login_and_nav(self):
         '''
         Login and navigate to random pages
         '''
 
-        # aeolus = aeolus.Conductor(mozwebqa)
-        aeolus = apps.getProductClass('aeolus')(mozwebqa)
-
         # Login
-        home = aeolus.load_page('Home')
+        home = self.aeolus.load_page('Home')
         home.login()
 
         # Access different views
