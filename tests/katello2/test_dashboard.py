@@ -3,16 +3,16 @@
 import pytest
 import apps
 import time
+from tests.katello2 import Katello_Test
 
 @pytest.mark.nondestructive
-class TestDashboard:
+class TestDashboard(Katello_Test):
 
-    def test_dashboard_present(self, mozwebqa):
+    def test_dashboard_present(self):
         """
         Verify dashboard page contains key elements.
         """
-        katello = apps.getProductClass(mozwebqa.project)(mozwebqa)
-        home_page = katello.load_page('Home')
+        home_page = self.katello.load_page('Home')
 
         home_page.login()
         assert home_page.is_successful
@@ -25,7 +25,7 @@ class TestDashboard:
         assert not home_page.header.is_org_list_present
         assert home_page.header.get_text_from_switcher == "redhat"
 
-        dashboard = katello.load_page('Dashboard')
+        dashboard = self.katello.load_page('Dashboard')
         assert dashboard.is_dashboard_tab_selected
         assert dashboard.is_dashboard_dropbutton_present
         assert dashboard.is_dashboard_subscriptions_present
