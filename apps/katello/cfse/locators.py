@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-
 from apps.katello.locators import KatelloLocators
 from selenium.webdriver.common.by import By
-
 
 class CFSELocators(KatelloLocators):
     """

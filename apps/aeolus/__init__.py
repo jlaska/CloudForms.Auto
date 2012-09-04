@@ -3,7 +3,7 @@ import apps
 class Conductor(apps.BaseProduct):
     '''Product class'''
 
-class ConductorPage(apps.BasePage):
+class Conductor_Page(apps.BasePage):
     '''Page class'''
 
     def __init__(self, **kwargs):

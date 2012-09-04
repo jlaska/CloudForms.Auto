@@ -11,13 +11,13 @@ username_text_field = (By.NAME, "login")
 password_text_field = (By.ID, "password-input")
 login_locator = (By.NAME, "commit")
 
-class Home(apps.aeolus.ConductorPage):
+class Home(apps.aeolus.Conductor_Page):
 
     def __init__(self, **kwargs):
         '''
         Gets page ready for testing
         '''
-        apps.aeolus.ConductorPage.__init__(self, **kwargs)
+        apps.aeolus.Conductor_Page.__init__(self, **kwargs)
 
         if kwargs.get('open_url', True):
             self.selenium.get(self.base_url)
