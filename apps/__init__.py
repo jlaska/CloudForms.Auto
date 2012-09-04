@@ -6,6 +6,7 @@ import glob
 import os
 import locators as bl
 import logging
+import apps.locators
 
 # Enable debug
 # logging.getLogger().setLevel(logging.DEBUG)
@@ -17,6 +18,17 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
+
+
+def initializeProduct(mozwebqa):
+    '''
+    Return an initialized product class
+    '''
+
+    assert hasattr(mozwebqa, 'project'), "Expecting project attribute"
+
+    return getProductClass(mozwebqa.project, \
+        getattr(mozwebqa, 'version', None))(mozwebqa)
 
 def getProductClass(product=None, version=None):
     '''
@@ -53,77 +65,88 @@ def getProductClass(product=None, version=None):
     # If we get here ... we didn't find a matching class
     raise NotImplementedError("No class BaseProduct subclass matching '%s' found" % product)
 
-    # '''Older deprecated python 2.* way ...'''
-    # import imputil
-    # # FIXME - this only works for first-order modules (e.g. 'apps.*').  Anything else (e.g. 'apps.katello.cfse') will need special handling
-    # found =  imputil.imp.find_module(product, ['apps'])
-    # obj = imputil.imp.load_module(product, found[0], found[1], found[2])
-    # return obj
-
 class BaseProduct(object):
     """
     Base class for all Products
     """
+    locators = apps.locators.BaseLocators()
+
     def __init__(self, mozwebqa=None):
         """
         Default values for all products; likely won't be used
         as we focus on the differences.
         """
-        self._mozwebqa = mozwebqa
-        self._locators = self._load_locators()
-        logging.debug("Loaded locators: %s" % self._locators)
-        self._pages = self._load_all_pages()
-        logging.debug("Loaded pages: %s" % self._pages.values())
-
         # Ensure caller is a derived instance
         if self.__class__ == BaseProduct:
             raise NotImplementedError("Please sub-class")
+
+        self._mozwebqa = mozwebqa
+
+        assert self.locators is not None, "No locators defined"
+        # self.locators = apps.locators.BaseLocators()
+
+        # Dynamically build the locators
+        # self.locators = self._load_locators()
+        logging.debug("Loaded locators: %s" % self.locators)
+
+        # Dynamically build the list of application pages
+        self.pages = self._load_all_pages()
+        logging.debug("Loaded pages: %s" % self.pages.values())
 
     def _load_all_pages(self):
         '''
         Cache all page modules for the current product.  Scans for modules
         matching the glob expression 'page_*.py'.  Any subclasses of BasePage
-        are saved to the self._pages as a dictionary.
+        are saved to the self.pages as a dictionary.
         '''
 
         # initialize pages dict
         pages = dict()
 
-        # Get a relative path to the current module
-        modpath = inspect.getmodule(self).__path__[0]
-        modpath = modpath.replace(os.environ.get('PWD',''),'')
-        if modpath.startswith('/'):
-            modpath = modpath[1:]
+        # Walk through the class inheritance list
+        for cls in inspect.getmro(self.__class__):
 
-        while modpath:
-            logging.debug("(pages): looking for pages in: %s" % modpath)
+            logging.debug("Inspecting class: %s" % cls)
 
-            # Find other modules matching a specific glob pattern
+            # Stop when we reach the base new-style class
+            if cls is object:
+                break
+
+            # Determine the relative module path
+            modpath = os.path.realpath(inspect.getmodule(cls).__path__[0])
+            pwd = os.path.realpath(os.environ.get('PWD',''))
+            modpath = modpath.replace(pwd,'')
+            if modpath.startswith('/'):
+                modpath = modpath[1:]
+
+            # Find applicable page_ modules
+            logging.debug("Looking for pages in: %s" % modpath)
             modules = glob.glob("%s/page_*.py" % modpath)
-            for mod in modules:
-                # skip __init__.py
-                if '__init__.py' in mod or 'locators.py' in mod:
-                    continue
+
+            # Inspect each module for a BasePage class
+            for mod_file in modules:
+
+                logging.debug("Inspecting page module: %s" % mod_file)
 
                 # remove .py
-                mod = mod[:-3]
+                mod_file = mod_file[:-3]
                 # replace '/' with '.'
-                modname = mod.replace('/', '.')
+                modname = mod_file.replace('/', '.')
 
                 # Determine 'package' argument to import_module
                 # Converts 'apps.katello.cfse' -> 'apps.katello'
                 package = modname[0:modname.rindex('.')]
 
                 # import module
-                logging.debug("(pages): importlib.import_module('%s', '%s')" % (modname, package))
+                logging.debug("importlib.import_module('%s', '%s')" % (modname, package))
                 obj = importlib.import_module(modname, package)
 
-                # Find the subclass of BasePage
+                # Find the subclass of type BasePage
                 for (name, cls) in inspect.getmembers(obj, inspect.isclass):
                     # If a subclass of BasePage, and we haven't already loaded
-                    # this object
+                    # this object ... remember this page
                     if issubclass(cls, BasePage) and not pages.has_key(name):
-                        logging.debug("(pages): found page: %s" % name)
+                        logging.debug("found page: %s" % name)
                         pages[name] = cls
 
             # Scan the parent for matching modules
@@ -131,67 +154,21 @@ class BaseProduct(object):
 
         return pages
 
-    def _load_locators(self):
-
-        # initialize Locators object
-        locators = None
-
-        # Get a relative path to the current module
-        modpath = inspect.getmodule(self).__path__[0]
-        modpath = modpath.replace(os.environ.get('PWD',''),'')
-        if modpath.startswith('/'):
-            modpath = modpath[1:]
-
-        # FIXME - Can find do this for us instead?
-        while modpath and locators is None:
-            logging.debug("(locators): looking for locators in: %s" % modpath)
-
-            # Find other modules matching a specific glob pattern
-            modules = glob.glob("%s/locators.py" % modpath)
-            for mod in modules:
-
-                # remove .py
-                mod = mod[:-3]
-                # replace '/' with '.'
-                modname = mod.replace('/', '.')
-
-                # Determine 'package' argument to import_module
-                # Converts 'apps.katello.cfse' -> 'apps.katello'
-                package = modname[0:modname.rindex('.')]
-
-                # import module
-                logging.debug("(locators): importlib.import_module('%s', '%s')" % (modname, package))
-                obj = importlib.import_module(modname, package)
-
-                # Find the subclass of BaseLocators
-                for (name, cls) in inspect.getmembers(obj, inspect.isclass):
-                    # If a subclass of BaseLocators, and we haven't already loaded
-                    # this object
-                    if issubclass(cls, bl.BaseLocators):
-                        # FIXME ... scan for desired version
-                        logging.debug("(locators): found locator: %s" % name)
-                        locators = cls
-                        break
-
-            # Scan the parent for matching modules
-            modpath = os.path.dirname(modpath)
-
-        return locators
-
     def load_page(self, page, **kwargs):
         '''
-        Returns a BasePage subclass
+        Convenience method to return a properly initialized page (derived from
+        BasePage)
         '''
         # A case-insensative search for a match
         for k in [page, page.lower()]:
-            if self._pages.has_key(k):
+            if self.pages.has_key(k):
                 # Add universal mozwebqa object
                 if not kwargs.has_key('mozwebqa'):
                     kwargs['mozwebqa'] = self._mozwebqa
                 # Add app-specific locators
                 if not kwargs.has_key('locators'):
-                    kwargs['locators'] = self._locators
-                return self._pages[k](**kwargs)
+                    kwargs['locators'] = self.locators
+                return self.pages[k](**kwargs)
 
         raise NotImplementedError("No page matching '%s' found" % page)
 
@@ -231,6 +208,7 @@ class BasePage(object):
     def org(self):
         return self._mozwebqa.org
 
+    # FIXME - Should random_string be part of the BasePage, or more a shared test object?
     def random_string(self):
         """
         Generates a random *alphanumeric* string between 4 and 6 characters
@@ -265,22 +243,6 @@ class BasePage(object):
 # from page.py
 #
 ###
-    def click(self, *locator):
-        """
-        Executes a Left Mouse Click on locator.
-        """
-        WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_displayed())
-        click_locator = self.selenium.find_element(*locator)
-        ActionChains(self.selenium).move_to_element_with_offset(click_locator, 3, 3).click().perform()
-
-    def click_and_wait(self, *locator):
-        self.click(*locator)
-        self.jquery_wait()
-
-    def click_by_text(self, css, name):
-        _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
-        self.selenium.find_element(*_text_locator).click()
-
     def send_characters(self, text, *locator):
         WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_enabled())
         input_locator = self.selenium.find_element(*locator)
@@ -427,6 +389,22 @@ class BasePage(object):
     #
     # Click functions
     #
+    def click(self, *locator):
+        """
+        Executes a Left Mouse Click on locator.
+        """
+        WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_displayed())
+        click_locator = self.selenium.find_element(*locator)
+        ActionChains(self.selenium).move_to_element_with_offset(click_locator, 3, 3).click().perform()
+
+    def click_and_wait(self, *locator):
+        self.click(*locator)
+        self.jquery_wait()
+
+    def click_by_text(self, css, name):
+        _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
+        self.selenium.find_element(*_text_locator).click()
+
     def click_next(self):
         """ Click the *Next* button.
         """
