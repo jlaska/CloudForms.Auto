@@ -6,3 +6,4 @@ results/
 .pydevproject
 *.pem
 chromedriver.log
+private_data.*
