@@ -21,17 +21,6 @@ class KatelloLocators(apps.locators.BaseLocators):
     dashboard_subscriptions_locator = (By.ID, "dashboard_subscriptions")
     dashboard_nofications_locator = (By.ID, "dashboard_notifications")
 
-    # Tabs
-    dashboard_tab = (By.ID, "dashboard")
-    dashboard_tab_active_locator = (By.CSS_SELECTOR, "li#dashboard.dashboard.top_level.active.selected")
-    content_tab = (By.ID, "content")
-    providers_tab = (By.XPATH, "//a[.='Content Providers']")
-    systems_tab = (By.ID, "systems")
-    systems_all_tab = (By.ID, "registered")
-    systems_by_environment_tab = (By.ID, "env")
-    activation_keys_tab = (By.XPATH, "//a[.='Activation Keys']")
-    administer_tab = (By.ID, "admin")
-
     # Account controller
     account_controller_locator = (By.CSS_SELECTOR, "li.hello")
 
@@ -43,6 +32,7 @@ class KatelloLocators(apps.locators.BaseLocators):
     switcher_org_box_locator = (By.ID, "switcherBox")
     switcher_org_list_locator = (By.CSS_SELECTOR, "a.fl.clear")
 
+    # Roles
     role_list_locator = (By.CSS_SELECTOR, "div.block")
     role_original_title_locator = (By.XPATH, "//span[@original-title='%s']")
     role_permissions_locator = (By.ID, "role_permissions")
@@ -95,14 +85,17 @@ class KatelloLocators(apps.locators.BaseLocators):
     template_save = (By.ID, "template_save")
     remove_template = (By.ID, "remove_template")
 
-    """
-    Tabs
-    """
-    tab_elements = {"dashboard_tab" : (By.ID, "dashboard"),
-                    "content_tab" : (By.ID, "content"),
-                    "providers_tab" : (By.XPATH, "//a[.='Content Providers']"),
-                    "systems_tab" : (By.ID, "systems"),
-                    "systems_all_tab" : (By.ID, "registered"), 
-                    "systems_by_environment_tab" : (By.ID, "env") ,
-                    "activation_keys_tab" : (By.XPATH, "//a[.='Activation Keys']"),
-                            "roles_tab" : (By.ID, "roles"),}
+    # Tabs
+    def selected_tab(self, tab_name):
+        return (By.CSS_SELECTOR, "li#{name}.{name}.top_level.active.selected".format(name=tab_name))
+
+    tab_elements = {"dashboard" : (By.ID, "dashboard"),
+                    "content" : (By.ID, "content"),
+                        "providers" : (By.XPATH, "//a[.='Content Providers']"),
+                    "systems" : (By.ID, "systems"),
+                        "systems_all" : (By.ID, "registered"),
+                        "systems_by_environment" : (By.ID, "env") ,
+                        "activation_keys" : (By.XPATH, "//a[.='Activation Keys']"),
+                    "organizations" : (By.XPATH, "//a[.='Organizations']"),  # By.ID didn't work in firefox
+                    "administration" : (By.ID, "admin"),
+                        "roles" : (By.ID, "roles"),}
