@@ -1,14 +1,11 @@
-#!/usr/bin/env python
 # Name              : test_organizations.py
 # Purpose           : Calls tests and assertions related to organizations.
 # Contributors      : Eric L Sammons (eanxgeek)
 
 import pytest
 import apps
-from api.api import ApiTasks
 import random
 import time
-
 from tests.katello2 import Katello_Test
 
 @pytest.mark.nondestructive
