@@ -1,6 +1,8 @@
 import apps
 import locators
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
 class Katello(apps.BaseProduct):
@@ -38,6 +40,41 @@ class KatelloPage(apps.BasePage):
         """
         return [self.LoginOrgSelector(dict(mozwebqa=self._mozwebqa, element=element))
             for element in self.selenium.find_elements(*self.locators.login_org_selector)]
+
+    def is_tab_selected(self, tab_name):
+        """
+        Return True if the provided tab is active and displayed.
+
+        Parameters:
+            tab_name (string): Must match a key from the self.locators.tab_elements dictionary
+        Returns:
+            boolean
+        """
+        assert self.locators.tab_elements.has_key(tab_name), "Undefined tab_name ('%s') specified" % tab_name
+
+        return self.selenium.find_element(*self.locators.selected_tab(tab_name)).is_displayed()
+
+    def clear_search_criteria(self):
+        """
+        Select any existing text (ctrl-a), and press DELETE
+        :param criteria: string
+        """
+
+        new_org_locator = self.selenium.find_element(*self.locators.search_input_locator)
+        ActionChains(self.selenium).move_to_element(new_org_locator)\
+            .click()\
+            .key_down(Keys.CONTROL)\
+            .send_keys('a')\
+            .send_keys(Keys.DELETE).perform()
+
+    def enter_search_criteria(self, criteria):
+        """
+        Search for criteria
+        :param criteria: string
+        """
+
+        # Input criteria and newline
+        self.send_text_and_wait(criteria + "\n", *self.locators.search_input_locator)
 
 class LoginOrgSelector(apps.BasePage):
     _name_locator = (By.CSS_SELECTOR, 'a.fl.clear')
@@ -137,10 +174,3 @@ class HeaderRegion(apps.BasePage):
         orgs = self.selenium.find_elements(*self.locators.switcher_org_list_locator)
         org = orgs[random.randint(0, len(orgs)-1)]
         org.click()
-
-    @property
-    def is_dashboard_selected(self):
-        """
-        Return True if the dashboard tab is active and displayed.
-        """
-        return self.selenium.find_element(*self.locators.dashboard_tab_active_locator).is_displayed()

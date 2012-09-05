@@ -232,12 +232,6 @@ class BasePage(object):
         """
         return self.selenium.find_element(*self.locators.redhat_logo_link_locator).get_attribute('title')
 
-    def enter_search_criteria(self, criteria):
-        """
-        Search for criteria
-        :param criteria: string
-        """
-        self.send_text_and_wait(criteria + "\n", *self.locators.search_input_locator)
 ###
 #
 # from page.py
