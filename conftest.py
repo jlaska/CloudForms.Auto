@@ -39,7 +39,7 @@ def pytest_addoption(parser):
                      help="Product version number (string). Default: 1.1")
 
     parser.addoption("--test_cleanup",
-                     action="store",
+                     action="store_true",
                      dest='test_cleanup',
                      metavar='bool',
                      default=False,
