@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from pages.base import Base
 import base64
 import httplib
@@ -202,6 +200,20 @@ class ApiTasks(object):
             else:
                 envids.append(existing_env["id"])
 
+    def list_users(self, name=None, username='admin', password='admin'):
+        """
+        list available users
+
+        Usage: api.list_users(org)
+        Optional arguments; username and password.
+        """
+        self.set_basic_auth_credentials(username, password)
+        path = "users"
+        orgdata = dict()
+        if name is not None:
+            orgdata['username'] = name
+        return self._GET(path,orgdata)[1]
+
     def create_user(self, name, pw, email, username='admin', password='admin'):
         """
         Creates user name with password and email.
@@ -217,6 +229,17 @@ class ApiTasks(object):
                     "disabled" : 'false'}
 
         return self._POST(path, userdata)[1]
+
+    def destroy_user(self, uid, username='admin', password='admin'):
+        """
+        Deletes org matching the provided user id.
+
+        Usage: api.destroy_user(uid)
+        Optional arguments; username and password.
+        """
+        self.set_basic_auth_credentials(username, password)
+        path = "users/%s" % uid
+        return self._DELETE(path,{})
 
     def role(self, role_id):
         """
