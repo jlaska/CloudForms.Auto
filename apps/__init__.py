@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
+import os
+import sys
 import importlib
 import inspect
 import glob
-import os
 import locators as bl
 import logging
 import apps.locators
@@ -97,7 +96,7 @@ class BaseProduct(object):
         '''
         Cache all page modules for the current product.  Scans for modules
         matching the glob expression 'page_*.py'.  Any subclasses of BasePage
-        are saved to the self.pages as a dictionary.
+        within the module are saved to self.pages as a dictionary.
         '''
 
         # initialize pages dict
@@ -114,10 +113,18 @@ class BaseProduct(object):
 
             # Determine the relative module path
             modpath = os.path.realpath(inspect.getmodule(cls).__path__[0])
+            logging.debug("modpath for %s: %s" % (cls, modpath))
+
+            # Determine PWD
             pwd = os.path.realpath(os.environ.get('PWD',''))
-            modpath = modpath.replace(pwd,'')
-            if modpath.startswith('/'):
-                modpath = modpath[1:]
+            logging.debug("pwd: %s" % (pwd))
+
+            # Determine common prefix between pwd and modpath
+            prefix = os.path.commonprefix([pwd, modpath])
+            # If needed, add common prefix to sys.path
+            if prefix not in sys.path:
+                logging.debug("Adding '%s' to sys.path" % prefix)
+                sys.path.insert(0, prefix)
 
             # Find applicable page_ modules
             logging.debug("Looking for pages in: %s" % modpath)
@@ -128,10 +135,17 @@ class BaseProduct(object):
 
                 logging.debug("Inspecting page module: %s" % mod_file)
 
-                # remove .py
-                mod_file = mod_file[:-3]
+                # Convert mod_file to a module name
+                # '/path/to/foo/bar/baz.py' -> 'foo.bar.baz'
+                # Drop .py extension
+                mod_file = os.path.splitext(mod_file)[0]
+                # Remove the common directory prefix
+                modname = mod_file.replace(prefix, '')
                 # replace '/' with '.'
-                modname = mod_file.replace('/', '.')
+                modname = modname.replace('/', '.')
+                # Remove a prefixing '.'
+                if modname.startswith('.'):
+                    modname = modname[1:]
 
                 # Determine 'package' argument to import_module
                 # Converts 'apps.katello.cfse' -> 'apps.katello'
@@ -141,7 +155,7 @@ class BaseProduct(object):
                 logging.debug("importlib.import_module('%s', '%s')" % (modname, package))
                 obj = importlib.import_module(modname, package)
 
-                # Find the subclass of type BasePage
+                # Look for a subclass of type BasePage
                 for (name, cls) in inspect.getmembers(obj, inspect.isclass):
                     # If a subclass of BasePage, and we haven't already loaded
                     # this object ... remember this page

@@ -1,6 +1,7 @@
 results/
 *.swap
 *.py[co]
+*.swp
 *pycache*
 .project
 .pydevproject

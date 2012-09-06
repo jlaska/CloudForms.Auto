@@ -87,7 +87,11 @@ class KatelloLocators(apps.locators.BaseLocators):
 
     # Tabs
     def selected_tab(self, tab_name):
-        return (By.CSS_SELECTOR, "li#{name}.{name}.top_level.active.selected".format(name=tab_name))
+        # HACK!
+        if tab_name == 'administration':
+            return (By.CSS_SELECTOR, "li#admin.operations.top_level.active.selected".format(name=tab_name))
+        else:
+            return (By.CSS_SELECTOR, "li#{name}.{name}.top_level.active.selected".format(name=tab_name))
 
     tab_elements = {"dashboard" : (By.ID, "dashboard"),
                     "content" : (By.ID, "content"),
