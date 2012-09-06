@@ -208,6 +208,12 @@ class BasePage(object):
     def org(self):
         return self._mozwebqa.org
 
+    def login(self, user="admin", password="password"):
+        self.send_text(user, *self.locators.username_text_field)
+        self.send_text(password, *self.locators.password_text_field)
+        self.click(*self.locators.login_locator)
+        #return self.get_text(*self.locators.confirmation_msg)
+
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?
     def random_string(self):
         """
@@ -232,11 +238,6 @@ class BasePage(object):
         """
         return self.selenium.find_element(*self.locators.redhat_logo_link_locator).get_attribute('title')
 
-###
-#
-# from page.py
-#
-###
     def send_characters(self, text, *locator):
         WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_enabled())
         input_locator = self.selenium.find_element(*locator)
@@ -365,6 +366,9 @@ class BasePage(object):
         except NoSuchElementException, ElementNotVisibleException:
             return False
 
+    def get_text(self, *locator):
+        return self.selenium.find_element(*locator).text
+
     #
     # Basic navigation helpers
     #
@@ -379,6 +383,10 @@ class BasePage(object):
     def go_to_page_view(self, view):
         # pass in view, e.g. system for katello/system
         self.selenium.get(self.base_url + "/" + view)
+
+    def url_by_text(self, css, name):
+        _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
+        return self.selenium.find_element(*_text_locator).get_attribute("href")
 
     #
     # Click functions
@@ -427,6 +435,13 @@ class BasePage(object):
         Click on the *Confirm* locator.
         """
         self.click(*self.locators.confirmation_yes_locator)
+
+    def click_popup_confirm(self):
+        """
+        Confirm javascript popup
+        """
+        alert = self.selenium.switch_to_alert()
+        alert.accept()
 
     def click_tab(self, tab):
         """
