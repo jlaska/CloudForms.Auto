@@ -60,8 +60,10 @@ class KatelloPage(apps.BasePage):
         :param criteria: string
         """
 
-        new_org_locator = self.selenium.find_element(*self.locators.search_input_locator)
-        ActionChains(self.selenium).move_to_element(new_org_locator)\
+        # FIXME - use the UI elements to clear the searchbox (e.g. query_button
+        # and query_clear)
+        search_locator = self.selenium.find_element(*self.locators.search_input_locator)
+        ActionChains(self.selenium).move_to_element(search_locator)\
             .click()\
             .key_down(Keys.CONTROL)\
             .send_keys('a')\
