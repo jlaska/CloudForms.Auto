@@ -57,14 +57,14 @@ class AdministrationTab(apps.katello.KatelloPage):
     def change_password(self, password, confirm=None):
         WebDriverWait(self.selenium, 30).until(lambda s: self.is_element_visible(*self._new_user_password_field_locator))
 
-        change_password_field_locator = self.selenium.find_element(*self._new_user_password_field_locator)
-        change_password_field_locator.send_keys(password)
-        confirm_password_field_locator = self.selenium.find_element(*self._new_user_confirm_field_locator)
+        # Enter password
+        self.send_text(password, *self._new_user_password_field_locator)
 
-        if confirm == None:
-            confirm_password_field_locator.send_keys(password)
+        # Confirm password
+        if confirm is None:
+            self.send_text(password, *self._new_user_confirm_field_locator)
         else:
-            confirm_password_field_locator.send_keys(confirm)
+            self.send_text(confirm, *self._new_user_confirm_field_locator)
 
         save_button_locator = self.selenium.find_element(*self._save_password_locator)
         ActionChains(self.selenium).move_to_element(save_button_locator).\
@@ -97,7 +97,6 @@ class AdministrationTab(apps.katello.KatelloPage):
                      locators=self.locators, \
                      root_element=element) \
             for element in self.selenium.find_elements(*self._user_list_locator)]
-
 
 class User(apps.katello.KatelloPage):
     _name_locator = (By.CSS_SELECTOR, 'div.column_1.one-line-ellipsis')
