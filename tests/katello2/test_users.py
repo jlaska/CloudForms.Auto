@@ -94,34 +94,45 @@ class TestUsers(Katello_Test):
     def test_user_search(self, mozwebqa):
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
 
         home_page.click_tab('administration')
         assert home_page.is_tab_selected('administration')
-        administration = self.load_page('AdministrationTab')
 
-        for i in range(1,5):
+        # Create 4 users with random names
+        for i in range(4):
             new_user_name = self.random_str()
             password = self.random_str()
             email_addr = new_user_name + "@example.com"
             self.api.create_user(new_user_name, password, email_addr)
             self._cleanup_users.append(new_user_name)
 
-        for i in range(1,5):
+        # Create 4 users with name: searchuser-*
+        for i in range(4):
             new_user_name = self.random_str("searchuser-")
             password = self.random_str()
             email_addr = new_user_name + "@example.com"
             self.api.create_user(new_user_name, password, email_addr)
             self._cleanup_users.append(new_user_name)
 
-        home_page.enter_search_criteria("searchuser-*")
-        home_page.jquery_wait(30)
-        administration.is_search_correct("searchuser-")
+        # Search for users matching 'searchuser-*'
+        administration = self.load_page('AdministrationTab')
+        administration.enter_search_criteria("searchuser-*")
+        assert len(administration.users) >= 4
+        assert all([user.name.startswith("searchuser-") \
+            for user in administration.users])
+
+        # Search for all other users (NOT 'searchuser-*')
+        administration.clear_search_criteria()
+        administration.enter_search_criteria("username:* NOT username:searchuser-*")
+        assert len(administration.users) >= 4
+        assert all([not org.name.startswith("searchuser-") \
+            for org in administration.users])
 
     def test_change_user_password_valid_as_admin(self, mozwebqa):
         home_page = self.load_page('Home')
         home_page.login()
-
-        administration = self.load_page('AdministrationTab')
+        assert home_page.is_successful
 
         new_user_name = self.random_str("chgpasswd-")
         password = self.random_str()
@@ -132,6 +143,7 @@ class TestUsers(Katello_Test):
         home_page.click_tab('administration')
         assert home_page.is_tab_selected('administration')
         home_page.enter_search_criteria(new_user_name)
+        administration = self.load_page('AdministrationTab')
         administration.user(new_user_name).click()
 
         new_password = self.random_str()
@@ -141,6 +153,7 @@ class TestUsers(Katello_Test):
     def test_change_user_password_does_not_match_as_admin(self, mozwebqa):
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
 
         administration = self.load_page('AdministrationTab')
 
@@ -161,13 +174,13 @@ class TestUsers(Katello_Test):
         assert administration.passwords_do_not_match_visible
 
     def test_login_non_admin(self, mozwebqa):
-        home_page = self.load_page('Home')
-
+        # Create non-admin user to test with
         new_user_name = self.random_str("random-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
+        home_page = self.load_page('Home')
         home_page.login(new_user_name, password)
         assert home_page.is_successful
