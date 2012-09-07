@@ -60,12 +60,22 @@ class KatelloLocators(apps.locators.BaseLocators):
     error_notification_locator = (By.CSS_SELECTOR, "div.jnotify-notification.jnotify-notification-error")
     close_notification_locator = (By.CSS_SELECTOR, "a.jnotify-close")
 
-    sam_header_locator = (By.CSS_SELECTOR, "#head header h1")
-    sam_h1_locator = (By.CSS_SELECTOR, "h1")
-    hello_link_locator = (By.XPATH, "//a[contains(@href, '/users?id=')]")
+    # Search form
     search_form_locator = (By.XPATH, "//form[@id='search_form']")
     search_input_locator = (By.XPATH, "//input[@id='search']")
     search_button_locator = (By.XPATH, "//button[@id='search_button']")
+
+    # Search Queries
+    # query_button = (By.CSS_SELECTOR, "div.queries.open")
+    query_button = (By.XPATH, "//form[@id='search_form']/div[@class='queries open']")
+    query_clear = (By.ID, "search_clear")
+    # FIXME - locator for existing search entries
+    query_save = (By.ID, "search_favorite_save")
+    query_list = (By.ID, "search_list")
+
+    sam_header_locator = (By.CSS_SELECTOR, "#head header h1")
+    sam_h1_locator = (By.CSS_SELECTOR, "h1")
+    hello_link_locator = (By.XPATH, "//a[contains(@href, '/users?id=')]")
     footer_version_text_locator = (By.CSS_SELECTOR, "div.grid_16.ca.light_text")
     new_item_locator = (By.ID, "new")
     remove_item_locator = (By.CSS_SELECTOR, "a.remove_item")
