@@ -8,11 +8,13 @@ class KatelloLocators(apps.locators.BaseLocators):
 
     # Page title
     page_title = "Katello - Open Source Systems Management"
+    # login_card_logo = (By.CSS_SELECTOR, "img[alt='Katello Logo']")
+    login_card_logo = (By.XPATH, "//img[contains(@alt, 'Katello Logo') and contains(@src, '/logo.png')]")
 
     # Home Page and login related locators
     username_text_field = (By.ID, "username")
     password_text_field = (By.ID, "password-input")
-    login_locator = (By.NAME, "commit")
+    login_locator = (By.XPATH, "//input[@id='login_btn']")
     switcher_button = (By.CSS_SELECTOR, "a#switcherButton")
     logout_locator = (By.XPATH, "//a[contains(text(),'Logout')]")
 
@@ -25,7 +27,7 @@ class KatelloLocators(apps.locators.BaseLocators):
     account_controller_locator = (By.CSS_SELECTOR, "li.hello")
 
     # Org switcher
-    org_switcher_locator = (By.ID, "switcherButton")
+    org_switcher_locator = (By.XPATH, "//a[@id='switcherButton']/div")
     org_switcher_org_locator = (By.CSS_SELECTOR, "a[href*='org_id=2']")
     org_input_filter_locator = (By.CSS_SELECTOR, "input#orgfilter_input")
     org_filtered_button_locator = (By.CSS_SELECTOR, "button.filter_button")
@@ -53,7 +55,6 @@ class KatelloLocators(apps.locators.BaseLocators):
     roles_permission_desc_locator = (By.ID, "description")
     roles_locator = (By.CSS_SELECTOR, "span#roles.one-line-ellipsis")
     current_page_locator = (By.CSS_SELECTOR, ".paginator .num > a:nth-child(1)")
-    redhat_logo_link_locator = (By.CSS_SELECTOR, "#head header a")
 
     # Notification dialog
     success_notification_locator = (By.CSS_SELECTOR, "div.jnotify-notification.jnotify-notification-success")
