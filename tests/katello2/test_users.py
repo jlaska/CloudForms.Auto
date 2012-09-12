@@ -27,16 +27,14 @@ class TestUsers(Katello_Test):
         '''
         Test to create a new User, no org, no environment.
         '''
+
+        # Login
         home_page = self.load_page('Home')
         home_page.login()
-        assert home_page.is_successful
         assert home_page.is_dialog_cleared
 
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
-
         # FIXME - use data/
-        administration = self.load_page('AdministrationTab')
+        administration = self.load_page('User_Administration')
         new_user_name = self.random_str("newuser-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
@@ -50,19 +48,21 @@ class TestUsers(Katello_Test):
         """
         Returns Pass if creating a existing user fails.
         """
-        home_page = self.load_page('Home')
 
+        # Create new user using API
         new_user_name = self.random_str("dupuser-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
+        # Logi
+        home_page = self.load_page('Home')
         home_page.login()
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
+        assert home_page.is_dialog_cleared
 
-        administration = self.load_page('AdministrationTab')
+        # Attempt to create duplicate user
+        administration = self.load_page('User_Administration')
         administration.create_new_user(new_user_name, password, password, email_addr)
         assert home_page.is_failed
 
@@ -70,35 +70,29 @@ class TestUsers(Katello_Test):
         '''
         Test to remove a single user.
         '''
-        home_page = self.load_page('Home')
-
+        # Create user using API
         new_user_name = self.random_str("rmuser-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
+        # Login to UI
+        home_page = self.load_page('Home')
         home_page.login()
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
-        administration = self.load_page('AdministrationTab')
+        assert home_page.is_dialog_cleared
+
+        # Find existing user
+        administration = self.load_page('User_Administration')
         home_page.enter_search_criteria(new_user_name)
 
+        # Remove user
         administration.user(new_user_name).click()
-
         home_page.click_remove()
         home_page.click_confirm()
-
         assert home_page.is_successful
 
     def test_user_search(self, mozwebqa):
-        home_page = self.load_page('Home')
-        home_page.login()
-        assert home_page.is_successful
-
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
-
         # Create 4 users with random names
         for i in range(4):
             new_user_name = self.random_str()
@@ -115,8 +109,13 @@ class TestUsers(Katello_Test):
             self.api.create_user(new_user_name, password, email_addr)
             self._cleanup_users.append(new_user_name)
 
+        # Login to UI
+        home_page = self.load_page('Home')
+        home_page.login()
+        assert home_page.is_dialog_cleared
+
         # Search for users matching 'searchuser-*'
-        administration = self.load_page('AdministrationTab')
+        administration = self.load_page('User_Administration')
         administration.enter_search_criteria("searchuser-*")
         assert len(administration.users) >= 4
         assert all([user.name.startswith("searchuser-") \
@@ -130,50 +129,52 @@ class TestUsers(Katello_Test):
             for org in administration.users])
 
     def test_change_user_password_valid_as_admin(self, mozwebqa):
-        home_page = self.load_page('Home')
-        home_page.login()
-        assert home_page.is_successful
 
+        # Create new user using API
         new_user_name = self.random_str("chgpasswd-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
-        home_page.enter_search_criteria(new_user_name)
-        administration = self.load_page('AdministrationTab')
-        administration.user(new_user_name).click()
+        # Login to UI
+        home_page = self.load_page('Home')
+        home_page.login()
+        assert home_page.is_dialog_cleared
 
+        # Search for users matching 'searchuser-*'
+        administration = self.load_page('User_Administration')
+        home_page.enter_search_criteria(new_user_name)
+        administration.user(new_user_name).click()
         new_password = self.random_str()
         administration.change_password(new_password)
         assert home_page.is_successful
 
     def test_change_user_password_does_not_match_as_admin(self, mozwebqa):
-        home_page = self.load_page('Home')
-        home_page.login()
-        assert home_page.is_successful
 
-        administration = self.load_page('AdministrationTab')
-
+        # Create new user using API
         new_user_name = self.random_str("chgpasswd-")
         password = self.random_str()
         email_addr = new_user_name + "@example.com"
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
-        home_page.click_tab('administration')
-        assert home_page.is_tab_selected('administration')
+        # Login to UI
+        home_page = self.load_page('Home')
+        home_page.login()
+        assert home_page.is_dialog_cleared
+
+        # Load users page
+        administration = self.load_page('User_Administration')
         home_page.enter_search_criteria(new_user_name)
         administration.user(new_user_name).click()
-
         new_password = self.random_str()
         confirm_password = self.random_str()
         administration.change_password(new_password, confirm_password)
         assert administration.passwords_do_not_match_visible
 
     def test_login_non_admin(self, mozwebqa):
+
         # Create non-admin user to test with
         new_user_name = self.random_str("random-")
         password = self.random_str()
@@ -181,6 +182,7 @@ class TestUsers(Katello_Test):
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
+        # Login to UI
         home_page = self.load_page('Home')
         home_page.login(new_user_name, password)
-        assert home_page.is_successful
+        assert home_page.is_dialog_cleared

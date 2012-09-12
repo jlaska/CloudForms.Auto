@@ -5,10 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class OrganizationsTab(apps.katello.KatelloPage):
 
-    def __init__(self, **kwargs):
-        kwargs['open_url'] = False # don't reload this page
-        apps.katello.KatelloPage.__init__(self, **kwargs)
-
     # Define page specific locators
     _org_create_new_locator = (By.XPATH, "//a[@id='new']")
     _new_orgname_field_locator = (By.XPATH, "//input[@id='name']")

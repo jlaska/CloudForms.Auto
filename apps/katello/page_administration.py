@@ -5,15 +5,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
-class AdministrationTab(apps.katello.KatelloPage):
+class User_Administration(apps.katello.KatelloPage):
     def __init__(self, **kwargs):
-        kwargs['open_url'] = False # don't reload this page
         apps.katello.KatelloPage.__init__(self, **kwargs)
+        self.go_to_page_view("users")
 
     _admin_search_form_locator = (By.XPATH, "//form[@id='search_form']")
     _admin_search_input_locator = (By.XPATH, "//input[@id='search']")
     _admin_search_button_locator = (By.XPATH, "//button[@id='search_button']")
-    _new_user_locator = (By.XPATH, "//a[@id='new']")
 
     _user_details_tab_locator = (By.XPATH, "//li[@id='details']")
     _user_roles_tab_locator = (By.XPATH, "//li[@id='roles']")
@@ -24,10 +23,11 @@ class AdministrationTab(apps.katello.KatelloPage):
     _confirmation_yes_locator = (By.XPATH, "//span[@class='ui-button-text'][text()='Yes']")
     _close_user_detail_locator = (By.CSS_SELECTOR, "a.close")
 
-    _new_user_username_field_locator = (By.ID, "username_field")
+    _new_user_locator = (By.XPATH, "//a[@id='new']")
+    _new_user_username_field_locator = (By.ID, "user_username")
     _new_user_password_field_locator = (By.ID, "password_field")
     _new_user_confirm_field_locator = (By.ID, "confirm_field")
-    _new_user_email_field_locator = (By.ID, "email_field")
+    _new_user_email_field_locator = (By.ID, "user_email")
     _new_user_org_field_locator = (By.ID, "org_id_org_id")
     _new_user_save_user_locator = (By.ID, "save_user")
     _save_password_locator = (By.CSS_SELECTOR, "div#save_password.verify_password")
