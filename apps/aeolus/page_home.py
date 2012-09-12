@@ -14,9 +14,7 @@ class Home(apps.aeolus.Conductor_Page):
         Gets page ready for testing
         '''
         apps.aeolus.Conductor_Page.__init__(self, **kwargs)
-
-        if kwargs.get('open_url', True):
-            self.selenium.get(self.base_url)
+        self.go_to_home_page()
 
     @property
     def is_username_field_present(self):
