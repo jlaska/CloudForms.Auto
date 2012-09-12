@@ -42,15 +42,15 @@ provider_accounts = ["rhevm",
     "ec2-us-west-1",
     "ec2-us-west-2"]
 
-environments = ["dev", "test", "stage", "production"]
+environments = ["IT", "CloudForms", "Support", "Operations"]
 
-pools = ["IT", "web services", "engineering tools", "operations"]
+pools = ["dev", "test", "stage", "production"]
 
-catalogs = ["IT", "web services", "engineering tools", "operations"]
+catalogs = ["IT", "development", "web services", "engineering tools", "operations"]
 
 hardware_prof = ["small-x86_64", "medium-x86_64", "large-x86_64"]
 
-deployables = ["Wordpress", "SAP", "Mail Server", "DNS Server", "CloudEngine", "SystemEngine"]
+deployables = ["Katello_1.1", "Aeolus_1.1", "Wordpress", "DNS Server", "CloudEngine_1.1", "SystemEngine_1.1"]
 
 images = ["https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml", 
           "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
