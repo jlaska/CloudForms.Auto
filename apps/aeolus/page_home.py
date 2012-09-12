@@ -24,7 +24,7 @@ class Home(apps.aeolus.Conductor_Page):
     def is_password_field_present(self):
         return self.is_element_present(*self.locators.password_text_field)
 
-    def login(self, user="admin", password="password"):
-        self.send_text(user, *self.locators.username_text_field)
-        self.send_text(password, *self.locators.password_text_field)
-        self.click(*self.locators.login_locator)
+    #def login(self, user="admin", password="password"):
+    #    self.send_text(user, *self.locators.username_text_field)
+    #    self.send_text(password, *self.locators.password_text_field)
+    #    self.click(*self.locators.login_locator)
