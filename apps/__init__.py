@@ -13,6 +13,7 @@ import apps.locators
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
@@ -203,9 +204,6 @@ class BasePage(object):
         if kwargs.has_key('locators'):
             self.locators = kwargs.get('locators')
 
-        if kwargs.get('open_url', True):
-            self.selenium.get(self.base_url)
-
     @property
     def selenium(self):
         return self._mozwebqa.selenium
@@ -315,17 +313,19 @@ class BasePage(object):
     @property
     def is_dialog_cleared(self):
         """
-        Returns True if the success and notification locators have cleared.
+        Returns True if the success and notification locators are *NOT* present
         """
         self.selenium.implicitly_wait(2)
-        try:
-            no_success = WebDriverWait(self.selenium, 6).until_not(lambda s: s.find_element(*self.locators.success_notification_locator).is_displayed())
-            no_error = WebDriverWait(self.selenium, 6).until_not(lambda s: s.find_element(*self.locators.error_notification_locator).is_displayed())
-            return no_success and no_error
-        except Exception, e:
-            return False
-        finally:
-            self.selenium.implicitly_wait(self._mozwebqa.default_implicit_wait)
+        results = list()
+        for loc in [self.locators.success_notification_locator, \
+                    self.locators.error_notification_locator]:
+            try:
+                results.append(WebDriverWait(self.selenium, 6).until_not(lambda s: s.find_element(*loc).is_displayed()))
+            except Exception, e:
+                # Assume failure means we couldn't find the locator
+                results.append(True)
+        self.selenium.implicitly_wait(self._mozwebqa.default_implicit_wait)
+        return False not in results
 
     @property
     def is_failed(self):
@@ -490,13 +490,21 @@ class BasePage(object):
 
             This is dependent on the project name passed at runtime.
         """
-        # FIXME: no more BaseProductFactory class ... this won't work
-        myProject = BaseProductFactory.get(self.project)
-        if myProject._logo_locator:
-            return self.is_element_visible(*myProject._logo_locator)
+        return self.is_element_visible(*self.locators._logo_locator)
 
     def click_redhat_logo(self):
         """
         Will execute a left mouse click on the Logo locator.
         """
         self.click(*self.locators.redhat_logo_link_locator)
+
+    def clear_text_input(self, *locator):
+        '''
+        Generic method for clearing all text from a text input field.
+        '''
+        field_locator = self.selenium.find_element(*locator)
+        ActionChains(self.selenium).move_to_element(field_locator)\
+            .click()\
+            .key_down(Keys.CONTROL)\
+            .send_keys('a')\
+            .send_keys(Keys.DELETE).perform()
