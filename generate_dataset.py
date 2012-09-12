@@ -94,6 +94,13 @@ class Dataset(object):
         return alist
 
     @property
+    def selfservice_quota(self):
+        selfservice_quota = '''\
+    selfservice_quota = "4"
+        '''
+        return selfservice_quota
+
+    @property
     def provider_accounts(self):
         provider_acct = '''\
     accounts = [
@@ -131,7 +138,7 @@ class Dataset(object):
         alist = []
         for env in envs:
             alist.append(dict(environment=env, 
-                max_inst=randint(1, 12), 
+                max_inst=randint(10, 24), 
                 prov_accts=sample(accts, (randint(1,len(accts)-1)))))
         return alist
 
@@ -139,15 +146,15 @@ class Dataset(object):
         alist = []
         for pool in pools:
             alist.append(dict(pool_env=pool,
-                environments=sample(envs, (randint(1,len(envs)-1))),
-                quota=randint(1, 12)))
+                environments=sample(envs, (randint(3,len(envs)-1))),
+                quota=randint(8, 18)))
         return alist
 
     def gen_cat_list(self, catalogs, pool_envs):
         alist = []
         for cat in catalogs:
             alist.append(dict(catalog=cat,
-                pools=sample(pool_envs, (randint(1,len(pool_envs)-1))))),
+                pools=sample(pool_envs, (randint(3,len(pool_envs)-1))))),
         return alist
 
     @property
@@ -206,6 +213,9 @@ user_list = data.gen_user_list(raw.user_fname,
     raw.user_groups)
 user_string = data.match_template(user_template, user_list)
 data.write_dataset("users", user_string)
+
+# self-service quotas
+data.write_string(data.selfservice_quota)
 
 # provider accounts
 data.write_class('Provider', 'Define providers and provider accounts')
