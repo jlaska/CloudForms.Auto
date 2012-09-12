@@ -3,7 +3,7 @@
 import py
 
 def pytest_runtest_setup(item):
-    """ 
+    """
     pytest setup
     """
     pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
@@ -13,15 +13,15 @@ def pytest_runtest_setup(item):
     pytest_mozwebqa.TestSetup.test_cleanup = item.config.option.test_cleanup
 
 def pytest_addoption(parser):
-    """ 
-    Add option to the py.test command line, option is specific to 
+    """
+    Add option to the py.test command line, option is specific to
     this project.
     """
     parser.addoption("--project",
                      action="store",
                      dest='project',
                      metavar='str',
-                     default="katello",
+                     default=None,
                      help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
 
     parser.addoption("--org",
