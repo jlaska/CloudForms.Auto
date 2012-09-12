@@ -273,6 +273,13 @@ class BasePage(object):
         """
         Select(self.selenium.find_element_by_id(locatorid)).select_by_value(value)
 
+    def select_dropdown(self, value, *locator):
+        """
+        Selects options in locatorid by value.
+        """
+        select = Select(self.selenium.find_element(*locator))
+        select.select_by_visible_text(value)
+
     def return_to_previous_page(self):
         """
         Simulates a Back (Return to prior page).
