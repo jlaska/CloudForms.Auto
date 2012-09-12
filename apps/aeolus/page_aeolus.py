@@ -6,6 +6,10 @@ import time, re
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
+    def __init__(self, **kwargs):
+        apps.aeolus.Conductor_Page.__init__(self, **kwargs)
+        self.go_to_home_page()
+
     def logout(self):
         self.go_to_page_view("logout")
         return self.selenium.title

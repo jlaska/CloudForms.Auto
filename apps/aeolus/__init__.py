@@ -1,7 +1,9 @@
 import apps
+import locators
 
 class Conductor(apps.BaseProduct):
     '''Product class'''
+    locators = locators.AeolusLocators()
 
 class Conductor_Page(apps.BasePage):
     '''Page class'''
@@ -9,4 +11,3 @@ class Conductor_Page(apps.BasePage):
     def __init__(self, **kwargs):
         apps.BasePage.__init__(self, **kwargs)
 
-        # Conductor specific page content
