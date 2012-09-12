@@ -12,7 +12,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     login_locator = (By.NAME, "commit")
 
     # flash confirmation message
-    confirmation_msg = (By.XPATH, "//ul[@class='flashes']")
+    response = (By.XPATH, "//ul[@class='flashes']")
 
     # new user fields
     user_first_name_field = (By.ID, "user_first_name")
@@ -30,6 +30,13 @@ class AeolusLocators(apps.locators.BaseLocators):
     user_group_description_field = (By.ID, "user_group_description")
     user_group_submit_locator = (By.ID, "user_group_submit")
     user_group_delete_locator = (By.ID, "delete")
+
+    # add user to group
+    user_group_save = (By.ID, "save_button")
+    user_group_delete = (By.ID, "delete_button")
+
+    # self-service
+    instances_quota = (By.ID, "self_service_default_quota_maximum_running_instances")
 
     # new provider account fields
     prov_acct_details_locator = (By.ID, "details_accounts")
@@ -52,11 +59,11 @@ class AeolusLocators(apps.locators.BaseLocators):
     pool_family_delete_locator = (By.ID, "delete_pool_family_button")
 
     # new pool
-    pool_name_field = (By.ID, "pool_name")
+    pool_name = (By.ID, "pool_name")
     pool_family_parent_field = (By.ID, "pool_pool_family_id")
     pool_enabled_checkbox = (By.ID, "pool_enabled")
-    pool_save_locator = (By.ID, "save_button")
-    pool_delete_locator = (By.ID, "delete_pool_button")
+    pool_save = (By.ID, "save_button")
+    pool_deleter = (By.ID, "delete_pool_button")
 
     # new catalog
     catalog_name_field = (By.ID, "catalog_name")
