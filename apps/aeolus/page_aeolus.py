@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import apps.aeolus
-from apps.aeolus.locators import *
 import time, re
 
 class Aeolus(apps.aeolus.Conductor_Page):
@@ -14,6 +13,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("logout")
         return self.selenium.title
 
+    ###
+    # get IDs
+    ###
     def get_user_id(self, username):
         self.go_to_page_view("users")
         url = self.url_by_text("a", username)
@@ -26,6 +28,15 @@ class Aeolus(apps.aeolus.Conductor_Page):
         user_group_id = re.search(".+/(\d+)$", url)
         return user_group_id.group(1)
 
+    def get_pool_family_id(self, pool_fam):
+        self.go_to_page_view("pool_families")
+        url = self.url_by_text("a", pool_fam)
+        pool_fam_id = re.search(".+/(\d+)$", url)
+        return pool_fam_id.group(1)
+
+    ###
+    # user and groups admin
+    ###
     def create_user(self, user):
         '''
         create user from dictionary
@@ -105,6 +116,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.instances_quota).send_keys(Keys.RETURN)
         return self.get_text(*self.locators.response)
 
+    ###
+    # provider and provider accounts
+    ###
     def create_provider_account(self, acct):
         '''
         create provider account
@@ -124,8 +138,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(acct["provider_account_quota"], *self.locators.prov_acct_quota_field)
         self.selenium.find_element(*self.locators.prov_acct_save_locator).click()
         return self.get_text(*self.locators.response)
-        # success: "Provider Account updated!"
-        # failure: "Provider Account wasn't updated!"
 
     def delete_provider_account(self, acct):
         '''
@@ -140,7 +152,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         alert = self.selenium.switch_to_alert()
         alert.accept()
         return self.get_text(*self.locators.response)
-        # return success: "Provider account was deleted!"
 
     def connection_test_provider_account(self, acct):
         '''
@@ -152,7 +163,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", acct['provider_account_name'])
         self.click_by_text("a", "Test Connection")
         return self.get_text(*self.locators.response)
-        # return success: "Test Connection Success: Valid Account Details"
 
     def connection_test_provider(self, acct):
         '''
@@ -162,8 +172,23 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", acct['provider_name'])
         self.click_by_text("a", "Test Connection")
         return self.get_text(*self.locators.response)
-        # return success: "Successfully Connected to Provider"
 
+    def update_ec2_acct_credentials_from_config(self, account):
+        '''
+        add in private data from data/.ini file
+        '''
+        config_file = 'data/private_data.ini'
+        from ConfigParser import SafeConfigParser
+
+        parser = SafeConfigParser()
+        parser.read(config_file)
+        for (key, val) in parser.items('ec2_credentials'):
+            account[key] = val
+        return account
+
+    ###
+    # clouds/pool families/environments and cloud resource zones/pools
+    ###
     def new_environment(self, env):
         '''
         create new environment or pool family
@@ -183,12 +208,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.pool_family_delete_locator).click()
         self.click_popup_confirm()
         return self.get_text(*self.locators.response)
-
-    def get_pool_family_id(self, pool_fam):
-        self.go_to_page_view("pool_families")
-        url = self.url_by_text("a", pool_fam)
-        pool_fam_id = re.search(".+/(\d+)$", url)
-        return pool_fam_id.group(1)
 
     def new_pool(self, pool):
         '''
@@ -211,7 +230,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools/new?pool_family_id=%s" % env['id'])
         name = "%s - %s" % (pool["name"], env["name"])
         self.send_text(name, *self.locators.pool_name)
-        # enabled by default
+        # enabled by default in 1.1
         #if pool["enabled"] == True:
         #    self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
         self.selenium.find_element(*self.locators.pool_save).click()
@@ -227,6 +246,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_popup_confirm()
         return self.get_text(*self.locators.response)
 
+    ###
+    # content: catalogs and images
+    ###
     def new_catalog(self, catalog):
         '''
         create new catalog
@@ -251,16 +273,4 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("")
         self.click_by_text("a", "From URL")
 
-    def update_ec2_acct_credentials_from_config(self, account):
-        '''
-        add in private data from data/.ini file
-        '''
-        config_file = 'data/private_data.ini'
-        from ConfigParser import SafeConfigParser
-
-        parser = SafeConfigParser()
-        parser.read(config_file)
-        for (key, val) in parser.items('ec2_credentials'):
-            account[key] = val
-        return account
 
