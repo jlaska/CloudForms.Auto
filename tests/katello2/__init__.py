@@ -1,6 +1,6 @@
 import pytest
 import apps
-from api.api import ApiTasks
+from api.katello.api import ApiTasks
 from tests import Base_Test
 
 class Katello_Test(Base_Test):
