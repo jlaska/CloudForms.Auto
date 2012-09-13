@@ -56,13 +56,3 @@ class TestProvider(Aeolus_Test):
         #        assert page.delete_provider_account(account) == \
         #               aeolus_msg['delete_provider_acct']
 
-    @pytest.mark.xfail
-    def test_get_providers(self, mozwebqa):
-        '''
-        return list of providers from API
-        '''
-        page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
-        page.login()
-
-        print self.api.list_providers('admin', 'password')
