@@ -1,6 +1,7 @@
 import pytest
 import apps
 from tests import Base_Test
+from api.aeolus.api import ApiTasks
 
 class Aeolus_Test(Base_Test):
     '''
@@ -14,8 +15,7 @@ class Aeolus_Test(Base_Test):
     @classmethod
     def setup_class(self):
         Base_Test.setup_class.im_func(self)
-        # FIXME - assign self.api when API is available
-        # self.api = ApiTasks(self.testsetup)
+        self.api = ApiTasks(self.testsetup)
 
     @classmethod
     def teardown_class(self):
