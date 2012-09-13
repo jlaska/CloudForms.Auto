@@ -88,11 +88,11 @@ class TestAdmin(Aeolus_Test):
         # move to aeolus_page.py
         # capture user IDs from "/users/" view
         for user in Admin.users:
-            user["id"] = page.get_user_id(user["username"])
+            user["id"] = page.get_id_by_url("users", user["username"])
 
         # capture user_group IDs from "/user_groups/" view
         for user_group in Admin.user_groups:
-            user_group["id"] = page.get_user_group_id(user_group["name"])
+            user_group["id"] = page.get_id_by_url("user_groups", user_group["name"])
 
         # add users to groups
         for group in Admin.user_groups:
