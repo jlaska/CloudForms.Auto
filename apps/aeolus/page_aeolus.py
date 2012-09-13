@@ -13,26 +13,14 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("logout")
         return self.selenium.title
 
-    ###
-    # get IDs
-    ###
-    def get_user_id(self, username):
-        self.go_to_page_view("users")
-        url = self.url_by_text("a", username)
-        user_id = re.search(".+/(\d+)$", url)
-        return user_id.group(1)
-
-    def get_user_group_id(self, user_group):
-        self.go_to_page_view("user_groups")
-        url = self.url_by_text("a", user_group)
-        user_group_id = re.search(".+/(\d+)$", url)
-        return user_group_id.group(1)
-
-    def get_pool_family_id(self, pool_fam):
-        self.go_to_page_view("pool_families")
-        url = self.url_by_text("a", pool_fam)
-        pool_fam_id = re.search(".+/(\d+)$", url)
-        return pool_fam_id.group(1)
+    def get_id_by_url(self, view, element):
+        '''
+        go to view and screen scrape URL for ID
+        '''
+        self.go_to_page_view(view)
+        url = self.url_by_text("a", element)
+        element_id = re.search(".+/(\d+)$", url)
+        return element_id.group(1)
 
     ###
     # user and groups admin
