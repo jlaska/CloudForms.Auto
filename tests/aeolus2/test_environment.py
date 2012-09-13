@@ -45,7 +45,7 @@ class TestEnvironment(Aeolus_Test):
         # workaround. Select dropdown not working
         # capture pool_family_environment IDs from "/pool_families/" view
         for environment in Environment.pool_family_environments:
-            environment['id'] = page.get_pool_family_id(environment['name'])
+            environment['id'] = page.get_id_by_url("pool_families", environment['name'])
 
         for environment in Environment.pool_family_environments:
             for pool in Environment.pools:
@@ -58,7 +58,7 @@ class TestEnvironment(Aeolus_Test):
 
         # select dropdown not working
         #for pool in Environment.pools:
-        #    page.get_pool_family_id(pool)
+        #    page.get_id_by_url("pool_families", pool)
         #    assert page.new_pool(pool) == aeolus_msg['add_pool']
 
         # test cleanup
