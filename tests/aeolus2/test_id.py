@@ -13,9 +13,9 @@ def setup_module(module):
 class TestId(Aeolus_Test):
 
     @pytest.mark.get_id
-    def test_get_ids(self, mozwebqa):
+    def test_get_ids_from_ui(self, mozwebqa):
         '''
-        Cycle through and get IDs for these elements
+        Cycle through UI and get IDs for these elements
          - users
          - groups
          - clouds
@@ -49,4 +49,29 @@ class TestId(Aeolus_Test):
         for catalog in Content.catalogs:
             catalog["id"] = page.get_id_by_url("catalogs", catalog["name"])
             print "%s (%s)" % (catalog["name"], catalog["id"])
+
+    def test_get_ids_from_api(self, mozwebqa):
+        '''
+        Get IDs for these elements
+         - pools
+         - providers
+        '''
+        print "Clouds:"
+        print self.api.get_pool_family_ids('admin', 'password')
+        print "Pools:"
+        print self.api.get_pool_ids('admin', 'password')
+        print "Providers:"
+        print self.api.get_provider_ids('admin', 'password')
+        print "Provider Accounts"
+        print self.api.get_provider_account_ids('admin', 'password')
+        print "Images"
+        print self.api.get_image_ids('admin', 'password')
+        print "Builds"
+        print self.api.get_build_ids('admin', 'password')
+        print "Target Images"
+        print self.api.get_target_image_ids('admin', 'password')
+        print "Provider Images"
+        print self.api.get_provider_image_ids('admin', 'password')
+
+
 
