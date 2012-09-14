@@ -38,7 +38,7 @@ See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for m
 ### Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
 * `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
-* `--product=katello|aeolus|sam|cfse|cfce` Specify product under test.
+* `--product=katello|aeolus|katello.cfse|aeolus.cfce` Specify product under test.
 * `-k [test_keyword]` Test keyword to run specific tests.
 * `-m <marker>` For running tests tagged with py.test markers.
 
@@ -47,15 +47,21 @@ See [py.test documentation](http://pytest.org/) for more information.
 ## Development Notes
 
 ### About the Files
-`[project]/tests/test_file.py` Test code goes here.
+`tests/` Test code goes here.  It's common to organize tests into project-specific sub-directories.  For example, katello tests reside in `tests/katello`.
 
-`pages/page.py` Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file. Generally the functions in this file are common across our projects and don't change often.
+`apps/__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
 
-`pages/base.py` Page object helper functions that are global across the whole site.
+`apps/locators.py` Base locator object inherited by project-specific locators.  It's rare to have locators that work across applications.  However, if any exist, they'll live here.
 
-`[project]/pages/my_page.py` This is a page object file that represents a page on the website. Page-specific methods go here. It inherits the base.py class and inturn all of the methods that base.py has access to.
+`apps/[project]/__init__.py` Project specific handlers.
+
+`apps/[project]/locators.py` Project specific locators.
+
+`pages/` Going away.  The pages/ heirarchy exists for historic purposes.  The apps/ heirarchy is intended to replace the need for pages.
 
 `api/` API helper methods.
+
+`api/[project]/api.py` Project-specific API helper methods.
 
 `credentials.yaml` Not currently in use. Store the credentials to log into the site with. The mozwebqa plugin will parse this file and make the values available inside the tests.
 
