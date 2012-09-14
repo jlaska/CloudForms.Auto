@@ -5,7 +5,7 @@ import urllib
 import random
 import os
 import urlparse
-import xml.etree.ElementTree as tree
+import xml.etree.ElementTree as xmltree
 
 #
 # support for xml only
@@ -85,75 +85,32 @@ class ApiTasks(object):
     def _DELETE(self, path, body, multipart=False, customHeaders={}):
         return self._request('DELETE', path, body=body, multipart=multipart, customHeaders=customHeaders)
 
-    def _get_tree(self, element, xml):
-        data = tree.fromstring(xml)
-        alist = []
-        for child in data.findall(element):
-            alist.append(child.attrib)
-        return alist
-
-    def get_pool_family_ids(self, username='admin', password='password'):
+    def get_element_id_list(self, target, key, \
+                            username='admin', password='password'):
         """
-        list pool family ids
+        returns list of ids given an API target (URL path) and element key
+        for example URL path 'pools' points to conductor/api/pools
+
+        username/password optional
         """
         self.set_basic_auth_credentials(username, password)
-        response = self._GET("pool_families")
-        return self._get_tree("pool_family", response[1])
+        response = self._GET(target)
+        data = xmltree.fromstring(response[1])
+        id_list = []
+        for child in data.findall(key):
+            id_list.append(child.attrib['id'])
+        return id_list
 
-    def get_pool_ids(self, username='admin', password='password'):
+    def get_detailed_info(self, target, target_id, username='admin', password='password'):
         """
-        list pool ids
+        returns dictionary of detailed info
+        given an API target (URL path) and element ID
+        for example URL path 'users' and ID '1' points to conductor/api/pools/1
+
+        username/password optional
         """
         self.set_basic_auth_credentials(username, password)
-        response = self._GET("pools")
-        return self._get_tree("pool", response[1])
-
-    def get_provider_ids(self, username='admin', password='password'):
-        """
-        returns list of provider ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("providers")
-        return self._get_tree("provider", response[1])
-
-    def get_provider_account_ids(self, username='admin', password='password'):
-        """
-        returns list of provider account ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("provider_accounts")
-        return self._get_tree("provider_account", response[1])
-
-    def get_image_ids(self, username='admin', password='password'):
-        """
-        returns list of image ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("images")
-        return self._get_tree("image", response[1])
-
-    def get_build_ids(self, username='admin', password='password'):
-        """
-        returns list of build ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("builds")
-        return self._get_tree("build", response[1])
-
-    def get_target_image_ids(self, username='admin', password='password'):
-        """
-        returns list of target image ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("target_images")
-        return self._get_tree("target_image", response[1])
-
-    def get_provider_image_ids(self, username='admin', password='password'):
-        """
-        returns list of provider image ids
-        """
-        self.set_basic_auth_credentials(username, password)
-        response = self._GET("provider_images")
-        return self._get_tree("provider_image", response[1])
-
-
+        url = target + "/" + target_id
+        response = self._GET(url)
+        data = xmltree.fromstring(response[1])
+        return data[0].text
