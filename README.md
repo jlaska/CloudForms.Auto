@@ -47,7 +47,7 @@ See [py.test documentation](http://pytest.org/) for more information.
 ## Development Notes
 
 ### About the Files
-`[project]/tests/test_file.py` Test code goes here.
+`tests/` Test code goes here.  It's common to organize tests into project-specific sub-directories.  For example, katello tests reside in `tests/katello`.
 
 `apps/__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
 
