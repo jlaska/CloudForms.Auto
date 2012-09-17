@@ -65,44 +65,47 @@ class TestId(Aeolus_Test):
         print "### Clouds ###"
         pool_families = self.api.get_element_id_list("pool_families", "pool_family")
         for pool_fam_id in pool_families:
-            pool_name = self.api.get_detailed_info("pool_families", pool_fam_id)
-            print "%s (%s)" % (pool_name, pool_fam_id)
+            pool_detail = self.api.get_detailed_info("pool_families", pool_fam_id)
+            print "%s (%s)" % (pool_detail['name'], pool_fam_id)
 
         print "### Pools ###"
         pools = self.api.get_element_id_list("pools", "pool")
         for pool_id in pools:
-            pool_name = self.api.get_detailed_info("pools", pool_id)
-            print "%s (%s)" % (pool_name, pool_id)
+            pool_detail = self.api.get_detailed_info("pools", pool_id)
+            print "%s (%s)" % (pool_detail['name'], pool_id)
 
         print "### Providers ###"
         providers = self.api.get_element_id_list("providers", "provider")
         for provider_id in providers:
-            provider_name = self.api.get_detailed_info("providers", provider_id)
-            print "%s (%s)" % (provider_name, provider_id)
+            provider_detail = self.api.get_detailed_info("providers", provider_id)
+            print "%s (%s)" % (provider_detail['name'], provider_id)
 
         print "### Provider Accounts ###"
         provider_accounts = self.api.get_element_id_list("provider_accounts", "provider_account")
         for provider_acct_id in provider_accounts:
-            provider_acct_name = self.api.get_detailed_info("provider_accounts", provider_acct_id)
-            print "%s (%s)" % (provider_acct_name, provider_acct_id)
+            provider_acct_detail = self.api.get_detailed_info("provider_accounts", provider_acct_id)
+            print "%s (%s)" % (provider_acct_detail['label'], provider_acct_id)
 
         print "### Images ###"
         images = self.api.get_element_id_list("images", "image")
         for image_id in images:
-            image_name = self.api.get_detailed_info("images", image_id)
-            print "%s (%s)" % (image_name, image_id)
+            image_detail = self.api.get_detailed_info("images", image_id)
+            print "%s (%s)" % (image_detail['name'], image_id)
 
-        # FIXME: target image name not being returned. fix api index[0] 
+        # return XML more complex, not verified
         print "### Target Images ###"
         target_images = self.api.get_element_id_list("target_images", "target_image")
         for target_image_id in target_images:
-            target_image_name = self.api.get_detailed_info("target_images", target_image_id)
-            print "%s (%s)" % (target_image_name, target_image_id)
+            target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
+            print "%s (%s)" % (target_image_detail['template'], target_image_id)
 
-        # FIXME: provider image name not being returned. fix api index[0]
+        # return XML more complex, not verified
         print "### Provider Images ###"
         provider_images = self.api.get_element_id_list("provider_images", "provider_image")
         for provider_image_id in provider_images:
-            provider_image_name = self.api.get_detailed_info("provider_images", provider_image_id)
-            print "%s (%s)" % (provider_image_name, provider_image_id)
+            provider_image_detail = self.api.get_detailed_info("provider_images", provider_image_id)
+            print "Provider: %s\nTarget ID: %s\nProvider Image ID: %s\n" % \
+                   (provider_image_detail['provider'], \
+                   provider_image_detail['target_identifier'], \
+                   provider_image_id)
 
