@@ -101,11 +101,13 @@ class ApiTasks(object):
             id_list.append(child.attrib['id'])
         return id_list
 
+    # FIXME: could stand improvement.
+    # If only used for ID/Name match it should be fine
     def get_detailed_info(self, target, target_id, username='admin', password='password'):
         """
         returns dictionary of detailed info
         given an API target (URL path) and element ID
-        for example URL path 'users' and ID '1' points to conductor/api/pools/1
+        for example URL path 'pools' and ID '1' points to conductor/api/pools/1
 
         username/password optional
         """
@@ -113,4 +115,9 @@ class ApiTasks(object):
         url = target + "/" + target_id
         response = self._GET(url)
         data = xmltree.fromstring(response[1])
-        return data[0].text
+        d = dict()
+        for key in data.iter():
+            d[key.tag] = key.text
+            for k, v in key.attrib.iteritems():
+                d[k] = v
+        return d
