@@ -10,15 +10,15 @@ aeolus_msg = {
     'add_user_to_group' : 'These users have been added: %s',
     'delete_user_from_group' : 'These users have been removed: %s',
     'add_pool_family' : 'Cloud was added.',
-    'delete_pool_family' : 'Cloud was deleted!',
+    'delete_pool_family' : 'Cloud was deleted',
     'add_pool' : 'Cloud Resource Zone added.',
     'delete_pool' : 'Pool %s was deleted.',
-    'add_catalog' : 'Catalog created!',
-    'delete_catalog' : 'Catalog deleted!',
+    'add_catalog' : 'Catalog created',
+    'delete_catalog' : 'Catalog deleted',
     'connect_provider' : 'Successfully connected to Cloud Resource Provider',
     'connect_provider_acct' : 'Test Connection Success: Valid Account Details',
     'add_provider_acct' : 'Account %s was added.',
-    'delete_provider_acct' : 'Provider account was deleted!',
+    'delete_provider_acct' : 'Provider account was deleted',
     'update_settings' : 'Settings Updated'
     }
 
