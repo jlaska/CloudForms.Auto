@@ -7,7 +7,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     """
 
     page_title = "Aeolus Conductor"
-    username_text_field = (By.NAME, "login")
+    username_text_field = (By.NAME, "username")
     password_text_field = (By.ID, "password-input")
     login_locator = (By.NAME, "commit")
 
@@ -18,7 +18,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     user_first_name_field = (By.ID, "user_first_name")
     user_last_name_field = (By.ID, "user_last_name")
     user_email_field = (By.ID, "user_email")
-    user_username_field = (By.ID, "user_login")
+    user_username_field = (By.ID, "user_username")
     user_password_field = (By.ID, "user_password")
     user_password_confirmation_field = (By.ID, "user_password_confirmation")
     user_quota_max_running_instances_field = (By.ID, "user_quota_attributes_maximum_running_instances")
