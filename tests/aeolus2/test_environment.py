@@ -68,13 +68,11 @@ class TestEnvironment(Aeolus_Test):
         #               aeolus_msg['delete_pool'] % pool["name"]
 
 
-    @pytest.mark.xfail
     def test_new_catalog(self, mozwebqa):
         '''
         create new catalogs
         '''
         page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
         page.login()
 
         for catalog in Content.catalogs:
