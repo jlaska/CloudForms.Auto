@@ -18,7 +18,8 @@ Current documentation is [hosted here](http://eanxgeek.github.com/katello_challe
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
 2. Edit `data/template_data.py` if desired.
 3. Execute `./generate_dataset.py` to generate a semi-random dataset based on `data/template_data.py`.
-4. Run tests!
+4. Update `data/private_data.ini` file with private provider account details.
+5. Run tests!
 
 ## Requirements
 These tests assume a fresh install of the product(s) that are accessible from the machine running the tests.
