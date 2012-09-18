@@ -27,7 +27,6 @@ class TestProvider(Aeolus_Test):
             assert page.connection_test_provider(account) == \
                    aeolus_msg['connect_provider']
 
-    #@pytest.mark.xfail
     @pytest.mark.provider_admin
     @pytest.mark.aeolus_setup
     def test_create_provider_account(self, mozwebqa):
