@@ -2,6 +2,8 @@
 
 import apps.aeolus
 import time, re
+from selenium.webdriver.common.by import By
+import time
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
@@ -120,8 +122,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(acct["password_secret_access_key"], *self.locators.prov_acct_secret_access_key_field)
         if acct["type"] == "ec2":
             self.send_text(acct["account_number"], *self.locators.prov_acct_number_field)
-            self.send_text(acct["key_file"], *self.locators.prov_acct_key_file_locator)
-            self.send_text(acct["key_cert_file"], *self.locators.prov_acct_cert_file_locator)
+            self.send_text(acct["private_key_file"], *self.locators.prov_acct_x509_private_field)
+            self.send_text(acct["public_cert_file"], *self.locators.prov_acct_x509_public_field)
         self.send_text(acct["provider_account_priority"], *self.locators.prov_acct_prior_field)
         self.send_text(acct["provider_account_quota"], *self.locators.prov_acct_quota_field)
         self.selenium.find_element(*self.locators.prov_acct_save_locator).click()
