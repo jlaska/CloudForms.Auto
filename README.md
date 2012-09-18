@@ -90,13 +90,14 @@ Developing Selenium tests is tricky and requires some trial and error. Launching
 
     $ python
     >>> from selenium import webdriver
-    >>> url = 'https://myUrl/aeolus'
+    >>> from selenium.webdriver.common.by import By
+    >>> url = 'https://localhost/conductor'
     >>> driver = webdriver.Firefox()
     >>> driver.get(url)
 
 A Firefox browser window should open to the URL. You can now interact with the new  browser window (login, nav to page you're working on, inspect elements). Then try a locator and see if it works.
 
-    >>> driver.find_elements_by_css_selector('li#promotions')
+    >>> driver.find_elements(By.ID, 'user_first_name')
     >>> [<selenium.webdriver.remote.webelement.WebElement at 0x1a42e50>] # valid
 
 Once your selector code is valid you can add to your code and keep going!
