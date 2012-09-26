@@ -3,6 +3,7 @@
 import apps.aeolus
 import time, re
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 class Aeolus(apps.aeolus.Conductor_Page):
@@ -268,11 +269,65 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_popup_confirm()
         return self.get_text(*self.locators.response)
 
-    def new_image_from_url(self, image):
+    def new_image_from_url(self, cloud, image):
         '''
         create new image from url
         '''
-        self.go_to_page_view("")
-        self.click_by_text("a", "From URL")
+        self.go_to_page_view("pool_families")
+        self.click_by_text("a", cloud)
+        self.selenium.find_element(*self.locators.image_details).click()
+        self.click_by_text("a", "New Image")
+        self.selenium.find_element_by_link_text("From URL").click()
+        self.send_text(image['name'], *self.locators.new_image_name_field)
+        self.send_text(image['template_url'], *self.locators.new_image_url_field)
+        self.selenium.find_element(*self.locators.new_image_edit_box).click()
+        self.selenium.find_element(*self.locators.new_image_continue_button).click()
+        self.selenium.find_element(*self.locators.save_button).click()
 
+    def new_app_blueprint_from_image(self, image, app):
+        self.go_to_page_view("images")
+        self.click_by_text("a", image['name'])
+        self.click_by_text("a", "New Application Blueprint from Image")
+        # selecting catalog is tricky due to hidden elements
+        # it's not pretty but javascript is one approach that works
+        self.selenium.execute_script("el = " +\
+            "document.getElementsByClassName('catalog_link');"\
+            "el.onmouseover=(function(){document.getElementById" +\
+            "('catalog_id_').click();}());")
+        self.selenium.find_element(*self.locators.save_button).click()
 
+    def build_image(self, image):
+        '''
+        build all images
+        '''
+        self.go_to_page_view("images")
+        self.click_by_text("a", image)
+        self.selenium.find_element(*self.locators.build_all).click()
+
+    def push_image(self, image):
+        '''
+        push all images
+        '''
+        # FIXME: use API to confirm images built
+        self.go_to_page_view("images")
+        self.click_by_text("a", image)
+        self.selenium.find_element(*self.locators.push_all).click()
+
+    def launch_app(self, catalog, image, app):
+        '''
+        launch all apps
+
+        direct nav to catalogs, select catalog by name
+        select image by name, click launch
+        create unique app name with otherwise default opts
+        confirm launch
+        '''
+        # FIXME: use API to confirm images pushed
+        self.go_to_page_view("catalogs")
+        self.click_by_text("a", catalog)
+        self.click_by_text("a", image)
+        self.selenium.find_element(*self.locators.launch).click()
+        self.selenium.find_element(*self.locators.app_name_field).clear()
+        self.send_text(app, *self.locators.app_name_field)
+        self.selenium.find_element(*self.locators.next_button).click()
+        self.selenium.find_element(*self.locators.launch).click()

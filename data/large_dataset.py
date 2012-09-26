@@ -248,17 +248,21 @@ class Content(object):
         {"name" : "engineering tools",
         "pool_parent" : 'test'}]
 
-    images_from_url = [
+    images = [
         {"name" : "rhel6-x86_64",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml"},
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
+        # added manually
+        "app" : "CF Tools on 6Server - x86_64"},
 
         {"name" : "rhel5-x86_64",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml"},
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
+        "app" : "5Sever CF tools"},
 
         {"name" : "rhel5-i386",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml"}]
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
+        "app" : "5Sever i386"}]
         
-    deployables = [
+    apps = [
         {"name" : "Katello_1.1",
         "hwp" : ['small-x86_64'],
         "catalog" : ['web services', 'operations']},

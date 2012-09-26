@@ -79,3 +79,23 @@ class AeolusLocators(apps.locators.BaseLocators):
     catalog_save_locator = (By.ID, "save_button")
     catalog_delete_locator = (By.ID, "delete")
 
+    # new image
+    image_details = (By.ID, "details_images")
+    #new_image_name_field = (By.ID, "name")
+    # "(//input[@id='name'])[2]"
+    new_image_name_field = (By.XPATH, "(//input[@id='name'])[2]")
+    new_image_url_field = (By.ID, "image_url")
+    new_image_edit_box = (By.XPATH, "(//input[@id='edit'])[2]")
+    new_image_continue_button = (By.ID, "url_button")
+
+    # new app blueprint
+    app_catalog_id = (By.ID, "catalog_id_")
+    catalog_dropdown = (By.XPATH, "(//span[@class='catalog_link'])")
+    catalog_item = (By.XPATH, "(//input[@id='catalog_id_'])")
+
+    # build, push, launch
+    build_all = (By.XPATH, "(//input[@value='Build All'])")
+    push_all = (By.XPATH, "(//input[@value='Push all'])")
+    launch = (By.ID, "launch_deployment_button")
+    app_name_field = (By.ID, "deployment_name")
+    next_button = (By.ID, "next_button")

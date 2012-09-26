@@ -21,7 +21,9 @@ aeolus_msg = {
     'delete_provider_acct' : 'Provider account was deleted',
     'update_settings' : 'Settings Updated',
     # partial string, invalid assert
-    'add_provider_accts' : 'These Cloud Resource Provider Account have been added'
+    'add_provider_accts' : 'These Cloud Resource Provider Account have been added',
+    # partial string, invalid assert
+    'add_blueprint' : 'Application Blueprint added to Catalog %s.'
     }
 
 # see src/app/controllers for message text source

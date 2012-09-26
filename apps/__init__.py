@@ -423,8 +423,8 @@ class BasePage(object):
         self.click(*locator)
         self.jquery_wait()
 
-    def click_by_text(self, css, name):
-        _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
+    def click_by_text(self, css, text):
+        _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, text))
         self.selenium.find_element(*_text_locator).click()
 
     def click_next(self):
@@ -469,25 +469,25 @@ class BasePage(object):
         :param tab: str tab to click
         """
         self.click_and_wait(*self.locators.tab_elements[tab])
-    '''
+
     @property
     def redhat_logo_image_source(self):
         """
         Returns the src attribute for the Red Hat Logo image locator.
         """
         return self.selenium.find_element(*self._amo_logo_image_locator).get_attribute('src')
-    '''
+ 
 
     #
     # UI elements
     #
 
-    @property
-    def is_footer_version_text_visible(self):
-        """
-        Return True if the Footer version Text is visible.
-        """
-        return self.selenium.find_element(*self.locators.footer_version_text_locator).text
+    #@property
+    #def is_footer_version_text_visible(self):
+    #    """
+    #    Return True if the Footer version Text is visible.
+    #    """
+    #    return self.selenium.find_element(*self.locators.footer_version_text_locator).text
 
     @property
     def is_redhat_logo_visible(self):
@@ -504,6 +504,7 @@ class BasePage(object):
         """
         self.click(*self.locators.redhat_logo_link_locator)
 
+    # use .clear() instead
     def clear_text_input(self, *locator):
         '''
         Generic method for clearing all text from a text input field.
