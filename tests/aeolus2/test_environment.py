@@ -14,6 +14,9 @@ def setup_module(module):
 
 
 class TestEnvironment(Aeolus_Test):
+    '''
+    Create clouds, pools and catalogs
+    '''
 
     @pytest.mark.environment
     @pytest.mark.aeolus_setup

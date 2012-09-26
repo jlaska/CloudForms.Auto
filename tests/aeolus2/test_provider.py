@@ -4,6 +4,7 @@ import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test
 from data.large_dataset import Provider
+from data.large_dataset import Environment
 from data.assert_response import *
 import time
 
@@ -12,6 +13,10 @@ def setup_module(module):
     module.TestProvider.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 class TestProvider(Aeolus_Test):
+    '''
+    Test provider connections, create provider accounts and test connection,
+    add or enable provider accounts to clouds
+    '''
 
     @pytest.mark.provider_admin
     @pytest.mark.aeolus_setup
@@ -55,3 +60,16 @@ class TestProvider(Aeolus_Test):
         #        assert page.delete_provider_account(account) == \
         #               aeolus_msg['delete_provider_acct']
 
+    @pytest.mark.aeolus_setup
+    def test_add_provider_account_cloud(self, mozwebqa):
+        '''
+        Add provider accounts to all clouds
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        for environment in Environment.pool_family_environments:
+            # tricky assert: string includes list of accts added
+            #assert page.add_add_provider_accounts_cloud(environment['name']) ==\
+            #    aeolus_msg['add_provider_accts']
+            page.add_add_provider_accounts_cloud(environment['name'])

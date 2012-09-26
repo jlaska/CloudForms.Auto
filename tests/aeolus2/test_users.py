@@ -10,7 +10,10 @@ def setup_module(module):
     test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
     module.TestAdmin.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
-class TestAdmin(Aeolus_Test):
+class TestUsers(Aeolus_Test):
+    '''
+    Create users and groups, then add users to those groups
+    '''
 
     @classmethod
     def setup_class(self):

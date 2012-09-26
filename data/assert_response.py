@@ -19,7 +19,9 @@ aeolus_msg = {
     'connect_provider_acct' : 'Test Connection Success: Valid Account Details',
     'add_provider_acct' : 'Account %s was added.',
     'delete_provider_acct' : 'Provider account was deleted',
-    'update_settings' : 'Settings Updated'
+    'update_settings' : 'Settings Updated',
+    # partial string, invalid assert
+    'add_provider_accts' : 'These Cloud Resource Provider Account have been added'
     }
 
 # see src/app/controllers for message text source

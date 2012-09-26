@@ -218,7 +218,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         create new pool in environment by id
         '''
         self.go_to_page_view("pools/new?pool_family_id=%s" % env['id'])
-        name = "%s - %s" % (pool["name"], env["name"])
+        name = "%s" % (pool["name"])
         self.send_text(name, *self.locators.pool_name)
         # enabled by default in 1.1
         #if pool["enabled"] == True:
@@ -234,6 +234,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", pool["name"])
         self.selenium.find_element(*self.locators.pool_delete_locator).click()
         self.click_popup_confirm()
+        return self.get_text(*self.locators.response)
+
+    def add_add_provider_accounts_cloud(self, env):
+        '''
+        add or enable all provider accounts to cloud/pool family
+        '''
+        self.go_to_page_view('pool_families')
+        self.click_by_text("a", env)
+        self.selenium.find_element(*self.locators.env_prov_acct_details).click()
+        self.selenium.find_element(*self.locators.env_add_prov_acct_button).click()
+        self.selenium.find_element(*self.locators.select_all).click()
+        self.selenium.find_element(*self.locators.save_button).click()
         return self.get_text(*self.locators.response)
 
     ###

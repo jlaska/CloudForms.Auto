@@ -6,10 +6,13 @@ class AeolusLocators(apps.locators.BaseLocators):
     Locators for aeolus pages are contained within.
     """
 
+    # util
     page_title = "Aeolus Conductor"
     username_text_field = (By.NAME, "username")
     password_text_field = (By.ID, "password-input")
     login_locator = (By.NAME, "commit")
+    select_all = (By.ID, "select_all")
+    save_button = (By.ID, "save_button")
 
     # flash confirmation message
     response = (By.XPATH, "//ul[@class='flashes']")
@@ -32,6 +35,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     user_group_delete_locator = (By.ID, "delete")
 
     # add user to group
+    # dup of save_button
     user_group_save = (By.ID, "save_button")
     user_group_delete = (By.ID, "delete_button")
 
@@ -57,16 +61,21 @@ class AeolusLocators(apps.locators.BaseLocators):
     env_max_running_instances_field = (By.ID, "pool_family_quota_attributes_maximum_running_instances")
     env_submit_locator = (By.ID, "pool_family_submit")
     pool_family_delete_locator = (By.ID, "delete_pool_family_button")
+    env_prov_acct_details = (By.ID, "details_provider_accounts")
+    env_add_prov_acct_button = (By.ID, "add_provider_accounts_button")
 
     # new pool
     pool_name = (By.ID, "pool_name")
     pool_family_parent_field = (By.ID, "pool_pool_family_id")
     pool_enabled_checkbox = (By.ID, "pool_enabled")
+    # dup of save_button
     pool_save = (By.ID, "save_button")
     pool_deleter = (By.ID, "delete_pool_button")
 
     # new catalog
     catalog_name_field = (By.ID, "catalog_name")
     catalog_family_parent_field = (By.ID, "catalog_pool_id")
+    # dup of save_button
     catalog_save_locator = (By.ID, "save_button")
     catalog_delete_locator = (By.ID, "delete")
+

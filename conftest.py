@@ -43,7 +43,8 @@ def pytest_addoption(parser):
                      dest='test_cleanup',
                      metavar='bool',
                      default=False,
-                     help="Boolean flag to trigger post-test data cleanup such as deleting users and other data.")
+                     help="Boolean flag (True|False) to trigger post-test data cleanup such as deleting users and other data.")
+
 
 def pytest_funcarg__mozwebqa(request):
     pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
