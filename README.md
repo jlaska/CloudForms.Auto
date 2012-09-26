@@ -42,7 +42,7 @@ See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for m
 ### Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
 * `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
-* `--product=katello|aeolus|katello.cfse|aeolus.cfce` Specify product under test.
+* `--project=katello|aeolus|katello.cfse|aeolus.cfce` Specify project under test.
 * `-q path/to/test_file.py` Point to dir to run all tests in dir, or single file
 * `-k [test_keyword]` Test keyword to run specific tests.
 * `-m <marker>` For running tests tagged with py.test markers.
