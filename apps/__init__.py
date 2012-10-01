@@ -219,7 +219,22 @@ class BasePage(object):
     def org(self):
         return self._mozwebqa.org
 
+    def get_login_credentials_from_config(self, account):
+        '''
+        get user login credentials from data/private_data.ini file
+        '''
+        config_file = 'data/private_data.ini'
+        from ConfigParser import SafeConfigParser
+
+        parser = SafeConfigParser()
+        parser.read(config_file)
+        login = dict()
+        for (key, val) in parser.items('login_credentials'):
+            login[key] = val
+        return login 
+
     def login(self, user="admin", password="password"):
+        #login = get_login_credentials_from_config()
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
