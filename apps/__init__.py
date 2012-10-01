@@ -1,5 +1,6 @@
 import os
 import sys
+import base64
 import importlib
 import inspect
 import glob
@@ -219,9 +220,17 @@ class BasePage(object):
     def org(self):
         return self._mozwebqa.org
 
-    def get_login_credentials_from_config(self, account):
+    def decode_string(self, string):
+        '''
+        base64 decode
+        '''
+        return base64.b64decode(string)
+
+    def get_login_credentials_from_config(self):
         '''
         get user login credentials from data/private_data.ini file
+        assumes minimal base64 encoding of password
+        requires unique username and password for katello and aeolus projects
         '''
         config_file = 'data/private_data.ini'
         from ConfigParser import SafeConfigParser
@@ -229,12 +238,20 @@ class BasePage(object):
         parser = SafeConfigParser()
         parser.read(config_file)
         login = dict()
-        for (key, val) in parser.items('login_credentials'):
-            login[key] = val
+        if self.project == 'katello':
+            items = parser.items('katello_login_credentials')
+        elif self.project == 'aeolus':
+            items = parser.items('aeolus_login_credentials')
+        for (key,value) in items:
+            login[key] = value
+
+        login['password'] = self.decode_string(login['password'])
         return login 
 
     def login(self, user="admin", password="password"):
-        #login = get_login_credentials_from_config()
+        login = self.get_login_credentials_from_config()
+        user = login['username']
+        password = login['password']
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)

@@ -7,6 +7,12 @@ account_number=1234-1234-1234
 private_key_file=/full/path/to/my/private/pk-file.pem
 public_cert_file=/full/path/to/my/public/cert-file.pem
 
-[login_credentials]
+[aeolus_login_credentials]
 username=admin
-password=password
+# base64 encoded
+password=cGFzc3dvcmQ=
+
+[katello_login_credentials]
+username=admin
+# base64 encoded
+password=YWRtaW4=
