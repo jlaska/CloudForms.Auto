@@ -18,8 +18,13 @@ Current documentation is [hosted here](http://eanxgeek.github.com/katello_challe
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
 2. Edit `data/template_data.py` if desired.
 3. Execute `./generate_dataset.py` to generate a semi-random dataset based on `data/template_data.py`.
-4. Update `data/private_data.ini` file with private provider account details.
-5. Run tests!
+4. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords for aeolus and katello projects.
+        $ python
+        >>> import base64
+        >>> print base64.b64encode("password")
+        >>> cGFzc3dvcmQ= # copy this string to private_data.ini file
+5. Rename `data/private_data.template` to `data/private_data.ini` and add `data/private_data.template` to `.gitignore` file
+6. Run tests!
 
 ## Requirements
 These tests assume a fresh install of the product(s) that are accessible from the machine running the tests.
