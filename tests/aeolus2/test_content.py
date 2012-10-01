@@ -24,10 +24,9 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        # FIXME: loop on images
-        cloud = Environment.pool_family_environments[0]['name']
-        image = Content.images[0]
-        page.new_image_from_url(cloud, image)
+        cloud = Environment.pool_family_environments[1]['name']
+        for image in Content.images:
+            page.new_image_from_url(cloud, image)
 
     def test_build_images(self, mozwebqa):
         '''
@@ -36,9 +35,30 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
         
-        # FIXME: loop on images
-        image = Content.images[0]['name']
-        page.build_image(image)
+        for image in Content.images:
+            page.build_image(image['name'])
+            time.sleep(10)
+
+    ###
+    # api function for reference
+    # use/extend for polling status
+    ###
+    def test_poll_images(self, mozwebqa):
+        '''
+        poll image build and return status
+        '''
+        print "### Images ###"
+        images = self.api.get_element_id_list("images", "image")
+        for image_id in images:
+            image_detail = self.api.get_detailed_info("images", image_id)
+            print "%s (%s)" % (image_detail['name'], image_id)
+
+        # return XML more complex, not verified
+        print "### Target Images ###"
+        target_images = self.api.get_element_id_list("target_images", "target_image")
+        for target_image_id in target_images:
+            target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
+            print "%s (%s)" % (target_image_detail['template'], target_image_id)
 
     def test_create_app_blueprint(self, mozwebqa):
         '''
@@ -46,9 +66,9 @@ class TestContent(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        # FIXME: loop on images
-        image = Content.images[0]
-        page.new_app_blueprint_from_image(image, Content.apps[2])
+
+        for image in Content.images:
+            page.new_app_blueprint_from_image(image)
 
     def test_push_images(self, mozwebqa):
         '''
@@ -56,16 +76,19 @@ class TestContent(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        image = Content.images[0]['name']
-        page.push_image(image)
+        for image in Content.images:
+            page.push_image(image['name'])
+            time.sleep(10)
 
-    def test_launch_app(self, mozwebqa):
+    def test_launch_apps(self, mozwebqa):
         '''
-        Launch
+        Launch apps.
+        Launches a single app per image, seleting the first app in the list
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        catalog = Content.catalogs[0]['name']
-        image = Content.images[0]['name']
-        app = Content.apps[2]['name']
-        page.launch_app(catalog, image, app)
+        # TODO: link catalogs and images more elegantly
+        catalog = Content.catalogs[1]['name']
+        for image in Content.images:
+            page.launch_app(catalog, image)
+            time.sleep(10)

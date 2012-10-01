@@ -284,12 +284,17 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.new_image_continue_button).click()
         self.selenium.find_element(*self.locators.save_button).click()
 
-    def new_app_blueprint_from_image(self, image, app):
+    def new_app_blueprint_from_image(self, image):
+        '''
+        creates initial app blueprint
+        accepts default name and first catalog in list of catalogs
+        '''
         self.go_to_page_view("images")
         self.click_by_text("a", image['name'])
         self.click_by_text("a", "New Application Blueprint from Image")
         # selecting catalog is tricky due to hidden elements
         # it's not pretty but javascript is one approach that works
+        # selects first catalog in list
         self.selenium.execute_script("el = " +\
             "document.getElementsByClassName('catalog_link');"\
             "el.onmouseover=(function(){document.getElementById" +\
@@ -313,21 +318,20 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", image)
         self.selenium.find_element(*self.locators.push_all).click()
 
-    def launch_app(self, catalog, image, app):
+    def launch_app(self, catalog, image):
         '''
         launch all apps
 
         direct nav to catalogs, select catalog by name
         select image by name, click launch
         create unique app name with otherwise default opts
-        confirm launch
         '''
         # FIXME: use API to confirm images pushed
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
-        self.click_by_text("a", image)
+        self.click_by_text("a", image['name'])
         self.selenium.find_element(*self.locators.launch).click()
         self.selenium.find_element(*self.locators.app_name_field).clear()
-        self.send_text(app, *self.locators.app_name_field)
+        self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
         self.selenium.find_element(*self.locators.launch).click()
