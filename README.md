@@ -23,6 +23,7 @@ Current documentation is [hosted here](http://eanxgeek.github.com/katello_challe
 6. Run tests!
 
 *Base64 encoding:*
+
     $ python
     >>> import base64
     >>> print base64.b64encode("password")
