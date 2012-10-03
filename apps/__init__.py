@@ -226,7 +226,7 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def get_login_credentials_from_config(self):
+    def get_admin_credentials_from_config(self):
         '''
         get user login credentials from data/private_data.ini file
         assumes minimal base64 encoding of password
@@ -239,17 +239,19 @@ class BasePage(object):
         parser.read(config_file)
         login = dict()
         if self.project == 'katello':
-            items = parser.items('katello_login_credentials')
+            items = parser.items('katello_admin_login')
         elif self.project == 'aeolus':
-            items = parser.items('aeolus_login_credentials')
+            items = parser.items('aeolus_admin_login')
         for (key,value) in items:
             login[key] = value
 
         login['password'] = self.decode_string(login['password'])
         return login 
 
+    # tighen this up: allow for defaults?
+    # fail more gracefully
     def login(self, user="admin", password="password"):
-        login = self.get_login_credentials_from_config()
+        login = self.get_admin_credentials_from_config()
         user = login['username']
         password = login['password']
         self.send_text(user, *self.locators.username_text_field)

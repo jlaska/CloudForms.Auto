@@ -173,29 +173,6 @@ class Provider(object):
         "provider_account_priority" : "",
         "provider_account_quota" : "" },
 
-        # unique account number required?
-        #{"type" : "ec2",
-        #"provider_name" : "ec2-eu-west-1",
-        #"provider_account_name" : "Public cloud west",
-        #"username_access_key" : "",
-        #"password_secret_access_key" : "",
-        #"account_number" : "",
-        #"key_file" : "",
-        #"key_cert_file" : "",
-        #"provider_account_priority" : "",
-        #"provider_account_quota" : "" },
-
-        #{"type" : "ec2",
-        #"provider_name" : "ec2-eu-west-1",
-        #"provider_account_name" : "Public cloud EU",
-        #"username_access_key" : "",
-        #"password_secret_access_key" : "",
-        #"account_number" : "",
-        #"key_file" : "",
-        #"key_cert_file" : "",
-        #"provider_account_priority" : "",
-        #"provider_account_quota" : "" },
-
         {"type" : "rhevm",
         "provider_name" : "rhevm-default",
         "provider_account_name" : "rhevm",
@@ -211,87 +188,100 @@ class Provider(object):
         "password_secret_access_key" : "R3dhat!",
         "provider_account_priority" : "",
         "provider_account_quota" : "" }]
-        
+
+    resource_profiles = [
+        {"name" : "small-i386",
+        "memory" : "512",
+        "cpu_count" : "1",
+        "storage" : "",
+        "arch" : "i386"}]
+
 class Environment(object):
     '''
     Define environments and pools
     '''
-    pool_family_environments = [
-        {"name" : "IT",
+    clouds = [
+        {"name" : "Dev",
         "max_running_instances" : "14",
-        "enabled_provider_accounts" : ['rhevm', 'ec2-sa-east-1', 'ec2-ap-northeast-1', 'ec2-us-west-2', 'ec2-eu-west-1', 'ec2-ap-southeast-1', 'ec2-sa-east-1', 'ec2-us-west-1']},
-        {"name" : "CloudForms",
+        "enabled_provider_accounts" : ['rhevm']},
+        {"name" : "Test",
         "max_running_instances" : "23",
-        "enabled_provider_accounts" : ['ec2-us-west-2', 'ec2-eu-west-1', 'ec2-us-west-1', 'ec2-ap-northeast-1', 'ec2-sa-east-1', 'rhevm', 'vsphere', 'ec2-sa-east-1', 'ec2-ap-southeast-1']},
-        {"name" : "Support",
+        "enabled_provider_accounts" : ['vsphere']},
+        {"name" : "Production",
         "max_running_instances" : "21",
-        "enabled_provider_accounts" : ['ec2-eu-west-1', 'ec2-us-west-2', 'rhevm']},
-        {"name" : "Operations",
-        "max_running_instances" : "21",
-        "enabled_provider_accounts" : ['ec2-sa-east-1']}]
+        "enabled_provider_accounts" : ['Public cloud east']}]
+        #{"name" : "Operations-all",
+        #"max_running_instances" : "21",
+        #"enabled_provider_accounts" : ['ec2-us-west-2', 'ec2-eu-west-1', 'ec2-us-west-1', 'ec2-ap-northeast-1', 'ec2-sa-east-1', 'rhevm', 'vsphere', 'ec2-sa-east-1', 'ec2-ap-southeast-1']}]
 
     pools = [
-        {"name" : "dev",
-        "environment_parent" : ['CloudForms'],
-        "quota" : "18",
+        {"name" : "CloudForms-dev",
+        "environment_parent" : ['Dev'],
+        "quota" : "24",
         "enabled" : True},
-        {"name" : "qe",
-        "environment_parent" : ['Operations'],
+        {"name" : "CloudForms-test",
+        "environment_parent" : ['Test'],
         "quota" : "11",
         "enabled" : True},
-        {"name" : "stage",
-        "environment_parent" : ['IT'],
+        {"name" : "CloudForms-prod",
+        "environment_parent" : ['Production'],
         "quota" : "17",
-        "enabled" : True},
-        {"name" : "production",
-        "environment_parent" : ['Support'],
-        "quota" : "9",
         "enabled" : True}]
+        #{"name" : "Production",
+        #"environment_parent" : ['Operations-all'],
+        #"quota" : "9",
+        #"enabled" : True}]
 
 class Content(object):
     '''
     Define catalogs, images and deployables
     '''
     catalogs = [
-        {"name" : "IT",
-        "pool_parent" : 'stage'},
-        {"name" : "development",
-        "pool_parent" : 'dev'},
-        {"name" : "web services",
-        "pool_parent" : 'production'},
-        {"name" : "engineering tools",
-        "pool_parent" : 'test'}]
+        {"name" : "CF tools",
+        "pool_parent" : 'CloudForms-dev'},
+        {"name" : "RHEL apps",
+        "pool_parent" : 'CloudForms-test'},
+        {"name" : "Other apps",
+        "pool_parent" : 'CloudForms-prod'}]
 
     images = [
 
-        {"name" : "rhel-x86_64-6Server-cf-se",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-se-Library-export.xml",
-        "apps" : ["CFSE on 6Server - x86_64", "CFSE-6x86_64-b", "CFSE-6x86_64-c"]},
+        #{"name" : "rhel-x86_64-6Server-cf-se",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-se.xml",
+        #"apps" : ["CFSE on 6Server - x86_64", "CFSE-6x86_64-b", "CFSE-6x86_64-c"]},
 
-        {"name" : "rhel-x86_64-6Server-cf-ce",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-ce-Library-export.xml",
-        "apps" : ["CFCE on 6Server - x86_64", "CFCE-6x86_64-b", "CFCE-6x86_64-c"]},
+        #{"name" : "rhel-x86_64-6Server-cf-ce",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-ce.xml",
+        #"apps" : ["CFCE on 6Server - x86_64", "CFCE-6x86_64-b", "CFCE-6x86_64-c"]},
 
         {"name" : "rhel-x86_64-6Server-cf-configserver",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver-Library-export.xml",
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
         "apps" : ["ConfigServer on 6Server - x86_64", "ConfigServer-6x86_64-b", "ConcifServer-6x86_64-c"]},
 
         {"name" : "rhel-x86_64-6Server-cf-tools",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools-Library-export.xml",
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
         "apps" : ["CF Tools on 6Server - x86_64", "CF-tools-6x86_64-b", "CF-tools-6x86_64-c"]},
 
         {"name" : "rhel-x86_64-5Server-cf-tools",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools-Library-export.xml",
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
         "apps" : ["5Sever CF tools - x86_64", "CF-tools-5x86_64-b", "CF-tools-5x86_64-c"]},
 
         {"name" : "rhel-i386-5Server-cf-tools",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools-Library-export.xml",
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
         "apps" : ["5Sever i386", "5Sever i386-b", "5Sever i386-c"]},
 
         {"name" : "rhel-i386-6Server-cf-tools",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools-Library-export.xml",
+        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
         "apps" : ["6Sever i386", "6Sever i386-b", "6Sever i386-c"]}]
-        
+
+        #{"name" : "rhel-x86_64-6Server-cf-se",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-se.xml",
+        #"apps" : ["CFSE on 6Server - x86_64", "CFSE-6x86_64-b", "CFSE-6x86_64-c"]},
+
+        #{"name" : "rhel-x86_64-6Server-cf-ce",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-ce.xml",
+        #"apps" : ["CFCE on 6Server - x86_64", "CFCE-6x86_64-b", "CFCE-6x86_64-c"]},
+       
     apps = [
         {"name" : "Katello_1.1",
         "hwp" : ['small-x86_64'],

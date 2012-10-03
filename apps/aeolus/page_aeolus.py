@@ -25,6 +25,16 @@ class Aeolus(apps.aeolus.Conductor_Page):
         element_id = re.search(".+/(\d+)$", url)
         return element_id.group(1)
 
+    def get_provider_id_by_url(self, element):
+        '''
+        screen scrape URL for ID
+        '''
+        # FIXME: same as get_id_by_url but called from page_aeolus, not test
+        #self.go_to_page_view(view)
+        url = self.url_by_text("a", element)
+        element_id = re.search(".+/(\d+)$", url)
+        return element_id.group(1)
+
     ###
     # user and groups admin
     ###
@@ -237,15 +247,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_popup_confirm()
         return self.get_text(*self.locators.response)
 
-    def add_add_provider_accounts_cloud(self, env):
+    def add_add_provider_accounts_cloud(self, cloud):
         '''
         add or enable all provider accounts to cloud/pool family
         '''
         self.go_to_page_view('pool_families')
-        self.click_by_text("a", env)
+        self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.env_prov_acct_details).click()
         self.selenium.find_element(*self.locators.env_add_prov_acct_button).click()
-        self.selenium.find_element(*self.locators.select_all).click()
+        for account in cloud['enabled_provider_accounts']:
+            account_id = self.get_provider_id_by_url(account)
+            account_locator = (By.ID, "account_checkbox_%s" % account_id)
+            self.selenium.find_element(*account_locator).click()
         self.selenium.find_element(*self.locators.save_button).click()
         return self.get_text(*self.locators.response)
 
@@ -268,6 +281,15 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.catalog_delete_locator).click()
         self.click_popup_confirm()
         return self.get_text(*self.locators.response)
+
+    def new_cloud_resource_profile(self, profile):
+        self.go_to_page_view("hardware_profiles/new")
+        self.send_text(profile["name"], *self.locators.hwp_name_field)
+        self.send_text(profile["memory"], *self.locators.hwp_memory_field)
+        self.send_text(profile["cpu_count"], *self.locators.hwp_cpu_field)
+        self.send_text(profile["storage"], *self.locators.hwp_storage_field)
+        self.select_dropdown(profile["arch"], *self.locators.hwp_arch_field)
+        self.selenium.find_element(*self.locators.save_button).click()
 
     def new_image_from_url(self, cloud, image):
         '''
@@ -301,20 +323,24 @@ class Aeolus(apps.aeolus.Conductor_Page):
             "('catalog_id_').click();}());")
         self.selenium.find_element(*self.locators.save_button).click()
 
-    def build_image(self, image):
+    def build_image(self, cloud, image):
         '''
         build all images
         '''
-        self.go_to_page_view("images")
+        self.go_to_page_view("pool_families")
+        self.click_by_text("a", cloud)
+        self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image)
         self.selenium.find_element(*self.locators.build_all).click()
 
-    def push_image(self, image):
+    def push_image(self, cloud, image):
         '''
         push all images
         '''
         # FIXME: use API to confirm images built
-        self.go_to_page_view("images")
+        self.go_to_page_view("pool_families")
+        self.click_by_text("a", cloud)
+        self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image)
         self.selenium.find_element(*self.locators.push_all).click()
 

@@ -68,8 +68,18 @@ class TestProvider(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for environment in Environment.pool_family_environments:
+        for cloud in Environment.clouds:
             # tricky assert: string includes list of accts added
             #assert page.add_add_provider_accounts_cloud(environment['name']) ==\
             #    aeolus_msg['add_provider_accts']
-            page.add_add_provider_accounts_cloud(environment['name'])
+            page.add_add_provider_accounts_cloud(cloud)
+
+    def test_create_resource_profiles(self, mozwebqa):
+        '''
+        create cloud resource profiles
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        for profile in Provider.resource_profiles:
+            page.new_cloud_resource_profile(profile)

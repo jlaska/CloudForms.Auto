@@ -10,6 +10,7 @@ def setup_module(module):
     test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
     module.TestAdmin.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
+@pytest.mark.nonldap
 class TestUsers(Aeolus_Test):
     '''
     Create users and groups, then add users to those groups
@@ -34,8 +35,6 @@ class TestUsers(Aeolus_Test):
         # Call parent cleanup
         Aeolus_Test.teardown_class.im_func(self)
 
-    @pytest.mark.user_admin
-    @pytest.mark.aeolus_setup
     def test_create_users(self, mozwebqa):
         '''
         Create users
@@ -61,8 +60,6 @@ class TestUsers(Aeolus_Test):
         #    assert page.logout() == "Aeolus Conductor | Login"
 
     @pytest.mark.skipif("config.getvalue('product_version') == '1.0.1'")
-    @pytest.mark.user_admin
-    @pytest.mark.aeolus_setup
     def test_create_user_groups(self, mozwebqa):
         '''
         create user groups

@@ -79,6 +79,13 @@ class AeolusLocators(apps.locators.BaseLocators):
     catalog_save_locator = (By.ID, "save_button")
     catalog_delete_locator = (By.ID, "delete")
 
+    # new cloud resource profile
+    hwp_name_field = (By.ID, "hardware_profile_name")
+    hwp_memory_field = (By.ID, "hardware_profile_memory_attributes_value")
+    hwp_cpu_field = (By.ID, "hardware_profile_cpu_attributes_value")
+    hwp_storage_field = (By.ID, "hardware_profile_storage_attributes_value")
+    hwp_arch_field = (By.ID, "hardware_profile_architecture_attributes_value")
+
     # new image
     image_details = (By.ID, "details_images")
     #new_image_name_field = (By.ID, "name")

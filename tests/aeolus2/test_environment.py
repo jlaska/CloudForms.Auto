@@ -10,26 +10,26 @@ import time
 
 def setup_module(module):
     test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestEnvironment.aeolus = apps.initializeProduct(test_setup.TestSetup)
+    module.TestClouds.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 
-class TestEnvironment(Aeolus_Test):
+class TestClouds(Aeolus_Test):
     '''
-    Create clouds, pools and catalogs
+    Create clouds, pools, catalogs and cloud resource profile (front end)
     '''
 
     @pytest.mark.environment
     @pytest.mark.aeolus_setup
-    def test_new_environment_pool_family(self, mozwebqa):
+    def test_create_clouds(self, mozwebqa):
         '''
-        create new environments or pool families
+        create new clouds
         '''
         page = self.aeolus.load_page('Aeolus')
         #assert page.login() == aeolus_msg['login']
         page.login()
 
-        for environment in Environment.pool_family_environments:
-            assert page.new_environment(environment) == aeolus_msg['add_pool_family']
+        for cloud in Environment.clouds:
+            assert page.new_environment(cloud) == aeolus_msg['add_pool_family']
 
         # test cleanup
         #if self.testsetup.test_cleanup:
@@ -37,7 +37,7 @@ class TestEnvironment(Aeolus_Test):
         #        assert page.delete_environment(environment) == \
         #               aeolus_msg['delete_pool_family']
 
-    def test_new_pool(self, mozwebqa):
+    def test_new_pools(self, mozwebqa):
         '''
         create new pools
         '''
@@ -47,13 +47,13 @@ class TestEnvironment(Aeolus_Test):
 
         # workaround. Select dropdown not working
         # capture pool_family_environment IDs from "/pool_families/" view
-        for environment in Environment.pool_family_environments:
-            environment['id'] = page.get_id_by_url("pool_families", environment['name'])
+        for cloud in Environment.clouds:
+            cloud['id'] = page.get_id_by_url("pool_families", cloud['name'])
 
-        for environment in Environment.pool_family_environments:
+        for cloud in Environment.clouds:
             for pool in Environment.pools:
-                if environment['name'] in pool['environment_parent']:
-                    assert page.new_pool_by_id(environment, pool) == \
+                if cloud['name'] in pool['environment_parent']:
+                    assert page.new_pool_by_id(cloud, pool) == \
                         aeolus_msg['add_pool']
 
         #for pool in Environment.pools:
@@ -71,7 +71,7 @@ class TestEnvironment(Aeolus_Test):
         #               aeolus_msg['delete_pool'] % pool["name"]
 
 
-    def test_new_catalog(self, mozwebqa):
+    def test_create_catalogs(self, mozwebqa):
         '''
         create new catalogs
         '''
@@ -85,5 +85,4 @@ class TestEnvironment(Aeolus_Test):
         #if self.testsetup.test_cleanup:
         #    for catalog in Content.catalogs:
         #        assert page.delete_catalog(catalog) == aeolus_msg['delete_catalog']
-
 

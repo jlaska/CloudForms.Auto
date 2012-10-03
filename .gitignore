@@ -6,5 +6,5 @@ results/
 .project
 .pydevproject
 *.pem
-chromedriver.log
+*.log
 private_data.ini
