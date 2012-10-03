@@ -6,6 +6,7 @@ from tests.aeolus2 import Aeolus_Test
 from data.large_dataset import Provider
 from data.large_dataset import Environment
 from data.assert_response import *
+import logging
 import time
 
 def setup_module(module):
@@ -70,9 +71,9 @@ class TestProvider(Aeolus_Test):
 
         for cloud in Environment.clouds:
             # tricky assert: string includes list of accts added
-            #assert page.add_add_provider_accounts_cloud(environment['name']) ==\
+            #assert page.add_provider_accounts_cloud(environment['name']) ==\
             #    aeolus_msg['add_provider_accts']
-            page.add_add_provider_accounts_cloud(cloud)
+            page.add_provider_accounts_cloud(cloud)
 
     def test_create_resource_profiles(self, mozwebqa):
         '''

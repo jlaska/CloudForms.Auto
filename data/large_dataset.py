@@ -256,23 +256,28 @@ class Content(object):
 
         {"name" : "rhel-x86_64-6Server-cf-configserver",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
-        "apps" : ["ConfigServer on 6Server - x86_64", "ConfigServer-6x86_64-b", "ConcifServer-6x86_64-c"]},
+        "apps" : ["ConfigServer on 6Server - x86_64", "ConfigServer-6x86_64-b", "ConcifServer-6x86_64-c"],
+        "profile" : "small-x86_64"},
 
         {"name" : "rhel-x86_64-6Server-cf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
-        "apps" : ["CF Tools on 6Server - x86_64", "CF-tools-6x86_64-b", "CF-tools-6x86_64-c"]},
+        "apps" : ["CF Tools on 6Server - x86_64", "CF-tools-6x86_64-b", "CF-tools-6x86_64-c"],
+        "profile" : "small-x86_64"},
 
         {"name" : "rhel-x86_64-5Server-cf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
-        "apps" : ["5Sever CF tools - x86_64", "CF-tools-5x86_64-b", "CF-tools-5x86_64-c"]},
+        "apps" : ["5Sever CF tools - x86_64", "CF-tools-5x86_64-b", "CF-tools-5x86_64-c"],
+        "profile" : "small-x86_64"},
 
         {"name" : "rhel-i386-5Server-cf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
-        "apps" : ["5Sever i386", "5Sever i386-b", "5Sever i386-c"]},
+        "apps" : ["5Sever i386", "5Sever i386-b", "5Sever i386-c"],
+        "profile" : "small-i386"},
 
         {"name" : "rhel-i386-6Server-cf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
-        "apps" : ["6Sever i386", "6Sever i386-b", "6Sever i386-c"]}]
+        "apps" : ["6Sever i386", "6Sever i386-b", "6Sever i386-c"],
+        "profile" : "small-i386"}]
 
         #{"name" : "rhel-x86_64-6Server-cf-se",
         #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-se.xml",

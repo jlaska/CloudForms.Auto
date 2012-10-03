@@ -103,6 +103,8 @@ class AeolusLocators(apps.locators.BaseLocators):
     # build, push, launch
     build_all = (By.XPATH, "(//input[@value='Build All'])")
     push_all = (By.XPATH, "(//input[@value='Push all'])")
+    blueprint_name = (By.ID, "deployable_name")
+    resource_profile_dropdown = (By.ID, "hardware_profile")
     launch = (By.ID, "launch_deployment_button")
     app_name_field = (By.ID, "deployment_name")
     next_button = (By.ID, "next_button")

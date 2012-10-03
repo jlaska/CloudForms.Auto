@@ -8,9 +8,6 @@ import locators as bl
 import logging
 import apps.locators
 
-# Enable debug
-# logging.getLogger().setLevel(logging.DEBUG)
-
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
@@ -19,6 +16,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
+
+logging.basicConfig(filename='cloudforms_test.log', filemode='w', level=logging.INFO)
 
 def initializeProduct(mozwebqa):
     '''
@@ -257,6 +256,7 @@ class BasePage(object):
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
+        logging.info('login as user "%s"' % user)
         #return self.get_text(*self.locators.confirmation_msg)
 
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?

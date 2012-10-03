@@ -6,6 +6,7 @@ from tests.aeolus2 import Aeolus_Test
 from data.large_dataset import Environment
 from data.large_dataset import Content
 from data.assert_response import *
+import logging
 import time
 
 def setup_module(module):

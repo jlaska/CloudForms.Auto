@@ -6,6 +6,7 @@ from data.large_dataset import Environment
 from data.large_dataset import Content
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
+import logging
 import time
 
 def setup_module(module):
@@ -57,8 +58,9 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for image in Content.images:
-            page.new_app_blueprint_from_image(image)
+        for cloud in Environment.clouds:
+            for image in Content.images:
+                page.new_app_blueprint_from_image(cloud['name'], image)
 
     # Eval guide: publish app blueprint to catalog?
     # separate launch and config of configserver?

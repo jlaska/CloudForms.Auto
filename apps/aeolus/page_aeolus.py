@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
 import apps.aeolus
-import time, re
+import time, re, logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-import time
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
     def __init__(self, **kwargs):
         apps.aeolus.Conductor_Page.__init__(self, **kwargs)
         self.go_to_home_page()
+        logging.info('load home page')
 
     def logout(self):
         self.go_to_page_view("logout")
+        logging.info('logout')
         return self.selenium.title
 
     def get_id_by_url(self, view, element):
@@ -51,6 +52,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(user["passwd"], *self.locators.user_password_confirmation_field)
         self.send_text(user["max_instances"], *self.locators.user_quota_max_running_instances_field)
         self.selenium.find_element(*self.locators.user_submit_locator).click()
+        logging.info("create user '%s'" % user)
         return self.get_text(*self.locators.response)
 
     def delete_user(self, username):
@@ -62,6 +64,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.user_delete_locator).click()
         alert = self.selenium.switch_to_alert()
         alert.accept()
+        logging.info("delete user '%s'" % username)
         return self.get_text(*confirmation_msg)
 
     def create_user_group(self, user_group):
@@ -72,6 +75,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(user_group["name"], *self.locators.user_group_name_field)
         self.send_text(user_group["description"], *self.locators.user_group_description_field)
         self.selenium.find_element(*self.locators.user_group_submit_locator).click()
+        logging.info("create user group '%s'" % user_group)
         return self.get_text(*self.locators.response)
 
     def delete_user_group(self, name):
@@ -83,6 +87,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.user_group_delete_locator).click()
         alert = self.selenium.switch_to_alert()
         alert.accept()
+        logging.info("delete user group '%s'" % name)
         return self.get_text(*self.locators.response)
 
     def add_user_to_group(self, group_id, user_id):
@@ -93,6 +98,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("user_groups/%s/add_members" % group_id)
         self.selenium.find_element(*_member_checkbox).click()
         self.selenium.find_element(*self.locators.user_group_save).click()
+        logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
     def delete_user_from_group(self, group_id, user_id):
@@ -105,6 +111,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.user_group_delete).click()
         alert = self.selenium.switch_to_alert()
         alert.accept()
+        logging.info("delete user '%s' from group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
     def add_selfservice_quota(self, quota):
@@ -115,6 +122,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(quota, *self.locators.instances_quota)
         # FIXME: submit not working
         self.selenium.find_element(*self.locators.instances_quota).send_keys(Keys.RETURN)
+        logging.info("add self-service quota '%s'" % quota)
         return self.get_text(*self.locators.response)
 
     ###
@@ -138,6 +146,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(acct["provider_account_priority"], *self.locators.prov_acct_prior_field)
         self.send_text(acct["provider_account_quota"], *self.locators.prov_acct_quota_field)
         self.selenium.find_element(*self.locators.prov_acct_save_locator).click()
+        logging.info("create provider account '%s'" % acct["provider_account_name"])
         return self.get_text(*self.locators.response)
 
     def delete_provider_account(self, acct):
@@ -152,6 +161,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", "Delete Account")
         alert = self.selenium.switch_to_alert()
         alert.accept()
+        logging.info("delete provider account '%s'" % acct['provider_account_name'])
         return self.get_text(*self.locators.response)
 
     def connection_test_provider_account(self, acct):
@@ -163,6 +173,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.prov_acct_details_locator).click()
         self.click_by_text("a", acct['provider_account_name'])
         self.click_by_text("a", "Test Connection")
+        logging.info("test provider account connection '%s'" % acct['provider_account_name'])
         return self.get_text(*self.locators.response)
 
     def connection_test_provider(self, acct):
@@ -172,6 +183,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("providers")
         self.click_by_text("a", acct['provider_name'])
         self.click_by_text("a", "Test Connection")
+        logging.info("test provider connection '%s'" % acct['provider_name'])
         return self.get_text(*self.locators.response)
 
     def update_ec2_acct_credentials_from_config(self, account):
@@ -198,6 +210,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(env["name"], *self.locators.env_name_field)
         self.send_text(env["max_running_instances"], *self.locators.env_max_running_instances_field)
         self.selenium.find_element(*self.locators.env_submit_locator).click()
+        logging.info("create cloud '%s'" % env['name'])
         return self.get_text(*self.locators.response)
 
     def delete_environment(self, env):
@@ -208,6 +221,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", env["name"])
         self.selenium.find_element(*self.locators.pool_family_delete_locator).click()
         self.click_popup_confirm()
+        logging.info("delete cloud '%s'" % env['name'])
         return self.get_text(*self.locators.response)
 
     def new_pool(self, pool):
@@ -221,6 +235,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #if pool["enabled"] == True:
         #    self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
         self.selenium.find_element(*self.locators.pool_save_locator).click()
+        logging.info("create pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
 
     # use if new_pool dropdown doesn't work
@@ -235,6 +250,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #if pool["enabled"] == True:
         #    self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
         self.selenium.find_element(*self.locators.pool_save).click()
+        logging.info("create pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
 
     def delete_pool(self, pool):
@@ -245,9 +261,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", pool["name"])
         self.selenium.find_element(*self.locators.pool_delete_locator).click()
         self.click_popup_confirm()
+        logging.info("delete pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
 
-    def add_add_provider_accounts_cloud(self, cloud):
+    def add_provider_accounts_cloud(self, cloud):
         '''
         add or enable all provider accounts to cloud/pool family
         '''
@@ -260,6 +277,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             account_locator = (By.ID, "account_checkbox_%s" % account_id)
             self.selenium.find_element(*account_locator).click()
         self.selenium.find_element(*self.locators.save_button).click()
+        logging.info("Add provider accounts to cloud '%s'" % cloud['name'])
         return self.get_text(*self.locators.response)
 
     ###
@@ -273,6 +291,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(catalog["name"], *self.locators.catalog_name_field)
         self.select_dropdown(catalog["pool_parent"], *self.locators.catalog_family_parent_field)
         self.selenium.find_element(*self.locators.catalog_save_locator).click()
+        logging.info("create catalog '%s'" % catalog['name'])
         return self.get_text(*self.locators.response)
 
     def delete_catalog(self, catalog):
@@ -280,6 +299,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", catalog["name"])
         self.selenium.find_element(*self.locators.catalog_delete_locator).click()
         self.click_popup_confirm()
+        logging.info("delete catalog '%s'" % catalog['name'])
         return self.get_text(*self.locators.response)
 
     def new_cloud_resource_profile(self, profile):
@@ -289,6 +309,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(profile["cpu_count"], *self.locators.hwp_cpu_field)
         self.send_text(profile["storage"], *self.locators.hwp_storage_field)
         self.select_dropdown(profile["arch"], *self.locators.hwp_arch_field)
+        logging.info("create cloud resource profile '%s'" % profile['name'])
         self.selenium.find_element(*self.locators.save_button).click()
 
     def new_image_from_url(self, cloud, image):
@@ -304,16 +325,24 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(image['template_url'], *self.locators.new_image_url_field)
         self.selenium.find_element(*self.locators.new_image_edit_box).click()
         self.selenium.find_element(*self.locators.new_image_continue_button).click()
+        logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
         self.selenium.find_element(*self.locators.save_button).click()
 
-    def new_app_blueprint_from_image(self, image):
+    def new_app_blueprint_from_image(self, cloud, image):
         '''
         creates initial app blueprint
         accepts default name and first catalog in list of catalogs
         '''
-        self.go_to_page_view("images")
+        self.go_to_page_view("pool_families")
+        self.click_by_text("a", cloud)
+        self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image['name'])
         self.click_by_text("a", "New Application Blueprint from Image")
+        self.selenium.find_element(*self.locators.blueprint_name).clear()
+        self.send_text("%s-%s" % (image['name'], cloud), \
+            *self.locators.blueprint_name)
+        self.select_dropdown(image['profile'], 
+            *self.locators.resource_profile_dropdown)
         # selecting catalog is tricky due to hidden elements
         # it's not pretty but javascript is one approach that works
         # selects first catalog in list
@@ -321,6 +350,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             "document.getElementsByClassName('catalog_link');"\
             "el.onmouseover=(function(){document.getElementById" +\
             "('catalog_id_').click();}());")
+        logging.info("create application blueprint '%s'" % image['name'])
         self.selenium.find_element(*self.locators.save_button).click()
 
     def build_image(self, cloud, image):
@@ -331,6 +361,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", cloud)
         self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image)
+        logging.info("Build image '%s' in cloud '%s'" % \
+            (image, cloud))
         self.selenium.find_element(*self.locators.build_all).click()
 
     def push_image(self, cloud, image):
@@ -342,6 +374,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", cloud)
         self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image)
+        logging.info("push image '%s' to all providers in cloud '%s'" % \
+            (image, cloud))
         self.selenium.find_element(*self.locators.push_all).click()
 
     def launch_app(self, catalog, image):
@@ -360,4 +394,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.app_name_field).clear()
         self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
+        logging.info("Launch app '%s' in catalog '%s'" % \
+            (image['apps'][0], catalog))
         self.selenium.find_element(*self.locators.launch).click()
