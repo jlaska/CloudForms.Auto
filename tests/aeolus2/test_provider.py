@@ -43,6 +43,8 @@ class TestProvider(Aeolus_Test):
         #assert page.login() == aeolus_msg['login']
         page.login()
 
+        # TODO: delete mock provider account to prevent launching to mock
+
         # create provider account
         for account in Provider.accounts:
             if account["type"] == "ec2":

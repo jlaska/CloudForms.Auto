@@ -378,7 +378,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             (image, cloud))
         self.selenium.find_element(*self.locators.push_all).click()
 
-    def launch_app(self, catalog, image):
+    def launch_app(self, catalog, app_name):
         '''
         launch all apps
 
@@ -389,11 +389,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # FIXME: use API to confirm images pushed
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
-        self.click_by_text("a", image['name'])
+        self.click_by_text("a", app_name)
         self.selenium.find_element(*self.locators.launch).click()
-        self.selenium.find_element(*self.locators.app_name_field).clear()
-        self.send_text(image['apps'][0], *self.locators.app_name_field)
+        #self.selenium.find_element(*self.locators.app_name_field).clear()
+        #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
         logging.info("Launch app '%s' in catalog '%s'" % \
-            (image['apps'][0], catalog))
+            (app_name, catalog))
         self.selenium.find_element(*self.locators.launch).click()

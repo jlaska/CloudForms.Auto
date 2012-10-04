@@ -16,11 +16,10 @@ Current documentation is [hosted here](http://eanxgeek.github.com/katello_challe
 * unittestzero
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Edit `data/template_data.py` if desired.
-3. Execute `./generate_dataset.py` to generate a semi-random dataset based on `data/template_data.py`.
-4. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords for aeolus and katello projects. See encoding instructions below.
-5. Rename `data/private_data.template` to `data/private_data.ini` and add `data/private_data.template` to `.gitignore` file
-6. Run tests!
+2. Verify `data/large_dataset.py` is pointed to correct system templates.
+3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords for aeolus and katello projects. See encoding instructions below.
+4. Rename `data/private_data.template` to `data/private_data.ini` and add `data/private_data.template` to `.gitignore` file
+5. Run tests per `tests/aeolus2/README.md`.
 
 *Base64 encoding:*
 

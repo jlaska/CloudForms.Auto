@@ -54,6 +54,7 @@ class TestContent(Aeolus_Test):
     def test_create_app_blueprint(self, mozwebqa):
         '''
         Create App Blueprints
+        Uses unique name and selects appropriate resource profile
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
@@ -62,24 +63,44 @@ class TestContent(Aeolus_Test):
             for image in Content.images:
                 page.new_app_blueprint_from_image(cloud['name'], image)
 
-    # Eval guide: publish app blueprint to catalog?
-    # separate launch and config of configserver?
-
-    # do as self-service user might?
-    def test_launch_apps(self, mozwebqa):
+    def test_launch_configserver(self, mozwebqa):
         '''
-        Launch apps.
-        Launches a single app per image, seleting the first app in the list
+        Launch configserver
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
+
+        for catalog in Content.catalogs:
+            for image in Content.images:
+                if image['name'] == "ConfigServer":
+                    app_name = "%s-%s" % \
+                        (image['name'], catalog['cloud_parent'])
+                    page.launch_app(catalog['name'], app_name)
+                    # TODO: configure via cli, ssh...
+
+    # Manual: configure config server
+    # if ec2 get key, chmod
+    # ssh
+    # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
+    # nav to cloud provider account, enter url, key, secret, assert notification
+
+    def test_launch_apps(self, mozwebqa):
+        '''
+        Launch apps.
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        # TODO: login as self-service, less priveledged use
+        page.login()
         # TODO: link catalogs and images more elegantly
-        catalog = Content.catalogs[1]['name']
-        for image in Content.images:
-            page.launch_app(catalog, image)
-            time.sleep(10)
+        for catalog in Content.catalogs:
+            for image in Content.images:
+                if image['name'] != "ConfigServer":
+                    app_name = "%s-%s" % \
+                        (image['name'], catalog['cloud_parent'])
+                    page.launch_app(catalog['name'], app_name)
 
     ###
+    # FIXME: 
     # api function for reference
     # use/extend for polling status
     ###
