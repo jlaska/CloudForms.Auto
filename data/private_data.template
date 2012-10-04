@@ -9,10 +9,10 @@ public_cert_file=/full/path/to/my/public/cert-file.pem
 
 [aeolus_login_credentials]
 username=admin
-# base64 encoded
+# base64 encoded 'password'
 password=cGFzc3dvcmQ=
 
 [katello_login_credentials]
 username=admin
-# base64 encoded
+# base64 encoded 'admin'
 password=YWRtaW4=
