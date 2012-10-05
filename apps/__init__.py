@@ -235,17 +235,23 @@ class BasePage(object):
         from ConfigParser import SafeConfigParser
 
         parser = SafeConfigParser()
-        parser.read(config_file)
+        # TODO - Ensure that we successfully read from config_file
+        assert len(parser.read(config_file)) > 0, "Unable to load config_file: %s " % config_file
+
         login = dict()
-        if self.project == 'katello':
-            items = parser.items('katello_admin_login')
-        elif self.project == 'aeolus':
-            items = parser.items('aeolus_admin_login')
+        items = None
+        if self.project.startswith('katello'):
+            items = parser.items('katello_login_credentials')
+        elif self.project.startswith('aeolus'):
+            items = parser.items('aeolus_login_credentials')
+        else:
+            raise Exception("No matching administrator configuration found: %s" % config_file)
+
         for (key,value) in items:
             login[key] = value
 
         login['password'] = self.decode_string(login['password'])
-        return login 
+        return login
 
     # tighen this up: allow for defaults?
     # fail more gracefully
