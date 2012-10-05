@@ -6,34 +6,11 @@ from data.large_dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 
-def setup_module(module):
-    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestAdmin.aeolus = apps.initializeProduct(test_setup.TestSetup)
-
 @pytest.mark.nonldap
 class TestUsers(Aeolus_Test):
     '''
     Create users and groups, then add users to those groups
     '''
-
-    @classmethod
-    def setup_class(self):
-        Aeolus_Test.setup_class.im_func(self)
-
-        # List to trac users to cleanup
-        self._cleanup_users = list()
-
-    @classmethod
-    def teardown_class(self):
-        # Remove users
-        if self.testsetup.test_cleanup:
-            for name in self._cleanup_users:
-                # FIXME
-                assert Aeolus.delete_user(name) == \
-                    aeolus_msg['delete_user']
-
-        # Call parent cleanup
-        Aeolus_Test.teardown_class.im_func(self)
 
     def test_create_users(self, mozwebqa):
         '''
@@ -45,7 +22,6 @@ class TestUsers(Aeolus_Test):
 
         for user in Admin.users:
             assert page.create_user(user) == aeolus_msg['add_user']
-            self._cleanup_users.append(user['username'])
 
         # TODO: not needed if teardown_class working
         # test cleanup
