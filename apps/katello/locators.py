@@ -27,10 +27,10 @@ class KatelloLocators(apps.locators.BaseLocators):
 
     # Org switcher
     org_switcher_locator = (By.XPATH, "//a[@id='switcherButton']/div")
+    switcher_org_box_locator = (By.ID, "switcherBox")
     org_switcher_org_locator = (By.CSS_SELECTOR, "a[href*='org_id=2']")
     org_input_filter_locator = (By.CSS_SELECTOR, "input#orgfilter_input")
     org_filtered_button_locator = (By.CSS_SELECTOR, "button.filter_button")
-    switcher_org_box_locator = (By.ID, "switcherBox")
     switcher_org_list_locator = (By.CSS_SELECTOR, "a.fl.clear")
 
     # Roles

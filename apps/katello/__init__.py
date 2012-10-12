@@ -141,7 +141,7 @@ class HeaderRegion(apps.BasePage):
     @property
     def is_org_list_present(self):
         """
-        Return True if evidence exists that the org switcher list is available
+        Return True if evidence exists that the org list is available
         """
         return self.is_element_visible(*self.locators.switcher_org_box_locator)
 
@@ -155,16 +155,11 @@ class HeaderRegion(apps.BasePage):
         """
         Execute a left mouse click on an org from the org switcher.
         """
-        orgs = self.selenium.find_elements(*self.locators.switcher_org_list_locator)
+        orgs = self.selenium.find_elements(*self.locators.login_org_selector)
         for org in orgs:
             if org.text == value:
                 org.click()
                 break
-
-        # I believe the following code selects the second org in the org list
-        # ... not sure why this is useful
-        #WebDriverWait(self.selenium, 20).until(lambda s: s.find_element(*self.locators.org_switcher_org_locator).is_displayed())
-        #self.selenium.find_element(*self.locators.org_switcher_org_locator).click()
 
     @property
     def get_text_from_switcher(self):
