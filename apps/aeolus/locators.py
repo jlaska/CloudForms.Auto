@@ -11,8 +11,13 @@ class AeolusLocators(apps.locators.BaseLocators):
     username_text_field = (By.NAME, "username")
     password_text_field = (By.ID, "password-input")
     login_locator = (By.NAME, "commit")
+    login_logo = (By.XPATH, "//img[@alt='Login-card-logo-upstream']")
+    logo_link = (By.XPATH, "//a[contains(text(),'Aeolus Conductor')]")
     select_all = (By.ID, "select_all")
     save_button = (By.ID, "save_button")
+
+    # Notification
+    error_notification_locator = (By.XPATH, "//div[@class='error']")
 
     # flash confirmation message
     response = (By.XPATH, "//ul[@class='flashes']")

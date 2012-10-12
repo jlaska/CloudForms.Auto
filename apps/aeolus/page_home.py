@@ -16,14 +16,6 @@ class Home(apps.aeolus.Conductor_Page):
         apps.aeolus.Conductor_Page.__init__(self, **kwargs)
         self.go_to_home_page()
 
-    @property
-    def is_username_field_present(self):
-        return self.is_element_present(*self.locators.username_text_field)
-
-    @property
-    def is_password_field_present(self):
-        return self.is_element_present(*self.locators.password_text_field)
-
     #def login(self, user="admin", password="password"):
     #    self.send_text(user, *self.locators.username_text_field)
     #    self.send_text(password, *self.locators.password_text_field)
