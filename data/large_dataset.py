@@ -19,13 +19,6 @@ class Admin(object):
         "description" : "Limited privilege users"}]
 
     users = [
-        {"fname" : "Admin",
-        "lname" : "Joe",
-        "email" : "admin@redhat.com",
-        "username" : "admin",
-        "passwd" : "password",
-        "max_instances" : "",
-        "user_groups" : ['admin'] },
         {"fname" : "Auto",
         "lname" : "Roboto",
         "email" : "admin@redhat.com",
@@ -134,11 +127,11 @@ class Environment(object):
         "enabled" : True},
         {"name" : "CloudForms-test",
         "environment_parent" : ['Test'],
-        "quota" : "11",
+        "quota" : "24",
         "enabled" : True},
         {"name" : "CloudForms-prod",
         "environment_parent" : ['Production'],
-        "quota" : "17",
+        "quota" : "24",
         "enabled" : True}]
 
 class Content(object):
@@ -159,41 +152,21 @@ class Content(object):
     images = [
         {"name" : "ConfigServer",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
-        "apps" : ["ConfigServer on 6Server - x86_64", 
-            "ConfigServer-6x86_64-b", 
-            "ConcifServer-6x86_64-c"],
         "profile" : "small-x86_64"},
 
-        {"name" : "rhel-x86_64-6Server-cf-tools",
+        {"name" : "x86_64-6Servercf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
-        "apps" : ["CF Tools on 6Server - x86_64", 
-            "CF-tools-6x86_64-b", 
-            "CF-tools-6x86_64-c"],
         "profile" : "small-x86_64"},
 
-        {"name" : "rhel-x86_64-5Server-cf-tools",
+        {"name" : "x86_64-5Servercf-tools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
-        "apps" : ["5Sever CF tools - x86_64", 
-            "CF-tools-5x86_64-b", 
-            "CF-tools-5x86_64-c"],
         "profile" : "small-x86_64"},
 
-        {"name" : "rhel-i386-5Server-cf-tools",
+        {"name" : "i386-5Server-cftools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
-        "apps" : ["5Sever i386", "5Sever i386-b", "5Sever i386-c"],
         "profile" : "small-i386"},
 
-        {"name" : "rhel-i386-6Server-cf-tools",
+        {"name" : "i386-6Server-cftools",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
-        "apps" : ["6Sever i386", "6Sever i386-b", "6Sever i386-c"],
         "profile" : "small-i386"}]
-
-        #{"name" : "rhel-x86_64-6Server-cf-se",
-        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-se.xml",
-        #"apps" : ["CFSE on 6Server - x86_64", "CFSE-6x86_64-b", "CFSE-6x86_64-c"]},
-
-        #{"name" : "rhel-x86_64-6Server-cf-ce",
-        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-ce.xml",
-        #"apps" : ["CFCE on 6Server - x86_64", "CFCE-6x86_64-b", "CFCE-6x86_64-c"]},
-
 
