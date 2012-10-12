@@ -55,7 +55,7 @@ class TestOrganizations(Katello_Test):
         Returns PASS if trying to create a org that exists
         fails.
         """
-        home_page = self.katello.load_page('Home')
+        home_page = self.load_page('Home')
         new_org_name = self.random_str(prefix="duporg_")
         self.api.create_org(new_org_name)
 
@@ -70,7 +70,7 @@ class TestOrganizations(Katello_Test):
 
     @pytest.mark.bugzilla(772575)
     def test_recreate_previously_deleted_org(self, mozwebqa):
-        home_page = self.katello.load_page('Home')
+        home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
 
@@ -103,7 +103,7 @@ class TestOrganizations(Katello_Test):
         '''
         Test to create a new org, with environment.
         '''
-        home_page = self.katello.load_page('Home')
+        home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
         assert home_page.header.is_user_logged_in
@@ -138,7 +138,7 @@ class TestOrganizations(Katello_Test):
             self._cleanup_orgs.append(org_name)
             self.api.create_org(org_name)
 
-        home_page = self.katello.load_page('Home')
+        home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
 

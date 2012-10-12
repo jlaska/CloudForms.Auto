@@ -2,7 +2,6 @@ import pytest
 import apps
 from tests.katello2 import Katello_Test
 
-@pytest.mark.nondestructive
 class TestUsers(Katello_Test):
 
     @classmethod

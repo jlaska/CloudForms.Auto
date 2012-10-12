@@ -3,6 +3,7 @@ import apps
 from api.katello.api import ApiTasks
 from tests import Base_Test
 
+@pytest.mark.katello
 class Katello_Test(Base_Test):
     '''
     Base katello test class

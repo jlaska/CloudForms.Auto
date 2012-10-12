@@ -3,6 +3,7 @@ import apps
 import tests
 
 @pytest.mark.nondestructive
+@pytest.mark.sanity
 class TestHomePage(tests.katello2.Katello_Test):
 
     def test_verify_page_title(self):
@@ -18,12 +19,15 @@ class TestHomePage(tests.katello2.Katello_Test):
 
         # login
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Still have branding?
-        assert home_page.is_login_logo_present
+        assert home_page.is_logo_present
 
-    def test_username_password_text_fields_present(self):
+    def test_verify_login_fields(self):
         '''
         Test whether the username and password fields exist
         '''
@@ -37,10 +41,10 @@ class TestHomePage(tests.katello2.Katello_Test):
 
         # login
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
-
-        # FIXME -- make this version specific
-        # home_page.select_org(home_page.org).click()
 
         # logout
         home_page.click_logout()

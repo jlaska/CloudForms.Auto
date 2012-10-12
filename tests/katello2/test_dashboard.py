@@ -5,7 +5,6 @@ import apps
 import time
 from tests.katello2 import Katello_Test
 
-@pytest.mark.nondestructive
 class TestDashboard(Katello_Test):
 
     def test_dashboard_present(self):
