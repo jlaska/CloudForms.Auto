@@ -8,7 +8,6 @@ import random
 import time
 from tests.katello2 import Katello_Test
 
-@pytest.mark.nondestructive
 class TestOrganizations(Katello_Test):
 
     @classmethod
@@ -35,6 +34,8 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         home_page.click_tab('organizations')
@@ -60,8 +61,12 @@ class TestOrganizations(Katello_Test):
         self.api.create_org(new_org_name)
 
         home_page.login()
-        home_page.click_tab("organizations")
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
+        assert home_page.is_dialog_cleared
 
+        home_page.click_tab("organizations")
         org_page = self.load_page('OrganizationsTab')
         org_page.create_new_org(new_org_name)
         self._cleanup_orgs.append(new_org_name)
@@ -73,6 +78,9 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
+        assert home_page.is_dialog_cleared
 
         home_page.click_tab("organizations")
 
@@ -106,8 +114,10 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
+        assert home_page.is_dialog_cleared
         assert home_page.header.is_user_logged_in
-
         home_page.click_tab("organizations")
         assert home_page.is_the_current_page
 
@@ -141,6 +151,9 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
+        assert home_page.is_dialog_cleared
 
         home_page.click_tab("organizations")
 
