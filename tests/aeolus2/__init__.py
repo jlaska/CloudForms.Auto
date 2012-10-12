@@ -3,6 +3,7 @@ import apps
 from tests import Base_Test
 from api.aeolus.api import ApiTasks
 
+@pytest.mark.aeolus
 class Aeolus_Test(Base_Test):
     '''
     Base aeolus test class
