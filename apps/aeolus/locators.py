@@ -101,7 +101,9 @@ class AeolusLocators(apps.locators.BaseLocators):
     catalog_item = (By.XPATH, "(//input[@id='catalog_id_'])")
 
     # build, push, launch
-    build_all = (By.XPATH, "(//input[@value='Build All'])")
+    # TODO: 'Build' with single provider; 'Build All' with multiple providers
+    # is there an alternate way to access button?
+    build_all = (By.XPATH, "(//input[@value='Build'])")
     push_all = (By.XPATH, "(//input[@value='Push all'])")
     blueprint_name = (By.ID, "deployable_name")
     resource_profile_dropdown = (By.ID, "hardware_profile")
