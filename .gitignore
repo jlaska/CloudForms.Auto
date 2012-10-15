@@ -8,3 +8,4 @@ results/
 *.pem
 *.log
 private_data.ini
+sauce_labs.yaml
