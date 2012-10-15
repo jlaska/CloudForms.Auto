@@ -16,51 +16,53 @@ class Admin(object):
         {"name" : "qe", 
         "description" : "real QE users"},
         {"name" : "cfusers", 
-        "description" : "Limited privilege users"}]
+        "description" : "Limited privilege users"}
+        ]
 
     users = [
         {"fname" : "Auto",
         "lname" : "Roboto",
         "email" : "admin@redhat.com",
         "username" : "automation",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "",
         "user_groups" : ['admin'] },
         {"fname" : "Aaron",
         "lname" : "Weitekamp",
         "email" : "aweiteka@redhat.com",
         "username" : "aweiteka-admin",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "20",
         "user_groups" : ['qe','cfadmins'] },
         {"fname" : "Aaron",
         "lname" : "Weitekamp",
         "email" : "aweiteka@redhat.com",
         "username" : "aweiteka-user",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "20",
         "user_groups" : ['cfusers'] },
         {"fname" : "James",
         "lname" : "Laska",
         "email" : "jlaska@redhat.com",
         "username" : "jlaska",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "20",
         "user_groups" : ['qe','cfadmins'] },
         {"fname" : "Milan",
         "lname" : "Falenik",
         "email" : "mfalesni@redhat.com",
         "username" : "mfalesni",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "20",
         "user_groups" : ['qe','cfadmins'] },
         {"fname" : "Gabriel",
         "lname" : "Szasz",
         "email" : "gszasz@redhat.com",
         "username" : "gszasz",
-        "passwd" : "password",
+        "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['qe','cfadmins'] }]
+        "user_groups" : ['qe','cfadmins'] }
+        ]
 
     selfservice_quota = "10"
         
@@ -96,14 +98,24 @@ class Provider(object):
         "username_access_key" : "Administrator",
         "password_secret_access_key" : "R3dhat!",
         "provider_account_priority" : "",
-        "provider_account_quota" : "" }]
+        "provider_account_quota" : "" },
+
+        {"type" : "vsphere",
+        "provider_name" : "vsphere-backup",
+        "provider_account_name" : "vsphere-alt",
+        "username_access_key" : "Administrator",
+        "password_secret_access_key" : "R3dhat!",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "" }
+        ]
 
     resource_profiles = [
         {"name" : "small-i386",
         "memory" : "512",
         "cpu_count" : "1",
         "storage" : "",
-        "arch" : "i386"}]
+        "arch" : "i386"}
+        ]
 
 class Environment(object):
     '''
@@ -118,7 +130,8 @@ class Environment(object):
         "enabled_provider_accounts" : ['vsphere']},
         {"name" : "Production",
         "max_running_instances" : "21",
-        "enabled_provider_accounts" : ['Public cloud east']}]
+        "enabled_provider_accounts" : ['Public cloud east']}
+        ]
 
     pools = [
         {"name" : "CloudForms-dev",
@@ -132,7 +145,8 @@ class Environment(object):
         {"name" : "CloudForms-prod",
         "environment_parent" : ['Production'],
         "quota" : "24",
-        "enabled" : True}]
+        "enabled" : True}
+        ]
 
 class Content(object):
     '''
@@ -141,32 +155,34 @@ class Content(object):
     catalogs = [
         {"name" : "CF tools-dev",
         "pool_parent" : 'CloudForms-dev',
-        "cloud_parent" : "Dev"},
+        "cloud_parent" : "Dev"}]
         {"name" : "CF tools-test",
         "pool_parent" : 'CloudForms-test',
         "cloud_parent" : "Test"},
         {"name" : "CF tools-prod",
         "pool_parent" : 'CloudForms-prod',
-        "cloud_parent" : "Production"}]
+        "cloud_parent" : "Production"}
+        ]
 
     images = [
         {"name" : "ConfigServer",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
         "profile" : "small-x86_64"},
 
-        {"name" : "x86_64-6Servercf-tools",
+        {"name" : "CFtools-x86_64-6Server",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
         "profile" : "small-x86_64"},
 
-        {"name" : "x86_64-5Servercf-tools",
+        {"name" : "CFtools-x86_64-5Server",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
         "profile" : "small-x86_64"},
 
-        {"name" : "i386-5Server-cftools",
+        {"name" : "CFtools-i386-5Server",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
         "profile" : "small-i386"},
 
-        {"name" : "i386-6Server-cftools",
+        {"name" : "CFtools-i386-6Server",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
-        "profile" : "small-i386"}]
+        "profile" : "small-i386"}
+        ]
 
