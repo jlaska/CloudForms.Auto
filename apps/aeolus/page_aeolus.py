@@ -350,7 +350,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
             "document.getElementsByClassName('catalog_link');"\
             "el.onmouseover=(function(){document.getElementById" +\
             "('catalog_id_').click();}());")
-        logging.info("create application blueprint '%s'" % image['name'])
+        logging.info("create application blueprint '%s' in cloud '%s'" % \
+            image['name'], cloud)
         self.selenium.find_element(*self.locators.save_button).click()
 
     def build_image(self, cloud, image):
