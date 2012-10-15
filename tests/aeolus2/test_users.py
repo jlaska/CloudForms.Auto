@@ -8,7 +8,7 @@ from tests.aeolus2 import Aeolus_Test
 
 def setup_module(module):
     test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestAdmin.aeolus = apps.initializeProduct(test_setup.TestSetup)
+    module.TestUsers.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 @pytest.mark.nonldap
 class TestUsers(Aeolus_Test):
