@@ -7,6 +7,7 @@ import glob
 import locators as bl
 import logging
 import apps.locators
+import datetime
 
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
@@ -17,7 +18,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 
-logging.basicConfig(filename='cloudforms_test.log', filemode='w', level=logging.INFO)
+logging.basicConfig(filename='cloudforms_test.log', filemode='a+', level=logging.INFO)
+logging.info("\n###\n# Start test session\n# %s\n###" % datetime.datetime.today())
 
 def initializeProduct(mozwebqa):
     '''
@@ -241,22 +243,18 @@ class BasePage(object):
             items = parser.items('katello_admin_login')
         elif self.project == 'aeolus':
             items = parser.items('aeolus_admin_login')
-        for (key,value) in items:
+        for (key, value) in items:
             login[key] = value
 
         login['password'] = self.decode_string(login['password'])
         return login 
 
-    # tighen this up: allow for defaults?
-    # fail more gracefully
-    def login(self, user="admin", password="password"):
+    def login(self):
         login = self.get_admin_credentials_from_config()
-        user = login['username']
-        password = login['password']
-        self.send_text(user, *self.locators.username_text_field)
-        self.send_text(password, *self.locators.password_text_field)
+        self.send_text(login['username'], *self.locators.username_text_field)
+        self.send_text(login['password'], *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
-        logging.info('login as user "%s"' % user)
+        logging.info('login as user "%s"' % login['username'])
         #return self.get_text(*self.locators.confirmation_msg)
 
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?
