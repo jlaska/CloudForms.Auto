@@ -18,14 +18,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 
-<<<<<<< HEAD
-logging.basicConfig(filename='cloudforms_test.log', filemode='a+', level=logging.INFO)
-logging.info("\n###\n# Start test session\n# %s\n###" % datetime.datetime.today())
-=======
 # FIXME - Use of logging, the logfile and level, should be enabled by the
 # command-line
 logging.basicConfig(filename='cloudforms_test.log', filemode='w', level=logging.INFO)
->>>>>>> 0f968d42f53eaa0196a3190b9d2337899840dd6c
 
 def initializeProduct(mozwebqa):
     '''
