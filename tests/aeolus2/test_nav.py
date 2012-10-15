@@ -46,7 +46,9 @@ class TestNav(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        workflow = ['%', 'asdf', 'users/asdf', 'logout', 'users/asdf', 'asdf']
+        workflow = ['%400_bad_request%', '404_not_found', 
+        'users/1/unknown_action', 'logout', 'users/403_forbidden', 
+        '404_not_found']
         for view in workflow:
             page.go_to_page_view(view)
             logging.info('nav to page "/%s"' % view)
