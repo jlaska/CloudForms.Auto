@@ -6,12 +6,6 @@ from tests.aeolus2 import Aeolus_Test
 from data.large_dataset import Provider
 from data.large_dataset import Environment
 from data.assert_response import *
-import logging
-import time
-
-def setup_module(module):
-    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestProvider.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 class TestProvider(Aeolus_Test):
     '''

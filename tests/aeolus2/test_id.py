@@ -2,13 +2,8 @@
 
 import pytest
 import apps
-from data.small_dataset import *
 #from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
-
-def setup_module(module):
-    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestId.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 class TestId(Aeolus_Test):
 

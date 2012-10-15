@@ -23,22 +23,36 @@ class KatelloPage(apps.BasePage):
     def header(self):
         return HeaderRegion(mozwebqa=self._mozwebqa, locators=self.locators, open_url=False)
 
+    def login_with_org(self, user=None, password=None, **kwargs):
+        '''Login and select an org'''
+        # Login normally
+        apps.BasePage.login(self, user, password)
+
+        # If login didn't fail, select an org
+        if not self.is_element_visible(*self.locators.error_notification_locator):
+            '''if no login error occured, select an org'''
+            self.select_org(kwargs.get('org', 'ACME_Corporation'))
+
     def select_org(self, value):
         """
         Select an org from the available orgs.
         :param value: The org to look for, by text.
         """
-        self.click(*self.locators.login_org_dropdown)
+        if not self.is_element_visible(*self.locators.switcher_org_box_locator):
+            '''if switcher_box is not visible, click to expand it'''
+            self.click(*self.locators.org_switcher_locator)
         for org in self.selectable_orgs():
+            '''loop through ords in switcher_box'''
             if value in org.name:
-                return org
-        raise Exception('Organization not found: %s' % value)
+                org.click()
+                return
+        raise Exception("Organization not found: '%s'" % value)
 
     def selectable_orgs(self):
         """
         Iterate over the available orgs in the login org selector.
         """
-        return [self.LoginOrgSelector(dict(mozwebqa=self._mozwebqa, element=element))
+        return [LoginOrgSelector(**dict(mozwebqa=self._mozwebqa, element=element))
             for element in self.selenium.find_elements(*self.locators.login_org_selector)]
 
     def is_tab_selected(self, tab_name):
@@ -78,8 +92,12 @@ class KatelloPage(apps.BasePage):
         # Input criteria and newline
         self.send_text_and_wait(criteria + "\n", *self.locators.search_input_locator)
 
+    def click_logout(self):
+        return self.header.click_logout()
+
 class LoginOrgSelector(apps.BasePage):
-    _name_locator = (By.CSS_SELECTOR, 'a.fl.clear')
+    # FIXME - this should be locators.switcher_org_list_locator
+    _name_locator = (By.CSS_SELECTOR, 'a')
 
     def __init__(self, **kwargs):
         apps.BasePage.__init__(self, **kwargs)
@@ -87,8 +105,7 @@ class LoginOrgSelector(apps.BasePage):
 
     @property
     def name(self):
-        name_text = self._root_element.find_element(*self._name_locator).text
-        return name_text
+        return self._root_element.find_element(*self._name_locator).text
 
     @property
     def is_displayed(self):
@@ -124,7 +141,7 @@ class HeaderRegion(apps.BasePage):
     @property
     def is_org_list_present(self):
         """
-        Return True if evidence exists that the org switcher list is available
+        Return True if evidence exists that the org list is available
         """
         return self.is_element_visible(*self.locators.switcher_org_box_locator)
 
@@ -138,16 +155,11 @@ class HeaderRegion(apps.BasePage):
         """
         Execute a left mouse click on an org from the org switcher.
         """
-        orgs = self.selenium.find_elements(*self.locators.switcher_org_list_locator)
+        orgs = self.selenium.find_elements(*self.locators.login_org_selector)
         for org in orgs:
             if org.text == value:
                 org.click()
                 break
-
-        # I believe the following code selects the second org in the org list
-        # ... not sure why this is useful
-        #WebDriverWait(self.selenium, 20).until(lambda s: s.find_element(*self.locators.org_switcher_org_locator).is_displayed())
-        #self.selenium.find_element(*self.locators.org_switcher_org_locator).click()
 
     @property
     def get_text_from_switcher(self):

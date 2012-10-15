@@ -2,16 +2,10 @@
 
 import pytest
 import apps
-import time
 import logging
 from data.large_dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
-
-
-def setup_module(module):
-    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestNav.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
 class TestNav(Aeolus_Test):
 

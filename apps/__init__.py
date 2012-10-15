@@ -18,8 +18,14 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 
+<<<<<<< HEAD
 logging.basicConfig(filename='cloudforms_test.log', filemode='a+', level=logging.INFO)
 logging.info("\n###\n# Start test session\n# %s\n###" % datetime.datetime.today())
+=======
+# FIXME - Use of logging, the logfile and level, should be enabled by the
+# command-line
+logging.basicConfig(filename='cloudforms_test.log', filemode='w', level=logging.INFO)
+>>>>>>> 0f968d42f53eaa0196a3190b9d2337899840dd6c
 
 def initializeProduct(mozwebqa):
     '''
@@ -237,25 +243,34 @@ class BasePage(object):
         from ConfigParser import SafeConfigParser
 
         parser = SafeConfigParser()
-        parser.read(config_file)
+        # TODO - Ensure that we successfully read from config_file
+        assert len(parser.read(config_file)) > 0, "Unable to load config_file: %s " % config_file
+
         login = dict()
-        if self.project == 'katello':
-            items = parser.items('katello_admin_login')
-        elif self.project == 'aeolus':
-            items = parser.items('aeolus_admin_login')
-        for (key, value) in items:
+        items = None
+        if self.project.startswith('katello'):
+            items = parser.items('katello_login_credentials')
+        elif self.project.startswith('aeolus'):
+            items = parser.items('aeolus_login_credentials')
+        else:
+            raise Exception("No matching administrator configuration found: %s" % config_file)
+
+        for (key,value) in items:
             login[key] = value
 
         login['password'] = self.decode_string(login['password'])
-        return login 
+        return login
 
-    def login(self):
+    def login(self, user=None, password=None):
         login = self.get_admin_credentials_from_config()
-        self.send_text(login['username'], *self.locators.username_text_field)
-        self.send_text(login['password'], *self.locators.password_text_field)
+        if user is None:
+            user = login['username']
+        if password is None:
+            password = login['password']
+        self.send_text(user, *self.locators.username_text_field)
+        self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
-        logging.info('login as user "%s"' % login['username'])
-        #return self.get_text(*self.locators.confirmation_msg)
+        logging.info('login as user "%s"' % user)
 
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?
     def random_string(self):
@@ -273,13 +288,6 @@ class BasePage(object):
         """
         WebDriverWait(self.selenium, 20).until(lambda s: self.selenium.title)
         return self.selenium.title
-
-    @property
-    def redhat_logo_title(self):
-        """
-        Returns the title attribute for the Red Hat logo.
-        """
-        return self.selenium.find_element(*self.locators.redhat_logo_link_locator).get_attribute('title')
 
     def send_characters(self, text, *locator):
         WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_enabled())
@@ -502,39 +510,35 @@ class BasePage(object):
         """
         self.click_and_wait(*self.locators.tab_elements[tab])
 
-    @property
-    def redhat_logo_image_source(self):
-        """
-        Returns the src attribute for the Red Hat Logo image locator.
-        """
-        return self.selenium.find_element(*self._amo_logo_image_locator).get_attribute('src')
- 
-
     #
     # UI elements
     #
 
-    #@property
-    #def is_footer_version_text_visible(self):
-    #    """
-    #    Return True if the Footer version Text is visible.
-    #    """
-    #    return self.selenium.find_element(*self.locators.footer_version_text_locator).text
+    @property
+    def is_login_logo_present(self):
+        return self.is_element_present(*self.locators.login_logo)
 
     @property
-    def is_redhat_logo_visible(self):
-        """
-        Return True if the appropriate logo is visible. ::
+    def is_logo_present(self):
+        return self.is_element_present(*self.locators.logo_link)
 
-            This is dependent on the project name passed at runtime.
-        """
-        return self.is_element_visible(*self.locators._logo_locator)
-
-    def click_redhat_logo(self):
+    def click_logo(self):
         """
         Will execute a left mouse click on the Logo locator.
         """
-        self.click(*self.locators.redhat_logo_link_locator)
+        self.click(*self.locators.logo_link)
+
+    @property
+    def is_username_field_present(self):
+        return self.is_element_present(*self.locators.username_text_field)
+
+    @property
+    def is_password_field_present(self):
+        return self.is_element_present(*self.locators.password_text_field)
+
+    @property
+    def is_login_button_present(self):
+        return self.is_element_present(*self.locators.login_locator)
 
     # use .clear() instead
     def clear_text_input(self, *locator):

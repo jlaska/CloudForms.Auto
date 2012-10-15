@@ -7,8 +7,9 @@ class CFSELocators_1_1_x(KatelloLocators):
     """
 
     # Page title
-    page_title = "CloudForms System Engine - Systems Management"
-    login_card_logo = (By.XPATH, "//img[contains(@alt, 'CloudForms System Engine Logo') and contains(@src, '/rh-logo.png')]")
+    page_title = "CloudForms System Engine - Open Source Systems Management"
+    login_logo = (By.XPATH, "//img[@alt='Red Hat CloudForms System Engine Logo']")
+    logo_link = (By.XPATH, "//a[contains(text(),'CloudForms System Engine')]")
 
 class CFSELocators_1_0_x(KatelloLocators):
     """

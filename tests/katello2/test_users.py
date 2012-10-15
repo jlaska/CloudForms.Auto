@@ -2,7 +2,6 @@ import pytest
 import apps
 from tests.katello2 import Katello_Test
 
-@pytest.mark.nondestructive
 class TestUsers(Katello_Test):
 
     @classmethod
@@ -31,6 +30,9 @@ class TestUsers(Katello_Test):
         # Login
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # FIXME - use data/
@@ -56,9 +58,12 @@ class TestUsers(Katello_Test):
         self.api.create_user(new_user_name, password, email_addr)
         self._cleanup_users.append(new_user_name)
 
-        # Logi
+        # Login
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Attempt to create duplicate user
@@ -80,6 +85,9 @@ class TestUsers(Katello_Test):
         # Login to UI
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Find existing user
@@ -112,6 +120,9 @@ class TestUsers(Katello_Test):
         # Login to UI
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Search for users matching 'searchuser-*'
@@ -140,6 +151,9 @@ class TestUsers(Katello_Test):
         # Login to UI
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Search for users matching 'searchuser-*'
@@ -162,6 +176,9 @@ class TestUsers(Katello_Test):
         # Login to UI
         home_page = self.load_page('Home')
         home_page.login()
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
         # Load users page
@@ -185,4 +202,7 @@ class TestUsers(Katello_Test):
         # Login to UI
         home_page = self.load_page('Home')
         home_page.login(new_user_name, password)
+        assert home_page.is_successful
+        if self.testsetup.product_version == '1.1':
+            home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared

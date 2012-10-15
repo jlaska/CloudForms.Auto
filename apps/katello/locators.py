@@ -8,15 +8,14 @@ class KatelloLocators(apps.locators.BaseLocators):
 
     # Page title
     page_title = "Katello - Open Source Systems Management"
-    # login_card_logo = (By.CSS_SELECTOR, "img[alt='Katello Logo']")
-    login_card_logo = (By.XPATH, "//img[contains(@alt, 'Katello Logo') and contains(@src, '/logo.png')]")
+    login_logo = (By.XPATH, "//img[@alt='Katello Logo']")
+    logo_link = (By.XPATH, "//a[contains(text(),'Katello')]")
 
     # Home Page and login related locators
     username_text_field = (By.ID, "username")
     password_text_field = (By.ID, "password-input")
     login_locator = (By.XPATH, "//input[@id='login_btn']")
-    switcher_button = (By.CSS_SELECTOR, "a#switcherButton")
-    logout_locator = (By.XPATH, "//a[contains(text(),'Logout')]")
+    logout_locator = (By.XPATH, "//a[contains(text(),'Log Out')]")
 
     # Dashboard locators
     dashboard_dropbutton_locator = (By.XPATH, "//div[contains(@class, 'dropbutton')]")
@@ -28,10 +27,10 @@ class KatelloLocators(apps.locators.BaseLocators):
 
     # Org switcher
     org_switcher_locator = (By.XPATH, "//a[@id='switcherButton']/div")
+    switcher_org_box_locator = (By.ID, "switcherBox")
     org_switcher_org_locator = (By.CSS_SELECTOR, "a[href*='org_id=2']")
     org_input_filter_locator = (By.CSS_SELECTOR, "input#orgfilter_input")
     org_filtered_button_locator = (By.CSS_SELECTOR, "button.filter_button")
-    switcher_org_box_locator = (By.ID, "switcherBox")
     switcher_org_list_locator = (By.CSS_SELECTOR, "a.fl.clear")
 
     # Roles
@@ -87,8 +86,7 @@ class KatelloLocators(apps.locators.BaseLocators):
     organization_new_name_locator = (By.ID, "new")
     close_locator = (By.CLASS_NAME, "close")
     login_org_name_selector_css = ('a')
-    login_org_selector = (By.CSS_SELECTOR, "a.fl")
-    login_org_dropdown = (By.CSS_SELECTOR, "div.one-line-ellipsis")
+    login_org_selector = (By.CSS_SELECTOR, "div.row.clickable")
     admin_drop_down = (By.ID, "admin")
     new_template = (By.ID, "new")
     system_template_name = (By.ID, "system_template_name")
