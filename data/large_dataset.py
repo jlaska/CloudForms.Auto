@@ -155,7 +155,7 @@ class Content(object):
     catalogs = [
         {"name" : "CF tools-dev",
         "pool_parent" : 'CloudForms-dev',
-        "cloud_parent" : "Dev"}]
+        "cloud_parent" : "Dev"},
         {"name" : "CF tools-test",
         "pool_parent" : 'CloudForms-test',
         "cloud_parent" : "Test"},
