@@ -6,13 +6,10 @@ from data.large_dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 
-<<<<<<< HEAD
 def setup_module(module):
     test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
     module.TestUsers.aeolus = apps.initializeProduct(test_setup.TestSetup)
 
-=======
->>>>>>> 0f968d42f53eaa0196a3190b9d2337899840dd6c
 @pytest.mark.nonldap
 class TestUsers(Aeolus_Test):
     '''
