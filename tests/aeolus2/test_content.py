@@ -53,7 +53,7 @@ class TestContent(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        print "hello?"
+
         for catalog in Content.catalogs:
             for dataset_img in Content.images:
                 deployable = "%s-%s" % (dataset_img['name'], \
@@ -68,15 +68,11 @@ class TestContent(Aeolus_Test):
                     api_images = self.api.get_image_list(\
                         login['username'], login['password'])
                     for api_img in api_images:
-                        print "api_image"
                         if dataset_img['name'] == api_img['name']:
-                            print "name matches"
                             if catalog['cloud_parent'] == api_img['env']:
-                                print "creating blueprint file"
                                 blueprint_file = \
                                     page.create_custom_blueprint(api_img, \
                                         dataset_img)
-                                print "uploading file"
                                 page.upload_custom_blueprint(blueprint_file, \
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)
