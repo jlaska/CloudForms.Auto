@@ -418,10 +418,10 @@ JoBKiWDrKWg2TeTJuVSJZMo=
               <value>Dev</value>
             </parameter>
             <parameter name="KATELLO_USER">
-              <value>ramesh-test</value>
+              <value>admin</value>
             </parameter>
             <parameter name="KATELLO_PASS">
-              <value type="password">Redhat@1234</value>
+              <value type="password">admin</value>
             </parameter>
             <parameter name="RELEASEVER">
               <value>Auto</value>
