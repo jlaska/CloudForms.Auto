@@ -406,64 +406,64 @@ JoBKiWDrKWg2TeTJuVSJZMo=
           <executable url="https://raw.github.com/jlaska/cloud-app-sanity/master/tools/run_suite_audreyvm_nounreg.sh" />
           <parameters>
             <parameter name="KATELLO_HOST">
-              <value type="scalar">qeblade40.rhq.lab.eng.bos.redhat.com</value>
+              <value>qeblade40.rhq.lab.eng.bos.redhat.com</value>
             </parameter>
             <parameter name="KATELLO_PORT">
-              <value type="scalar">443</value>
+              <value>443</value>
             </parameter>
             <parameter name="KATELLO_ORG">
-              <value type="scalar">redhat</value>
+              <value>redhat</value>
             </parameter>
             <parameter name="KATELLO_ENV">
-              <value type="scalar">Dev</value>
+              <value>Dev</value>
             </parameter>
             <parameter name="KATELLO_USER">
-              <value type="scalar">ramesh-test</value>
+              <value>ramesh-test</value>
             </parameter>
             <parameter name="KATELLO_PASS">
               <value type="password">Redhat@1234</value>
             </parameter>
             <parameter name="RELEASEVER">
-              <value type="scalar">Auto</value>
+              <value>Auto</value>
             </parameter>
             <parameter name="AUTO_SUBSCRIBE">
-              <value type="scalar">True</value>
+              <value>True</value>
             </parameter>
             <parameter name="ACTIVATION_KEY">
-              <value type="scalar">None</value>
+              <value>None</value>
             </parameter>
             <parameter name="IMPORT_GPG_BETA_KEY">
-              <value type="scalar">True</value>
+              <value>True</value>
             </parameter>
             <parameter name="RHEL_PRODUCT_CERT_TASK">
-              <value type="scalar">RHEL_PRODUCT_CERT</value>
+              <value>RHEL_PRODUCT_CERT</value>
             </parameter>
             <parameter name="DISABLE_RHUI">
-              <value type="scalar">True</value>
+              <value>True</value>
             </parameter>
             <parameter name="SSH_TUNNEL_ENABLED">
-              <value type="scalar">Auto</value>
+              <value>Auto</value>
             </parameter>
             <parameter name="SSH_TUNNEL_IP">
-              <value type="scalar">10.84.250.89</value>
+              <value>10.84.250.89</value>
             </parameter>
             <parameter name="SSH_TUNNEL_KATELLO_PORT">
-              <value type="scalar">1443</value>
+              <value>1443</value>
             </parameter>
             <parameter name="SSH_TUNNEL_GOFER_PORT">
-              <value type="scalar">5674</value>
+              <value>5674</value>
             </parameter>
             <parameter name="JENKINS_SSH_KEY_LOCATION">
-              <value type="scalar">None</value>
+              <value>None</value>
             </parameter>
             <parameter name="JENKINS_SSH_DIR">
-              <value type="scalar">/root/.ssh</value>
+              <value>/root/.ssh</value>
             </parameter>
             <parameter name="YUM_LOCAL_INSTALL">
-              <value type="scalar">emacs</value>
+              <value>emacs</value>
             </parameter>
             <parameter name="YUM_REMOTE_INSTALL">
-              <value type="scalar">mc vte</value>
+              <value>mc vte</value>
             </parameter>
           </parameters>
         </service>

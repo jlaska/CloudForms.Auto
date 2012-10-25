@@ -162,7 +162,7 @@ class Content(object):
         {"name" : "ConfigServer",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
         "profile" : "small-x86_64",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        "blueprint" : ""},
 
         {"name" : "CFtools-x86_64-6Serv",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",

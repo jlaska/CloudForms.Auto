@@ -341,7 +341,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         root = tree.getroot()
         root.set('name', static_data['name'])
         for assembly in root.findall("./assemblies/assembly"):
-            assembly.set('hpw', static_data['profile'])
+            assembly.set('hwp', static_data['profile'])
             assembly.set('name', static_data['name'])
         for img in root.findall("./assemblies/assembly/image"):
             img.set('id', api_data['build'])

@@ -10,7 +10,7 @@ Example command:
 4. `-q test_content.py -k create_images`
 5. `-q test_content.py -k build_images` (wait for build to complete)
 6. `-q test_content.py -k push_images`
-7. `-q test_content.py -k create_app_blueprint` (wait for push to complete
+7. `-q test_content.py -k create_blueprint` (wait for push to complete
 8. `-q test_content.py -k launch_configserver`
 9. Maually configure config server
 
