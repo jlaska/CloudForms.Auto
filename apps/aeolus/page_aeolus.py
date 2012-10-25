@@ -419,7 +419,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
             (image, cloud))
         self.selenium.find_element(*self.locators.push_all).click()
 
-    def launch_app(self, catalog, app_name):
+    def launch_app(self, catalog, app_name, image, \
+            katello_user='admin', katello_pass='admin'):
         '''
         launch all apps
 
@@ -435,10 +436,17 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.selenium.find_element(*self.locators.app_name_field).clear()
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
+        if image['blueprint'] != "":
+            # using custom blueprint
+            # clear and fill in hostname, katello user and pass and other action
+            # self.selenium.find_element(*self.locators.app_name_field).clear()
+            print "using custom blueprint"
+            self.selenium.find_element(*self.locators.katello_register_tab).click()
+            # sleep for manual verification
+            time.sleep(20)
+            self.selenium.find_element(*self.locators.submit_params).click()
         logging.info("Launch app '%s' in catalog '%s'" % \
             (app_name, catalog))
-        # FIXME: wait to give user time to review and finalize params
-        time.sleep(20)
         self.selenium.find_element(*self.locators.launch).click()
 
     def setup_configserver(self):
