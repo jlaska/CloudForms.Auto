@@ -23,7 +23,9 @@ aeolus_msg = {
     # partial string, invalid assert
     'add_provider_accts' : 'These Cloud Resource Provider Account have been added',
     # partial string, invalid assert
-    'add_blueprint' : 'Application Blueprint added to Catalog %s.'
+    'add_blueprint' : 'Application Blueprint added to Catalog %s.',
+    'add_configserver' : 'Config Server added.',
+    'update_blueprint' : 'Application Blueprint updated successfully'
     }
 
 # see src/app/controllers for message text source

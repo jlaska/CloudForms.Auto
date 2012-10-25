@@ -1,5 +1,6 @@
+<?xml version="1.0"?>
 <deployable version="1.0">
-  <description />
+  <description/>
   <assemblies>
     <assembly>
       <image />

@@ -6,6 +6,7 @@ from data.large_dataset import Environment
 from data.large_dataset import Content
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
+import time
 
 class TestContent(Aeolus_Test):
     '''
@@ -45,17 +46,40 @@ class TestContent(Aeolus_Test):
             for image in Content.images:
                 page.push_image(cloud['name'], image['name'])
 
-    def test_create_app_blueprint(self, mozwebqa):
+    def test_create_blueprint(self, mozwebqa):
         '''
-        Create App Blueprints
-        Uses unique name and selects appropriate resource profile
+        create custom blueprints if defined in dataset
+        otherwise the default blueprint is created
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-
-        for cloud in Environment.clouds:
-            for image in Content.images:
-                page.new_app_blueprint_from_image(cloud['name'], image)
+        print "hello?"
+        for catalog in Content.catalogs:
+            for dataset_img in Content.images:
+                deployable = "%s-%s" % (dataset_img['name'], \
+                    catalog['cloud_parent'])
+                if dataset_img['blueprint'] == "":
+                    # default blueprint
+                    page.new_default_blueprint(catalog['cloud_parent'],\
+                        dataset_img, deployable)
+                else:
+                    # custom blueprint, get image uid from api
+                    login = page.get_admin_credentials_from_config()
+                    api_images = self.api.get_image_list(\
+                        login['username'], login['password'])
+                    for api_img in api_images:
+                        print "api_image"
+                        if dataset_img['name'] == api_img['name']:
+                            print "name matches"
+                            if catalog['cloud_parent'] == api_img['env']:
+                                print "creating blueprint file"
+                                blueprint_file = \
+                                    page.create_custom_blueprint(api_img, \
+                                        dataset_img)
+                                print "uploading file"
+                                page.upload_custom_blueprint(blueprint_file, \
+                                    catalog['name'], api_img, \
+                                    dataset_img, deployable)
 
     def test_launch_configserver(self, mozwebqa):
         '''
@@ -72,7 +96,7 @@ class TestContent(Aeolus_Test):
                     page.launch_app(catalog['name'], app_name)
                     # TODO: configure via cli, ssh...
 
-    # Manual: configure config server
+    # Manual steps required: configure config server
     # if ec2 get key, chmod
     # ssh
     # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
@@ -83,7 +107,7 @@ class TestContent(Aeolus_Test):
         Launch apps.
         '''
         page = self.aeolus.load_page('Aeolus')
-        # TODO: login as self-service, less priveledged use
+        # TODO: login as self-service use case with less priveledged user
         page.login()
         # TODO: link catalogs and images more elegantly
         for catalog in Content.catalogs:
@@ -115,4 +139,32 @@ class TestContent(Aeolus_Test):
             target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
             print "%s (%s)" % (target_image_detail['template'], target_image_id)
 
+    def test_add_configserver(self, mozwebqa):
+        '''
+        Add configserver to provider accounts
+        '''
+        # TODO: make this work. 
+        # Only the second half of adding configserver works
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        # page.setup_configserver()
+
+        for cloud in Environment.clouds:
+            for image in Content.images:
+                if image['name'] == "ConfigServer":
+                    app_name = "%s-%s" % \
+                        (image['name'], cloud['name'])
+                    # TODO: get vars from configserver setup
+                    # vars = page.setup_configserver()
+
+                    url = 'https://ec2-23-20-147-44.compute-1.amazonaws.com'
+                    key = '570919152513002986425316'
+                    secret = 'AxiQy1NS3RR9PsihRcGBUANPfoIIZgrr4HUpIegYqgRlxY5C'
+
+                    assert page.add_configserver_to_provider(cloud, url, key, secret) == aeolus_msg['add_configserver']
+                    time.sleep(5)
+                else:
+                    print "No configserver found"
+                
 

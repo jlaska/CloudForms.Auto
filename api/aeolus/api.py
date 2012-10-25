@@ -101,6 +101,22 @@ class ApiTasks(object):
             id_list.append(child.attrib['id'])
         return id_list
 
+    def get_image_list(self, username='admin', password='password'):
+        """
+        returns list of image build ids 
+        """
+        self.set_basic_auth_credentials(username, password)
+        response = self._GET("images")
+        data = xmltree.fromstring(response[1])
+        image_list = []
+        for image in data.findall('image'):
+            name = image.find('name').text
+            env = image.find('environment').text
+            build = image.get('id')
+            image_list.append(dict(name=name, env=env, build=build))
+        print "Got image list: %s" % image_list
+        return image_list
+
     # FIXME: could stand improvement.
     # If only used for ID/Name match it should be fine
     def get_detailed_info(self, target, target_id, username='admin', password='password'):

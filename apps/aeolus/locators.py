@@ -115,3 +115,18 @@ class AeolusLocators(apps.locators.BaseLocators):
     launch = (By.ID, "launch_deployment_button")
     app_name_field = (By.ID, "deployment_name")
     next_button = (By.ID, "next_button")
+
+    # configserver
+    #add_configserver = (By.ID, "config_server_control")
+    configserver_endpoint = (By.ID, "config_server_endpoint")
+    configserver_key = (By.ID, "config_server_key")
+    configserver_secret = (By.ID, "config_server_secret")
+
+    # blueprint
+    new_deployable = (By.ID, "new_deployable_button")
+    #deployable_name = (By.ID, "deployable_name")
+    deployable_description = (By.ID, "deployable_description")
+    deployable_url = (By.ID, "url")
+    deployable_xml = (By.ID, "deployable_xml")
+    new_deployable = (By.ID, "new_deployable_button")
+    edit_xml = (By.ID, "edit_xml_button")

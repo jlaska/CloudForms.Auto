@@ -73,6 +73,8 @@ class Provider(object):
     # provider_name string must match conductor
     # valid account types: "ec2", "rhevm", "vsphere"
     accounts = [
+
+        # more than one ec2 account supported?
         {"type" : "ec2",
         "provider_name" : "ec2-us-east-1",
         "provider_account_name" : "Public cloud east",
@@ -95,14 +97,6 @@ class Provider(object):
         {"type" : "vsphere",
         "provider_name" : "vsphere-default",
         "provider_account_name" : "vsphere",
-        "username_access_key" : "Administrator",
-        "password_secret_access_key" : "R3dhat!",
-        "provider_account_priority" : "",
-        "provider_account_quota" : "" },
-
-        {"type" : "vsphere",
-        "provider_name" : "vsphere-backup",
-        "provider_account_name" : "vsphere-alt",
         "username_access_key" : "Administrator",
         "password_secret_access_key" : "R3dhat!",
         "provider_account_priority" : "",
@@ -155,7 +149,7 @@ class Content(object):
     catalogs = [
         {"name" : "CF tools-dev",
         "pool_parent" : 'CloudForms-dev',
-        "cloud_parent" : "Dev"}]
+        "cloud_parent" : "Dev"},
         {"name" : "CF tools-test",
         "pool_parent" : 'CloudForms-test',
         "cloud_parent" : "Test"},
@@ -165,24 +159,34 @@ class Content(object):
         ]
 
     images = [
-        {"name" : "ConfigServer",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
-        "profile" : "small-x86_64"},
+        #{"name" : "ConfigServer",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
+        #"profile" : "small-x86_64",
+        #"blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-x86_64-6Server",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
-        "profile" : "small-x86_64"},
+        #{"name" : "CFtools-x86_64-6Serv",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
+        #"profile" : "small-x86_64",
+        #"blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-x86_64-5Server",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
-        "profile" : "small-x86_64"},
+        #{"name" : "CFtools-x86_64-5Serv",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
+        #"profile" : "small-x86_64",
+        #"blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-i386-5Server",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
-        "profile" : "small-i386"},
+        #{"name" : "CFtools-i386-5Serv",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
+        #"profile" : "small-i386",
+        #"blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-i386-6Server",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
-        "profile" : "small-i386"}
+        #{"name" : "CFtools-i386-6Serv",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
+        #"profile" : "small-i386",
+        #"blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        {"name" : "CFtools-x86_64-6Serv-aweiteka",
+        "template_url" : "http://file.bos.redhat.com/~aweiteka/system_templates/xml/rhel-x86_64-6Server-cf-tools.xml",
+        "profile" : "x86_64",
+        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
+
         ]
 

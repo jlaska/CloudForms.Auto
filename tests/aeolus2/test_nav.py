@@ -6,6 +6,7 @@ import logging
 from data.large_dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
+import time
 
 class TestNav(Aeolus_Test):
 

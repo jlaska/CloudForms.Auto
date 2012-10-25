@@ -4,6 +4,8 @@ import apps.aeolus
 import time, re, logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+import xml.etree.ElementTree as xmltree
+import tempfile
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
@@ -266,7 +268,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
     def add_provider_accounts_cloud(self, cloud):
         '''
-        add or enable all provider accounts to cloud/pool family
+        enable provider account to cloud/pool family
         '''
         self.go_to_page_view('pool_families')
         self.click_by_text("a", cloud['name'])
@@ -328,9 +330,48 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
         self.selenium.find_element(*self.locators.save_button).click()
 
-    def new_app_blueprint_from_image(self, cloud, image):
+    def create_custom_blueprint(self, api_data, static_data):
         '''
-        creates initial app blueprint
+        uses data from api to create custom blueprint 
+        based on blueprint template found in dataset
+        '''
+        new_blueprint = tempfile.NamedTemporaryFile(delete=False)
+
+        tree = xmltree.parse(static_data['blueprint'])
+        root = tree.getroot()
+        root.set('name', static_data['name'])
+        for assembly in root.findall("./assemblies/assembly"):
+            assembly.set('hpw', static_data['profile'])
+            assembly.set('name', static_data['name'])
+        for img in root.findall("./assemblies/assembly/image"):
+            img.set('id', api_data['build'])
+
+        tree.write(new_blueprint, encoding="us-ascii", \
+            xml_declaration=True, method="xml")
+        logging.info("created custom blueprint %s, file %s" % \
+            (static_data['name'], new_blueprint.name))
+        return new_blueprint.name
+
+    def upload_custom_blueprint(self, blueprint_file, catalog, api_img, \
+                                      dataset_img, deployable):
+        '''
+        upload a custom blueprint from local file
+        '''
+        print blueprint_file, catalog, api_img, dataset_img
+        self.go_to_page_view("catalogs")
+        self.click_by_text("a", catalog)
+        self.selenium.find_element(*self.locators.new_deployable).click()
+        self.send_text(deployable, *self.locators.blueprint_name)
+        #self.send_text("description", *self.locators.deployable_description)
+        self.send_text(blueprint_file, *self.locators.deployable_xml)
+        self.selenium.find_element(*self.locators.save_button).click()
+        logging.info("upload custom blueprint %s, file %s, in cloud %s" % \
+            (deployable, blueprint_file, api_img['env']))
+        time.sleep(3)
+
+    def new_default_blueprint(self, cloud, image, deployable):
+        '''
+        creates default app blueprint
         accepts default name and first catalog in list of catalogs
         '''
         self.go_to_page_view("pool_families")
@@ -339,8 +380,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", image['name'])
         self.click_by_text("a", "New Application Blueprint from Image")
         self.selenium.find_element(*self.locators.blueprint_name).clear()
-        self.send_text("%s-%s" % (image['name'], cloud), \
-            *self.locators.blueprint_name)
+        self.send_text(deployable, *self.locators.blueprint_name)
         self.select_dropdown(image['profile'], 
             *self.locators.resource_profile_dropdown)
         # selecting catalog is tricky due to hidden elements
@@ -350,8 +390,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
             "document.getElementsByClassName('catalog_link');"\
             "el.onmouseover=(function(){document.getElementById" +\
             "('catalog_id_').click();}());")
-        logging.info("create application blueprint '%s' in cloud '%s'" % \
-            image['name'], cloud)
+        logging.info("create default blueprint '%s' in cloud '%s'" % \
+            (image['name'], cloud))
         self.selenium.find_element(*self.locators.save_button).click()
 
     def build_image(self, cloud, image):
@@ -397,4 +437,32 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.next_button).click()
         logging.info("Launch app '%s' in catalog '%s'" % \
             (app_name, catalog))
+        # FIXME: wait to give user time to review and finalize params
+        time.sleep(20)
         self.selenium.find_element(*self.locators.launch).click()
+
+    def setup_configserver(self):
+        '''
+        select running app, login and run setup
+        '''
+        # if ec2 download key, chmod 400 key.pem
+        # ssh [-i key.pem] config_server_url
+        # `aeolus-configserver-setup`, 'y', default
+        # return values
+        return 
+
+    def add_configserver_to_provider(self, cloud, url, key, secret):
+        self.go_to_page_view('pool_families')
+        self.click_by_text("a", cloud['name'])
+        self.selenium.find_element(*self.locators.env_prov_acct_details).click()
+        for account in cloud['enabled_provider_accounts']:
+            self.click_by_text("a", account)
+            self.click_by_text("a", "Add")
+            self.send_text(url, *self.locators.configserver_endpoint)
+            self.send_text(key, *self.locators.configserver_key)
+            self.send_text(secret, *self.locators.configserver_secret)
+            self.selenium.find_element(*self.locators.save_button).click()
+            logging.info("Add configserver to %s, endpoint %s" % \
+                (account, url))
+        return self.get_text(*self.locators.response)
+ 

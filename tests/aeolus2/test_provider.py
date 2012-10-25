@@ -60,7 +60,7 @@ class TestProvider(Aeolus_Test):
     @pytest.mark.aeolus_setup
     def test_add_provider_account_cloud(self, mozwebqa):
         '''
-        Add provider accounts to all clouds
+        Add provider accounts to clouds
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
