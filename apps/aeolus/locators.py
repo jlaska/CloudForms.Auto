@@ -130,3 +130,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     deployable_xml = (By.ID, "deployable_xml")
     new_deployable = (By.ID, "new_deployable_button")
     edit_xml = (By.ID, "edit_xml_button")
+
+    # special blueprint params
+    katello_register_tab = (By.ID, "KATELLO_REGISTER")
+    submit_params = (By.ID, "submit_params")
