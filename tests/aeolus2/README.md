@@ -9,8 +9,8 @@ Example command:
 3. `-q test_provider.py`
 4. `-q test_content.py -k create_images`
 5. `-q test_content.py -k build_images` (wait for build to complete)
-6. `-q test_content.py -k push_images`
-7. `-q test_content.py -k create_blueprint` (wait for push to complete
+6. `-q test_content.py -k create_blueprint`
+7. `-q test_content.py -k push_images` (wait for push to complete)
 8. `-q test_content.py -k launch_configserver`
 9. Maually configure config server
 
@@ -19,7 +19,7 @@ Example command:
         # `aeolus-configserver-setup`, 'y', default, copy values
         # nav to cloud provider account, enter values, confirm success
 
-10. `-q test_content.py -k launch_apps`
+10. `-q test_content.py -k launch_apps` (test sleeps for 20 seconds to provide time to edit blueprint params)
 
 *Note*: Comment out catalogs in `data/large_dataset.py` to isolate running to certain providers
 
