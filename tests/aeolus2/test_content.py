@@ -89,7 +89,7 @@ class TestContent(Aeolus_Test):
                 if image['name'] == "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
-                    page.launch_app(catalog['name'], app_name)
+                    page.launch_app(catalog['name'], app_name, image)
                     # TODO: configure via cli, ssh...
 
     # Manual steps required: configure config server
@@ -111,7 +111,7 @@ class TestContent(Aeolus_Test):
                 if image['name'] != "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
-                    page.launch_app(catalog['name'], app_name)
+                    page.launch_app(catalog['name'], app_name, image)
 
     ###
     # FIXME: 
