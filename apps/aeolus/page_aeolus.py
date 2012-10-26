@@ -443,7 +443,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             print "using custom blueprint"
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification
-            time.sleep(20)
+            time.sleep(5)
             self.selenium.find_element(*self.locators.submit_params).click()
         logging.info("Launch app '%s' in catalog '%s'" % \
             (app_name, catalog))
