@@ -59,7 +59,7 @@ See [py.test documentation](http://pytest.org/) for more information.
 ## Development Notes
 
 ### About the Files
-`tests/` Test code goes here.  It's common to organize tests into project-specific sub-directories.  For example, katello tests reside in `tests/katello`.
+`tests/` Test code goes here. These are typically simple calls to the more complex operations in` apps/`.
 
 `apps/__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
 
@@ -75,7 +75,7 @@ See [py.test documentation](http://pytest.org/) for more information.
 
 `api/[project]/api.py` Project-specific API helper methods.
 
-`credentials.yaml` Not currently in use. Store the credentials to log into the site with. The mozwebqa plugin will parse this file and make the values available inside the tests.
+`credentials.yaml` Not currently in use. Update `data/private_data.ini` instead.
 
 `conftest.py` Specify custom command-line options.
 
@@ -85,12 +85,13 @@ See [py.test documentation](http://pytest.org/) for more information.
 
 `data/large_dataset.py` Dataset generated from `generate_dataset.py`.
 
-`data/private_data.ini` Private cloud provider credentials. Update before running provider tests.
+`data/private_data.ini` Credentials file for users, EC2 provider and configserver. Update before running provider tests.
 
 `data/manifests/` Content provider manifest.zip files.
 
 `requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
 
+`sauce_labs.yaml` username, password, api-key for Saucelabs testing.
 
 ### Interactive Test Development
 Developing Selenium tests is tricky and requires some trial and error. Launching a whole test just to see if your last code edit works takes a long time. A quicker way is to use the interactive Python shell (or even better, [IPython](http://ipython.org/) for auto-complete) to start an interactive webdriver session.
