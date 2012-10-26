@@ -103,8 +103,8 @@ class TestContent(Aeolus_Test):
         Launch apps.
         '''
         page = self.aeolus.load_page('Aeolus')
-        # TODO: login as self-service use case with less priveledged user
-        page.login()
+        page.login(role="user")
+
         # TODO: link catalogs and images more elegantly
         for catalog in Content.catalogs:
             for image in Content.images:
