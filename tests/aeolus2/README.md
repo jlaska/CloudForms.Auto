@@ -16,8 +16,8 @@ Example command:
 
         # if ec2 download key, chmod 400 key.pem
         # ssh [-i key.pem] config_server_url
-        # `aeolus-configserver-setup`, 'y', default, copy values
-        # nav to cloud provider account, enter values, confirm success
+        # `aeolus-configserver-setup`, 'y', default
+        # copy values to data/private_data.ini
 
 10. `-q test_content.py -k add_configserver`
 11. `-q test_content.py -k launch_apps` (test sleeps for 20 seconds to provide time to edit blueprint params)
