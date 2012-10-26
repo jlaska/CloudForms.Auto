@@ -19,7 +19,8 @@ Example command:
         # `aeolus-configserver-setup`, 'y', default, copy values
         # nav to cloud provider account, enter values, confirm success
 
-10. `-q test_content.py -k launch_apps` (test sleeps for 20 seconds to provide time to edit blueprint params)
+10. `-q test_content.py -k add_configserver`
+11. `-q test_content.py -k launch_apps` (test sleeps for 20 seconds to provide time to edit blueprint params)
 
 *Note*: Comment out catalogs in `data/large_dataset.py` to isolate running to certain providers
 
