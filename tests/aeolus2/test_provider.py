@@ -43,7 +43,7 @@ class TestProvider(Aeolus_Test):
         for account in Provider.accounts:
             if account["type"] == "ec2":
                 creds = page.get_credentials_from_config('ec2_credentials')
-                for (key, val) in creds:
+                for (key, val) in creds.iteritems():
                     account[key] = val
 
             assert page.create_provider_account(account) == \
