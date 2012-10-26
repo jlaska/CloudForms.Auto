@@ -139,27 +139,20 @@ class TestContent(Aeolus_Test):
         '''
         Add configserver to provider accounts
         '''
-        # TODO: make this work. 
-        # Only the second half of adding configserver works
         page = self.aeolus.load_page('Aeolus')
-        page.login()
-
-        # page.setup_configserver()
+        #page.login()
 
         for cloud in Environment.clouds:
             for image in Content.images:
                 if image['name'] == "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], cloud['name'])
-                    # TODO: get vars from configserver setup
-                    # vars = page.setup_configserver()
-
-                    url = 'https://ec2-23-20-147-44.compute-1.amazonaws.com'
-                    key = '570919152513002986425316'
-                    secret = 'AxiQy1NS3RR9PsihRcGBUANPfoIIZgrr4HUpIegYqgRlxY5C'
-
-                    assert page.add_configserver_to_provider(cloud, url, key, secret) == aeolus_msg['add_configserver']
-                    time.sleep(5)
+                    creds = page.get_credentials_from_config(\
+                        'configserver_credentials')
+                    print "Got creds? %s" % creds
+                    #assert page.add_configserver_to_provider(cloud, creds) == \
+                    #    aeolus_msg['add_configserver']
+                    #time.sleep(5)
                 else:
                     print "No configserver found"
                 
