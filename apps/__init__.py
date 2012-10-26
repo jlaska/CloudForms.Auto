@@ -228,7 +228,7 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def get_credentials_from_config(self, role):
+    def get_login_from_config(self, role):
         '''
         get user login credentials from data/private_data.ini file
         assumes minimal base64 encoding of password
@@ -263,7 +263,7 @@ class BasePage(object):
         return login
 
     def login(self, role="admin", user=None, password=None):
-        login = self.get_credentials_from_config(role)
+        login = self.get_login_from_config(role)
         if user is None:
             user = login['username']
         if password is None:
