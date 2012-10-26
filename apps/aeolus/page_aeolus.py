@@ -188,18 +188,20 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("test provider connection '%s'" % acct['provider_name'])
         return self.get_text(*self.locators.response)
 
-    def update_ec2_acct_credentials_from_config(self, account):
+    def get_credentials_from_config(self, section):
         '''
-        add in private data from data/.ini file
+        get credentials from data/.ini file
         '''
+        # FIXME: move to apps/__init__.py as cross-project helper method
         config_file = 'data/private_data.ini'
         from ConfigParser import SafeConfigParser
 
         parser = SafeConfigParser()
         parser.read(config_file)
-        for (key, val) in parser.items('ec2_credentials'):
-            account[key] = val
-        return account
+        credentials = dict()
+        for (key, val) in parser.items(section):
+            credentials[key] = val
+        return credentials
 
     ###
     # clouds/pool families/environments and cloud resource zones/pools
@@ -449,28 +451,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
             (app_name, catalog))
         self.selenium.find_element(*self.locators.launch).click()
 
-    def setup_configserver(self):
-        '''
-        select running app, login and run setup
-        '''
-        # if ec2 download key, chmod 400 key.pem
-        # ssh [-i key.pem] config_server_url
-        # `aeolus-configserver-setup`, 'y', default
-        # return values
-        return 
-
-    def add_configserver_to_provider(self, cloud, url, key, secret):
+    def add_configserver_to_provider(self, cloud, cs):
         self.go_to_page_view('pool_families')
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.env_prov_acct_details).click()
         for account in cloud['enabled_provider_accounts']:
             self.click_by_text("a", account)
             self.click_by_text("a", "Add")
-            self.send_text(url, *self.locators.configserver_endpoint)
-            self.send_text(key, *self.locators.configserver_key)
-            self.send_text(secret, *self.locators.configserver_secret)
+            self.send_text(cs['endpoint'], *self.locators.configserver_endpoint)
+            self.send_text(cs['key'], *self.locators.configserver_key)
+            self.send_text(cs['secret'], *self.locators.configserver_secret)
             self.selenium.find_element(*self.locators.save_button).click()
             logging.info("Add configserver to %s, endpoint %s" % \
-                (account, url))
+                (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
  
