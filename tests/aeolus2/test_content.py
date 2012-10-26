@@ -98,6 +98,20 @@ class TestContent(Aeolus_Test):
     # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
     # nav to cloud provider account, enter url, key, secret, assert notification
 
+    def test_add_configserver(self, mozwebqa):
+        '''
+        Add configserver to provider accounts
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        creds = page.get_credentials_from_config('configserver_credentials')
+        print "Got creds? %s" % creds
+        for cloud in Environment.clouds:
+            assert page.add_configserver_to_provider(cloud, creds) == \
+                aeolus_msg['add_configserver']
+            time.sleep(5)
+
     def test_launch_apps(self, mozwebqa):
         '''
         Launch apps.
@@ -134,18 +148,4 @@ class TestContent(Aeolus_Test):
         for target_image_id in target_images:
             target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
             print "%s (%s)" % (target_image_detail['template'], target_image_id)
-
-    def test_add_configserver(self, mozwebqa):
-        '''
-        Add configserver to provider accounts
-        '''
-        page = self.aeolus.load_page('Aeolus')
-        page.login()
-
-        creds = page.get_credentials_from_config('configserver_credentials')
-        print "Got creds? %s" % creds
-        for cloud in Environment.clouds:
-            assert page.add_configserver_to_provider(cloud, creds) == \
-                aeolus_msg['add_configserver']
-            time.sleep(5)
 
