@@ -140,20 +140,12 @@ class TestContent(Aeolus_Test):
         Add configserver to provider accounts
         '''
         page = self.aeolus.load_page('Aeolus')
-        #page.login()
+        page.login()
 
+        creds = page.get_credentials_from_config('configserver_credentials')
+        print "Got creds? %s" % creds
         for cloud in Environment.clouds:
-            for image in Content.images:
-                if image['name'] == "ConfigServer":
-                    app_name = "%s-%s" % \
-                        (image['name'], cloud['name'])
-                    creds = page.get_credentials_from_config(\
-                        'configserver_credentials')
-                    print "Got creds? %s" % creds
-                    #assert page.add_configserver_to_provider(cloud, creds) == \
-                    #    aeolus_msg['add_configserver']
-                    #time.sleep(5)
-                else:
-                    print "No configserver found"
-                
+            assert page.add_configserver_to_provider(cloud, creds) == \
+                aeolus_msg['add_configserver']
+            time.sleep(5)
 
