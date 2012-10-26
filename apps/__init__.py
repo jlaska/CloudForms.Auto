@@ -228,7 +228,7 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def get_admin_credentials_from_config(self):
+    def get_credentials_from_config(self, role):
         '''
         get user login credentials from data/private_data.ini file
         assumes minimal base64 encoding of password
@@ -244,9 +244,15 @@ class BasePage(object):
         login = dict()
         items = None
         if self.project.startswith('katello'):
-            items = parser.items('katello_login_credentials')
+            if role == "user":
+                items = parser.items('katello_user_credentials')
+            else:
+                items = parser.items('katello_admin_credentials')
         elif self.project.startswith('aeolus'):
-            items = parser.items('aeolus_login_credentials')
+            if role == "user":
+                items = parser.items('aeolus_user_credentials')
+            else:
+                items = parser.items('aeolus_admin_credentials')
         else:
             raise Exception("No matching administrator configuration found: %s" % config_file)
 
@@ -256,8 +262,8 @@ class BasePage(object):
         login['password'] = self.decode_string(login['password'])
         return login
 
-    def login(self, user=None, password=None):
-        login = self.get_admin_credentials_from_config()
+    def login(self, role="admin", user=None, password=None):
+        login = self.get_credentials_from_config(role)
         if user is None:
             user = login['username']
         if password is None:
@@ -265,7 +271,7 @@ class BasePage(object):
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
-        logging.info('login as user "%s"' % user)
+        logging.info('login as user "%s" (role: "%s")' % (user, role))
 
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?
     def random_string(self):
