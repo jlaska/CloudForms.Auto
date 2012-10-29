@@ -195,7 +195,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # FIXME: move to apps/__init__.py as cross-project helper method
         config_file = 'data/private_data.ini'
         from ConfigParser import SafeConfigParser
-
         parser = SafeConfigParser()
         parser.read(config_file)
         credentials = dict()
@@ -369,7 +368,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.save_button).click()
         logging.info("upload custom blueprint %s, file %s, in cloud %s" % \
             (deployable, blueprint_file, api_img['env']))
-        time.sleep(3)
 
     def new_default_blueprint(self, cloud, image, deployable):
         '''
