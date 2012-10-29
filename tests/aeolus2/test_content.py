@@ -64,7 +64,7 @@ class TestContent(Aeolus_Test):
                         dataset_img, deployable)
                 else:
                     # custom blueprint, get image uid from api
-                    login = page.get_admin_credentials_from_config()
+                    login = page.get_login_from_config('admin')
                     api_images = self.api.get_image_list(\
                         login['username'], login['password'])
                     for api_img in api_images:
@@ -100,7 +100,7 @@ class TestContent(Aeolus_Test):
 
     def test_add_configserver(self, mozwebqa):
         '''
-        Add configserver to provider accounts
+        Add configserver to enabled provider accounts
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
@@ -110,7 +110,6 @@ class TestContent(Aeolus_Test):
         for cloud in Environment.clouds:
             assert page.add_configserver_to_provider(cloud, creds) == \
                 aeolus_msg['add_configserver']
-            time.sleep(5)
 
     def test_launch_apps(self, mozwebqa):
         '''
