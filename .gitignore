@@ -9,3 +9,4 @@ results/
 *.log
 private_data.ini
 sauce_labs.yaml
+Sauce-Connect.jar
