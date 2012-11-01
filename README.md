@@ -56,9 +56,7 @@ See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for m
 
 See [py.test documentation](http://pytest.org/) for more information.
 
-## Development Notes
-
-### About the Files
+## About the Files
 `tests/` Test code goes here. These are typically simple calls to the more complex operations in` apps/`.
 
 `apps/__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
@@ -92,21 +90,4 @@ See [py.test documentation](http://pytest.org/) for more information.
 `requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
 
 `sauce_labs.yaml` username, password, api-key for Saucelabs testing.
-
-### Interactive Test Development
-Developing Selenium tests is tricky and requires some trial and error. Launching a whole test just to see if your last code edit works takes a long time. A quicker way is to use the interactive Python shell (or even better, [IPython](http://ipython.org/) for auto-complete) to start an interactive webdriver session.
-
-    $ python
-    >>> from selenium import webdriver
-    >>> from selenium.webdriver.common.by import By
-    >>> url = 'https://localhost/conductor'
-    >>> driver = webdriver.Firefox()
-    >>> driver.get(url)
-
-A Firefox browser window should open to the URL. You can now interact with the new  browser window (login, nav to page you're working on, inspect elements). Then try a locator and see if it works.
-
-    >>> driver.find_elements(By.ID, 'user_first_name')
-    >>> [<selenium.webdriver.remote.webelement.WebElement at 0x1a42e50>] # valid
-
-Once your selector code is valid you can add to your code and keep going!
 
