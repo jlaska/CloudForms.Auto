@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 aeolus_msg = {
+    'cfce_title' : 'CloudForms Cloud Engine',
     'login' : 'Login successful',
     'logout' : 'Aeolus Conductor | Login',
     'add_user' : 'User registered',
@@ -25,12 +26,14 @@ aeolus_msg = {
     # partial string, invalid assert
     'add_blueprint' : 'Application Blueprint added to Catalog %s.',
     'add_configserver' : 'Config Server added.',
-    'update_blueprint' : 'Application Blueprint updated successfully'
+    'update_blueprint' : 'Application Blueprint updated successfully',
+    'launch_ready' : 'All Images are pushed and recent.'
     }
 
 # see src/app/controllers for message text source
 # https://github.com/Katello/katello/tree/master/src/app/controllers
 katello_msg = {
+    "cfse_title" : "CloudForms System Engine - Open Source Systems Management",
     "add_sys_template" : "System Template '%s' was created.",
     "delete_sys_template" : "Template '%s' was deleted.",
     "add_org" : "Organization '%s' was created."
