@@ -6,7 +6,7 @@ Example command:
 
 *Note*: Workflow assumes running configserver
 
-Tests are collected in correct order for complete workflow. Edit tests/aeolus2/pytest.ini for test control.
+Tests are collected in correct order for complete workflow. Edit `tests/aeolus2/pytest.ini` for test control.
 
 *Note*: Comment out select clouds (build/push) or catalogs (launch) in `data/large_dataset.py` to isolate running to certain providers
 
