@@ -5,6 +5,7 @@ Example command:
     py.test --project=aeolus --driver=firefox --baseurl=https://FQDN/conductor -q tests/aeolus2/test_[filename].py
 
 *Note*: Workflow assumes running configserver
+
 1. `-q test_users.py` (skip if in LDAP mode)
 2. `-q test_environment.py`
 3. `-q test_provider.py`
