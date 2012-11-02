@@ -2,14 +2,11 @@
 
 Example command: 
 
-    py.test --project=aeolus --driver=firefox --baseurl=https://FQDN/conductor -q tests/aeolus2/test_[filename].py
+    py.test tests/aeolus2/
 
 *Note*: Workflow assumes running configserver
 
-1. `-q test_users.py` (skip if in LDAP mode)
-2. `-q test_environment.py`
-3. `-q test_provider.py`
-4. `-q test_content.py`
+Tests are collected in correct order for complete workflow. Edit tests/aeolus2/pytest.ini for test control.
 
 *Note*: Comment out select clouds (build/push) or catalogs (launch) in `data/large_dataset.py` to isolate running to certain providers
 
