@@ -4,23 +4,11 @@ Example command:
 
     py.test --project=aeolus --driver=firefox --baseurl=https://FQDN/conductor -q tests/aeolus2/test_[filename].py
 
+*Note*: Workflow assumes running configserver
 1. `-q test_users.py` (skip if in LDAP mode)
 2. `-q test_environment.py`
 3. `-q test_provider.py`
-4. `-q test_content.py -k create_images`
-5. `-q test_content.py -k build_images` (wait for build to complete)
-6. `-q test_content.py -k create_blueprint`
-7. `-q test_content.py -k push_images` (wait for push to complete)
-8. `-q test_content.py -k launch_configserver` (may be performed manually)
-9. Maually configure config server
-
-        # if ec2 download key, chmod 400 key.pem
-        # ssh [-i key.pem] config_server_url
-        # `aeolus-configserver-setup`, 'y', default
-        # copy values to data/private_data.ini
-
-10. `-q test_content.py -k add_configserver`
-11. `-q test_content.py -k launch_apps` (test sleeps for 20 seconds to provide time to edit blueprint params)
+4. `-q test_content.py`
 
 *Note*: Comment out select clouds (build/push) or catalogs (launch) in `data/large_dataset.py` to isolate running to certain providers
 
