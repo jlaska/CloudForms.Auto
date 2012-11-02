@@ -134,3 +134,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     # special blueprint params
     katello_register_tab = (By.ID, "KATELLO_REGISTER")
     submit_params = (By.ID, "submit_params")
+
+    # verification
+    image_pushed = (By.CSS_SELECTOR, "div.build_status > span")
+    app_table = (By.XPATH, "(//table)")
