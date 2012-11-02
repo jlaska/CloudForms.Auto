@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import xml.etree.ElementTree as xmltree
 import tempfile
+from data.assert_response import *
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
@@ -406,18 +407,47 @@ class Aeolus(apps.aeolus.Conductor_Page):
             (image, cloud))
         self.selenium.find_element(*self.locators.build_all).click()
 
-    def push_image(self, cloud, image):
+    def verify_image_build(self, cloud, image):
         '''
-        push all images
+        check if image is built
         '''
-        # FIXME: use API to confirm images built
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud)
         self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", image)
+        if self.is_element_present(*self.locators.push_all):
+            logging.info("Image built. Ready for push.")
+            return True
+        else:
+            logging.info("Image not built")
+            return False
+
+    def push_image(self, cloud, image):
+        '''
+        push all images
+        '''
+        self.go_to_page_view("pool_families")
+        self.click_by_text("a", cloud)
+        self.selenium.find_element(*self.locators.image_details).click()
+        self.click_by_text("a", image)
+        self.selenium.find_element(*self.locators.push_all).click()
         logging.info("push image '%s' to all providers in cloud '%s'" % \
             (image, cloud))
-        self.selenium.find_element(*self.locators.push_all).click()
+
+
+    def verify_image_push(self, catalog, app_name, image):
+        '''
+        check if image is pushed and ready for launch
+        '''
+        self.go_to_page_view("catalogs")
+        self.click_by_text("a", catalog)
+        self.click_by_text("a", app_name)
+        if self.is_text_present(aeolus_msg['launch_ready'], *self.locators.image_pushed):
+            logging.info("Image pushed. Ready for launch. 3... 2... 1...")
+            return True
+        else:
+            logging.info("Image not pushed")
+            return False
 
     def launch_app(self, catalog, app_name, image, \
             katello_user='admin', katello_pass='admin'):
@@ -428,7 +458,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         select image by name, click launch
         create unique app name with otherwise default opts
         '''
-        # FIXME: use API to confirm images pushed
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
         self.click_by_text("a", app_name)
@@ -440,16 +469,51 @@ class Aeolus(apps.aeolus.Conductor_Page):
             # using custom blueprint
             # clear and fill in hostname, katello user and pass and other action
             # self.selenium.find_element(*self.locators.app_name_field).clear()
-            print "using custom blueprint"
+            logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
-            # sleep for manual verification
-            time.sleep(5)
+            # sleep for manual verification, update params
+            time.sleep(10)
             self.selenium.find_element(*self.locators.submit_params).click()
         logging.info("Launch app '%s' in catalog '%s'" % \
             (app_name, catalog))
         self.selenium.find_element(*self.locators.launch).click()
 
+    def verify_launch(self, app):
+        '''
+        Verify app has launched
+        '''
+        # go to table view, grab full text of table, split into rows,
+        # split each row into dictionary to account for multi-instance apps
+        # parse status
+
+        app = app.replace("_", "-")
+        self.click_by_text("a", app)
+        view = "?details_tab=instances&view=filter"
+        url = self.get_url_current_page()
+        self.go_to_url(url + view)
+        table = self.selenium.find_element(*self.locators.app_table)
+        table = table.text
+        rows = table.split("\n")
+        rows.pop(0)
+        apps = []
+        for row in rows:
+            row = row.split(" ")
+            apps.append({"name" : row[0], "ip" : row[1], "status" : row[2], 
+                          "cloud" : row[3], "owner" : row[4]})
+        # FIXME: will return true if _any_ instances in that app is running
+        for app in apps:
+            if app['status'] == "Running":
+                logging.info("\n\tInstance: %s\n\tStatus: %s\n\tIP: %s" %\
+                    (app['name'], app['status'], app['ip']))
+                return True
+            else:
+                logging.info("%s '%s'" % (app['name'], app['status']))
+                return False
+
     def add_configserver_to_provider(self, cloud, cs):
+        '''
+        add configserver to provider
+        '''
         self.go_to_page_view('pool_families')
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.env_prov_acct_details).click()
@@ -463,4 +527,4 @@ class Aeolus(apps.aeolus.Conductor_Page):
             logging.info("Add configserver to %s, endpoint %s" % \
                 (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
- 
+
