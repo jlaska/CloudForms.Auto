@@ -8,6 +8,7 @@ import locators as bl
 import logging
 import apps.locators
 import datetime
+import time
 
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
@@ -17,10 +18,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
+import selenium.webdriver as driver
 
 # FIXME - Use of logging, the logfile and level, should be enabled by the
 # command-line
-logging.basicConfig(filename='cloudforms_test.log', filemode='w', level=logging.INFO)
+logging.basicConfig(filename='cloudforms_test.log', filemode='w', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
 def initializeProduct(mozwebqa):
     '''
@@ -206,6 +208,10 @@ class BasePage(object):
         if kwargs.has_key('locators'):
             self.locators = kwargs.get('locators')
 
+        logging.info('Platform under test: %s %s on %s' % \
+            (self.browsername, self.browserver, self.platform))
+
+
     @property
     def selenium(self):
         return self._mozwebqa.selenium
@@ -221,6 +227,15 @@ class BasePage(object):
     @property
     def org(self):
         return self._mozwebqa.org
+    @property
+    def browsername(self):
+        return self.selenium.capabilities['browserName']
+    @property
+    def browserver(self):
+        return self.selenium.capabilities['version']
+    @property
+    def platform(self):
+        return self.selenium.capabilities['platform']
 
     def decode_string(self, string):
         '''
@@ -272,6 +287,36 @@ class BasePage(object):
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
         logging.info('login as user "%s" (role: "%s")' % (user, role))
+
+    # method per http://sauceio.com/index.php/2011/04/how-to-lose-races-and-win-at-selenium/
+    def spin_assert(self, msg, assertion):
+        for i in xrange(50):
+            try:
+                logging.info(msg)            
+                assert assertion()
+                return
+            except Exception, e:
+                logging.debug("exception %s" % e)
+                pass
+            time.sleep(1)
+        #self.fail(msg)
+
+    def wait_for_title(self, text, msg=None):
+        msg = msg or "Waiting for text '%s' to appear. Title: %s" % (text, self.selenium.title)
+        logging.info(msg)
+        #assertion = lambda: self.selenium.is_text_present(text)
+        assertion = lambda: self.selenium.title == text
+        logging.info(msg)
+        self.spin_assert(msg, assertion)
+        logging.info("Complete. Title: %s" % self.selenium.title)
+
+    def wait_for_id(self, text, msg=None):
+        msg = msg or "Waiting for id '%s'. Title: %s" % (text, self.selenium.title)
+        logging.info(msg)
+        assertion = lambda: self.is_element_present(By.ID, text)
+        logging.info(msg)
+        self.spin_assert(msg, assertion)
+        logging.info("Complete. Title: %s" % self.selenium.title)
 
     # FIXME - Should random_string be part of the BasePage, or more a shared test object?
     def random_string(self):
@@ -403,6 +448,16 @@ class BasePage(object):
         except Exception as e:
             return False
 
+    def is_text_present(self, text, *locator):
+        """
+        Returns True if text is present.
+        """
+        try:
+            WebDriverWait(self.selenium, 5).until(lambda s: text == s.find_element(*locator).text)
+            return True
+        except Exception as e:
+            return False
+
     def is_element_visible(self, *locator):
         """
         Returns True if locator is visible.
@@ -444,6 +499,7 @@ class BasePage(object):
     def go_to_page_view(self, view):
         # pass in view, e.g. system for katello/system
         self.selenium.get(self.base_url + "/" + view)
+        logging.info("nav to page '/%s'" % view)
 
     def url_by_text(self, css, name):
         _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
