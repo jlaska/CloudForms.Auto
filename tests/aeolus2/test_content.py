@@ -44,7 +44,12 @@ class TestContent(Aeolus_Test):
 
         for cloud in Environment.clouds:
             for image in Content.images:
-                page.push_image(cloud['name'], image['name'])
+                # 'while not' used to loop until image built
+                # FIXME: better way?
+                while not page.verify_image_build(cloud['name'], image['name']):
+                    time.sleep(30)
+                else:
+                    page.push_image(cloud['name'], image['name'])
 
     def test_create_blueprint(self, mozwebqa):
         '''
@@ -77,6 +82,7 @@ class TestContent(Aeolus_Test):
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)
 
+    @pytest.mark.skipif("1 == 1")
     def test_launch_configserver(self, mozwebqa):
         '''
         Launch configserver
@@ -98,6 +104,7 @@ class TestContent(Aeolus_Test):
     # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
     # nav to cloud provider account, enter url, key, secret, assert notification
 
+    @pytest.mark.skipif("1 == 1")
     def test_add_configserver(self, mozwebqa):
         '''
         Add configserver to enabled provider accounts
@@ -106,7 +113,6 @@ class TestContent(Aeolus_Test):
         page.login()
 
         creds = page.get_credentials_from_config('configserver_credentials')
-        print "Got creds? %s" % creds
         for cloud in Environment.clouds:
             assert page.add_configserver_to_provider(cloud, creds) == \
                 aeolus_msg['add_configserver']
@@ -124,13 +130,39 @@ class TestContent(Aeolus_Test):
                 if image['name'] != "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
-                    page.launch_app(catalog['name'], app_name, image)
+                    # 'while not' used to loop until image pushed
+                    # FIXME: better way?
+                    while not page.verify_image_push(catalog['name'], app_name, image):
+                        time.sleep(30)
+                    else:
+                        page.launch_app(catalog['name'], app_name, image)
+
+    def test_verify_launch(self, mozwebqa):
+        '''
+        verify app launch
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        for catalog in Content.catalogs:
+            for image in Content.images:
+                if image['name'] != "ConfigServer":
+                    app_name = "%s-%s" % \
+                        (image['name'], catalog['cloud_parent'])
+                    # 'while not' used to loop until image pushed
+                    # FIXME: better way?
+                    while not page.verify_launch(app_name):
+                        time.sleep(10)
+                    else:
+                        print "App '%s' launched" % app_name
+
 
     ###
-    # FIXME: 
+    # TOD: 
     # api function for reference
     # use/extend for polling status
     ###
+    @pytest.mark.skipif("1 == 1")
     def test_poll_images(self, mozwebqa):
         '''
         poll image build and return status
