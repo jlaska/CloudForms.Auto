@@ -569,16 +569,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
                           "cloud" : row[3], "owner" : row[4]})
         # FIXME: will return true if _any_ instances in that app is running
         for app in apps:
+            # We're only checking if it's a pending or new launch
+            # otherwise it's running or failed and we're moving on
             if app['status'] == "Running":
                 logging.info("\n\tInstance: %s\n\tStatus: \033[1;32m%s\033[0m\
                     \n\tIP: %s" % (app['name'], app['status'], app['ip']))
                 return True
-            elif app['status'] == "Stopped":
+            elif app['status'] in list("Pending", "New"):
+                return False
+            else:
                 logging.info("\n\tInstance: %s\n\tStatus: \033[1;31m%s\033[0m" \
                     % (app['name'], app['status']))
                 return True
-            else:
-                return False
 
     def add_configserver_to_provider(self, cloud, cs):
         '''
