@@ -20,7 +20,7 @@ class TestContent(Aeolus_Test):
 
         for cloud in Environment.clouds:
             for image in Content.images:
-                page.new_image_from_url(cloud['name'], image, \
+                page.new_image_from_url(cloud, image, \
                     page.sys_templates_url)
 
     def test_build_images(self, mozwebqa):
