@@ -11,6 +11,7 @@ def pytest_runtest_setup(item):
     pytest_mozwebqa.TestSetup.org = item.config.option.org
     pytest_mozwebqa.TestSetup.product_version = item.config.option.product_version
     pytest_mozwebqa.TestSetup.test_cleanup = item.config.option.test_cleanup
+    pytest_mozwebqa.TestSetup.sys_templates_url = item.config.option.sys_templates_url
 
 def pytest_addoption(parser):
     """
@@ -45,7 +46,15 @@ def pytest_addoption(parser):
                      default=False,
                      help="Boolean flag (True|False) to trigger post-test data cleanup such as deleting users and other data.")
 
+    parser.addoption("--sys_templates_url",
+                     action="store",
+                     dest='sys_templates_url',
+                     metavar='str',
+                     default='https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/',
+                     help="Location of system templates exported from katello. Include trailing slash. Default: https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/")
 
 def pytest_funcarg__mozwebqa(request):
+    """Load mozwebqa plugin
+    """
     pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
     return pytest_mozwebqa.TestSetup(request)
