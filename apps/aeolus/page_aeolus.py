@@ -360,7 +360,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         create new image from url
         '''
         self.go_to_page_view("pool_families")
-        self.click_by_text("a", cloud)
+        self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
         self.click_by_text("a", "New Image")
         self.selenium.find_element_by_link_text("From URL").click()
@@ -371,12 +371,38 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # OPTIONS: 1. edit text box
         #   self.selenium.find_element(loc).send_keys(Keys.ARROW_DOWN), etc?
         # 2. Use custom component outline for i386 on RHEV?
-        if self.selenium.find_element(*self.locators.new_image_edit_box).\
-            get_attribute('checked'):
-            self.selenium.find_element(*self.locators.new_image_edit_box).click()
-        self.selenium.find_element(*self.locators.new_image_continue_button).click()
-        logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
+        if "rhevm" in cloud['enabled_provider_accounts'] and \
+            "i386" in image['profile']:
+            if not self.selenium.find_element(*self.locators.new_image_edit_box).get_attribute('checked'):
+                self.selenium.find_element(*self.locators.new_image_edit_box).click()
+            self.selenium.find_element(*self.locators.new_image_continue_button).click()
+            self.hack_component_outline_for_rhev_i386("x86_64")
+            self.selenium.find_element(*self.locators.save_image).submit()
+        else:
+            if self.selenium.find_element(*self.locators.new_image_edit_box).\
+                get_attribute('checked'):
+                self.selenium.find_element(*self.locators.new_image_edit_box).click()
+            self.selenium.find_element(*self.locators.new_image_continue_button).click()
         self.selenium.find_element(*self.locators.save_button).submit()
+        logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
+
+
+    def hack_component_outline_for_rhev_i386(self, profile):
+        '''
+        crazy hack: edit component outline in textbox.
+        Don't try this at home, kids!
+        '''
+        self.selenium.find_element(*self.locators.new_image_textbox).click()
+        for i in range(6):
+            self.selenium.find_element(*self.locators.new_image_textbox).\
+                send_keys(Keys.ARROW_DOWN)
+        for i in range(10):
+            self.selenium.find_element(*self.locators.new_image_textbox).\
+                send_keys(Keys.ARROW_RIGHT)
+        for i in range(4):
+            self.selenium.find_element(*self.locators.new_image_textbox).\
+                send_keys(Keys.DELETE)
+        self.send_text("x86_64", *self.locators.new_image_textbox)
 
     def create_custom_blueprint(self, api_data, static_data):
         '''
