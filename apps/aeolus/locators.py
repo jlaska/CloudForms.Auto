@@ -100,7 +100,9 @@ class AeolusLocators(apps.locators.BaseLocators):
     new_image_name_field = (By.XPATH, "(//input[@id='name'])[2]")
     new_image_url_field = (By.ID, "image_url")
     new_image_edit_box = (By.XPATH, "(//input[@id='edit'])[2]")
+    new_image_textbox = (By.ID, "image_xml")
     new_image_continue_button = (By.ID, "url_button")
+    save_image = (By.ID, "save_image")
 
     # new app blueprint
     app_catalog_id = (By.ID, "catalog_id_")
