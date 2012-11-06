@@ -72,6 +72,8 @@ class AeolusLocators(apps.locators.BaseLocators):
     # new pool
     pool_name = (By.ID, "pool_name")
     pool_family_parent_field = (By.ID, "pool_pool_family_id")
+    pool_quota_field = (By.ID, "quota_instances")
+    pool_unlim_quota_checkbox = (By.ID, "unlimited_quota")
     pool_enabled_checkbox = (By.ID, "pool_enabled")
     # dup of save_button
     pool_save = (By.ID, "save_button")
@@ -138,3 +140,8 @@ class AeolusLocators(apps.locators.BaseLocators):
     # verification
     image_pushed = (By.CSS_SELECTOR, "div.build_status > span")
     app_table = (By.XPATH, "(//table)")
+
+    # search
+    permissions_filter = (By.ID, "entities_preset_filter")
+    entities_search = (By.ID, "entities_search")
+    role_dropdown = (By.NAME, "entity_role_selected[]")
