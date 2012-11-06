@@ -24,7 +24,7 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 7. Monitor log: `tail -f cloudforms_test.log`.
 
 ## Requirements
-These tests assume a fresh install of the product(s) that are accessible from the machine running the tests.
+The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `data/private_data.ini`.
 
 ## Executing Tests
 There are two ways to run Selenium tests.
@@ -40,6 +40,8 @@ See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for m
 
 ### Basic Usage
 `py.test --driver=firefox --baseurl=https://<FQDN>/conductor|katello --project=[project] -q testdir/path/my_test_file.py`
+
+To reduce command line arguments include a `pytest.ini` file in the test directory. See example `tests/aeolus2/pytest.ini`.
 
 ### Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
