@@ -3,6 +3,5 @@
 
 selenium
 pytest>=2.2
-pytest-xdist==1.6
-pytest-mozwebqa==0.7.1
-unittestzero
+pytest-xdist==1.7
+pytest-mozwebqa==10
