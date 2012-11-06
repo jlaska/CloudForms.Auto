@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 from data.large_dataset import Admin
@@ -17,6 +15,7 @@ class TestUsers(Aeolus_Test):
     Use default credentials until users, groups and permissions are defined
     '''
 
+    @pytest.mark.setup
     def test_create_users(self, mozwebqa):
         '''
         Create users
@@ -40,6 +39,8 @@ class TestUsers(Aeolus_Test):
         #else:
         #    assert page.logout() == "Aeolus Conductor | Login"
 
+
+    @pytest.mark.setup
     @pytest.mark.skipif("config.getvalue('product_version') == '1.0.1'")
     def test_create_user_groups(self, mozwebqa):
         '''
@@ -60,6 +61,7 @@ class TestUsers(Aeolus_Test):
 
         #assert page.logout() == "Aeolus Conductor | Login"
 
+    @pytest.mark.setup
     @pytest.mark.skipif("config.getvalue('product_version') == '1.0.1'")
     def test_add_users_to_user_groups(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
@@ -92,6 +94,7 @@ class TestUsers(Aeolus_Test):
          #                    aeolus_msg['delete_user_from_group'] % \
          #                    user['fname'] + ' ' + user['lname']
 
+    @pytest.mark.setup
     def test_add_permissions(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
         page.login(user='admin', password='password')
@@ -102,6 +105,7 @@ class TestUsers(Aeolus_Test):
             page.grant_permissions("user", user)
 
 
+    @pytest.mark.setup
     @pytest.mark.xfail
     def test_add_selfservice_quota(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
