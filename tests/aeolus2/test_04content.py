@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 from data.large_dataset import Environment
@@ -22,7 +20,8 @@ class TestContent(Aeolus_Test):
 
         for cloud in Environment.clouds:
             for image in Content.images:
-                page.new_image_from_url(cloud['name'], image)
+                page.new_image_from_url(cloud['name'], image, \
+                    page.sys_templates_url)
 
     def test_build_images(self, mozwebqa):
         '''
@@ -87,6 +86,7 @@ class TestContent(Aeolus_Test):
         '''
         Launch configserver
         '''
+        # skipping. manual configserver assumed
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
@@ -104,7 +104,6 @@ class TestContent(Aeolus_Test):
     # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
     # nav to cloud provider account, enter url, key, secret, assert notification
 
-    @pytest.mark.skipif("1 == 1")
     def test_add_configserver(self, mozwebqa):
         '''
         Add configserver to enabled provider accounts
@@ -117,6 +116,7 @@ class TestContent(Aeolus_Test):
             assert page.add_configserver_to_provider(cloud, creds) == \
                 aeolus_msg['add_configserver']
 
+    @pytest.mark.launch
     def test_launch_apps(self, mozwebqa):
         '''
         Launch apps.
@@ -137,6 +137,9 @@ class TestContent(Aeolus_Test):
                     else:
                         page.launch_app(catalog['name'], app_name, image)
 
+    @pytest.mark.nondestructive
+    @pytest.mark.verify
+    @pytest.mark.launch
     def test_verify_launch(self, mozwebqa):
         '''
         verify app launch
@@ -153,12 +156,9 @@ class TestContent(Aeolus_Test):
                     # FIXME: better way?
                     while not page.verify_launch(app_name):
                         time.sleep(10)
-                    else:
-                        print "App '%s' launched" % app_name
-
 
     ###
-    # TOD: 
+    # TODO: 
     # api function for reference
     # use/extend for polling status
     ###
