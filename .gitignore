@@ -7,6 +7,6 @@ results/
 .pydevproject
 *.pem
 *.log*
-private_data.ini
+data/private_data.ini
 sauce_labs.yaml
 Sauce-Connect.jar
