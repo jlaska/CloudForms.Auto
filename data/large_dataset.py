@@ -1,22 +1,25 @@
-#!/usr/bin/env python
+!/usr/bin/env python
 
 # generated from generate_dataset.py
 # based on list definitions in raw_data.py
 
-        
 class Admin(object):
     '''
     Define users and groups
     '''
     user_groups = [
         {"name" : "admin", 
-        "description" : "Global admins. With great power comes great responsibility"},
-        {"name" : "cfadmins", 
-        "description" : "Global admins. With great power comes great responsibility"},
+        "description" : "Global admins. With great power comes great responsibility",
+        "permissions" : ['Global Administrator'] },
+        {"name" : "cfmanagers", 
+        "description" : "Global admins. With great power comes great responsibility",
+        "permissions" : ['Global Administrator'] },
         {"name" : "qe", 
-        "description" : "real QE users"},
+        "description" : "real QE users",
+        "permissions" : [] },
         {"name" : "cfusers", 
-        "description" : "Limited privilege users"}
+        "description" : "Limited privilege users",
+        "permissions" : ['Global Cloud Resource Zone User'] }
         ]
 
     users = [
@@ -26,42 +29,48 @@ class Admin(object):
         "username" : "automation",
         "passwd" : "redhat",
         "max_instances" : "",
-        "user_groups" : ['admin'] },
+        "user_groups" : ['admin'],
+        "permissions" : [] },
         {"fname" : "Aaron",
         "lname" : "Weitekamp",
         "email" : "aweiteka@redhat.com",
         "username" : "aweiteka-admin",
         "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['qe','cfadmins'] },
+        "user_groups" : ['qe','cfmanagers'],
+        "permissions" : ['Global Administrator'] },
         {"fname" : "Aaron",
         "lname" : "Weitekamp",
         "email" : "aweiteka@redhat.com",
         "username" : "aweiteka-user",
         "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['cfusers'] },
+        "user_groups" : ['cfusers'],
+        "permissions" : [] },
         {"fname" : "James",
         "lname" : "Laska",
         "email" : "jlaska@redhat.com",
         "username" : "jlaska",
         "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['qe','cfadmins'] },
+        "user_groups" : ['qe','cfmanagers'],
+        "permissions" : [] },
         {"fname" : "Milan",
         "lname" : "Falenik",
         "email" : "mfalesni@redhat.com",
         "username" : "mfalesni",
         "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['qe','cfadmins'] },
+        "user_groups" : ['qe','cfmanagers'],
+        "permissions" : [] },
         {"fname" : "Gabriel",
         "lname" : "Szasz",
         "email" : "gszasz@redhat.com",
         "username" : "gszasz",
         "passwd" : "redhat",
         "max_instances" : "20",
-        "user_groups" : ['qe','cfadmins'] }
+        "user_groups" : ['qe','cfmanagers'],
+        "permissions" : [] }
         ]
 
     selfservice_quota = "10"
@@ -74,7 +83,7 @@ class Provider(object):
     # valid account types: "ec2", "rhevm", "vsphere"
     accounts = [
 
-        # more than one ec2 account supported?
+        # TODO: support multiple ec2 accounts
         {"type" : "ec2",
         "provider_name" : "ec2-us-east-1",
         "provider_account_name" : "Public cloud east",
@@ -117,28 +126,28 @@ class Environment(object):
     '''
     clouds = [
         {"name" : "Dev",
-        "max_running_instances" : "14",
+        "max_running_instances" : "24",
         "enabled_provider_accounts" : ['rhevm']},
         {"name" : "Test",
-        "max_running_instances" : "23",
+        "max_running_instances" : "24",
         "enabled_provider_accounts" : ['vsphere']},
         {"name" : "Production",
-        "max_running_instances" : "21",
+        "max_running_instances" : "24",
         "enabled_provider_accounts" : ['Public cloud east']}
         ]
 
     pools = [
         {"name" : "CloudForms-dev",
         "environment_parent" : ['Dev'],
-        "quota" : "24",
+        "quota" : "10",
         "enabled" : True},
         {"name" : "CloudForms-test",
         "environment_parent" : ['Test'],
-        "quota" : "24",
+        "quota" : "10",
         "enabled" : True},
         {"name" : "CloudForms-prod",
         "environment_parent" : ['Production'],
-        "quota" : "24",
+        "quota" : "10",
         "enabled" : True}
         ]
 
@@ -159,27 +168,27 @@ class Content(object):
         ]
 
     images = [
-        {"name" : "ConfigServer",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
-        "profile" : "small-x86_64",
-        "blueprint" : ""},
+        #{"name" : "ConfigServer",
+        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
+        #"profile" : "small-x86_64",
+        #"blueprint" : ""},
 
-        {"name" : "CFtools-x86_64-6Serv",
+        {"name" : "rhel-x86_64-6Server",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
         "profile" : "small-x86_64",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-x86_64-5Serv",
+        {"name" : "rhel-x86_64-5Serv",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
         "profile" : "small-x86_64",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
 
-        {"name" : "CFtools-i386-5Serv",
+        {"name" : "rhel-i386-5Serv",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
         "profile" : "small-i386",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
-        {"name" : "CFtools-i386-6Serv",
+        {"name" : "rhel-i386-6Serv",
         "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
         "profile" : "small-i386",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
