@@ -537,11 +537,12 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # FIXME: will return true if _any_ instances in that app is running
         for app in apps:
             if app['status'] == "Running":
-                logging.info("\n\tInstance: %s\n\tStatus: %s\n\tIP: %s" %\
-                    (app['name'], app['status'], app['ip']))
+                logging.info("\n\tInstance: %s\n\tStatus: \033[1;32m%s\033[0m\
+                    \n\tIP: %s" % (app['name'], app['status'], app['ip']))
                 return True
             elif app['status'] == "Stopped":
-                logging.info("Instance: %s %s" % (app['name'], app['status']))
+                logging.info("\n\tInstance: %s\n\tStatus: \033[1;31m%s\033[0m" \
+                    % (app['name'], app['status']))
                 return True
             else:
                 return False
