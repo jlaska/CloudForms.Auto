@@ -4,6 +4,7 @@ import apps.aeolus
 import time, re, logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 import xml.etree.ElementTree as xmltree
 import tempfile
 from data.assert_response import *
@@ -53,9 +54,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(user["username"], *self.locators.user_username_field)
         self.send_text(user["passwd"], *self.locators.user_password_field)
         self.send_text(user["passwd"], *self.locators.user_password_confirmation_field)
+        self.selenium.find_element(*self.locators.user_quota_max_running_instances_field).clear()
         self.send_text(user["max_instances"], *self.locators.user_quota_max_running_instances_field)
         self.selenium.find_element(*self.locators.user_submit_locator).click()
-        logging.info("create user '%s'" % user)
+        logging.info("create user '%s'" % user['username'])
         return self.get_text(*self.locators.response)
 
     def delete_user(self, username):
@@ -78,7 +80,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(user_group["name"], *self.locators.user_group_name_field)
         self.send_text(user_group["description"], *self.locators.user_group_description_field)
         self.selenium.find_element(*self.locators.user_group_submit_locator).click()
-        logging.info("create user group '%s'" % user_group)
+        logging.info("create user group '%s'" % user_group['name'])
         return self.get_text(*self.locators.response)
 
     def delete_user_group(self, name):
@@ -117,6 +119,35 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("delete user '%s' from group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
+    def grant_permissions(self, filter, entity):
+        '''
+        Add permissions to user or group
+        '''
+        self.go_to_page_view("permissions/new")
+        # init var for logging
+        entity_name = None
+        if filter == "group":
+            self.select_dropdown("User Group", \
+                *self.locators.permissions_filter)
+            self.send_text(entity['name'], *self.locators.entities_search)
+            entity_name = entity['name']
+        elif filter == "user":
+            self.select_dropdown("User", \
+                *self.locators.permissions_filter) 
+            self.send_text(entity['username'], *self.locators.entities_search)
+            entity_name = entity['username']
+        else:
+            logging.info("No matching filter found: %s" % filter)
+
+        self.selenium.find_element(*self.locators.entities_search).\
+            send_keys(Keys.RETURN)
+        time.sleep(1)
+        for permission in entity['permissions']:
+            self.select_dropdown(permission, *self.locators.role_dropdown)
+            self.selenium.find_element(*self.locators.save_button).click()
+            logging.info("added permissions '%s' to %s '%s'" %\
+                (permission, filter, entity_name))
+
     def add_selfservice_quota(self, quota):
         '''
         set self-service default
@@ -124,7 +155,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("settings/self_service")
         self.send_text(quota, *self.locators.instances_quota)
         # FIXME: submit not working
-        self.selenium.find_element(*self.locators.instances_quota).send_keys(Keys.RETURN)
+        self.selenium.find_element(*self.locators.instances_quota).\
+            send_keys(Keys.RETURN)
         logging.info("add self-service quota '%s'" % quota)
         return self.get_text(*self.locators.response)
 
@@ -235,9 +267,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools/new")
         self.send_text(pool["name"], *self.locators.pool_name_field)
         self.select_dropdown(pool["environment_parent"], *self.locators.pool_family_parent_field)
-        # enabled by default
-        #if pool["enabled"] == True:
-        #    self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
+        self.selenium.find_element(*self.locators.pool_unlim_quota_checkbox).click()
+        self.find_element(*self.locators.pool_quota_field).clear()
+        self.send_text(pool["quota"], *self.locators.pool_quota_field)
         self.selenium.find_element(*self.locators.pool_save_locator).click()
         logging.info("create pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
