@@ -56,7 +56,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(user["passwd"], *self.locators.user_password_confirmation_field)
         self.selenium.find_element(*self.locators.user_quota_max_running_instances_field).clear()
         self.send_text(user["max_instances"], *self.locators.user_quota_max_running_instances_field)
-        self.selenium.find_element(*self.locators.user_submit_locator).click()
+        self.selenium.find_element(*self.locators.user_submit_locator).submit()
         logging.info("create user '%s'" % user['username'])
         return self.get_text(*self.locators.response)
 
@@ -79,7 +79,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("user_groups/new")
         self.send_text(user_group["name"], *self.locators.user_group_name_field)
         self.send_text(user_group["description"], *self.locators.user_group_description_field)
-        self.selenium.find_element(*self.locators.user_group_submit_locator).click()
+        self.selenium.find_element(*self.locators.user_group_submit_locator).submit()
         logging.info("create user group '%s'" % user_group['name'])
         return self.get_text(*self.locators.response)
 
@@ -101,8 +101,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
         self.go_to_page_view("user_groups/%s/add_members" % group_id)
-        self.selenium.find_element(*_member_checkbox).click()
-        self.selenium.find_element(*self.locators.user_group_save).click()
+        if not self.selenium.find_element(*_member_checkbox).\
+            get_attribute('checked'):
+            self.selenium.find_element(*_member_checkbox).click()
+        self.selenium.find_element(*self.locators.user_group_save).submit()
         logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
@@ -112,7 +114,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
         self.go_to_page_view("user_groups/%s" % group_id)
-        self.selenium.find_element(*_member_checkbox).click()
+        if not self.selenium.find_element(*_member_checkbox).\
+            get_attribute('checked'):
+            self.selenium.find_element(*_member_checkbox).click()
         self.selenium.find_element(*self.locators.user_group_delete).click()
         alert = self.selenium.switch_to_alert()
         alert.accept()
@@ -124,7 +128,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         Add permissions to user or group
         '''
         self.go_to_page_view("permissions/new")
-        # init var for logging
+        # init var for logging purposes
         entity_name = None
         if filter == "group":
             self.select_dropdown("User Group", \
@@ -153,10 +157,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         set self-service default
         '''
         self.go_to_page_view("settings/self_service")
+        self.selenium.find_element(*self.locators.instances_quota).clear()
         self.send_text(quota, *self.locators.instances_quota)
-        # FIXME: submit not working
-        self.selenium.find_element(*self.locators.instances_quota).\
-            send_keys(Keys.RETURN)
+        self.selenium.find_element(*self.locators.instances_quota).submit()
         logging.info("add self-service quota '%s'" % quota)
         return self.get_text(*self.locators.response)
 
@@ -180,7 +183,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             self.send_text(acct["public_cert_file"], *self.locators.prov_acct_x509_public_field)
         self.send_text(acct["provider_account_priority"], *self.locators.prov_acct_prior_field)
         self.send_text(acct["provider_account_quota"], *self.locators.prov_acct_quota_field)
-        self.selenium.find_element(*self.locators.prov_acct_save_locator).click()
+        self.selenium.find_element(*self.locators.prov_acct_save_locator).submit()
         logging.info("create provider account '%s'" % acct["provider_account_name"])
         return self.get_text(*self.locators.response)
 
@@ -245,7 +248,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families/new")
         self.send_text(env["name"], *self.locators.env_name_field)
         self.send_text(env["max_running_instances"], *self.locators.env_max_running_instances_field)
-        self.selenium.find_element(*self.locators.env_submit_locator).click()
+        self.selenium.find_element(*self.locators.env_submit_locator).submit()
         logging.info("create cloud '%s'" % env['name'])
         return self.get_text(*self.locators.response)
 
@@ -266,11 +269,15 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         self.go_to_page_view("pools/new")
         self.send_text(pool["name"], *self.locators.pool_name_field)
-        self.select_dropdown(pool["environment_parent"], *self.locators.pool_family_parent_field)
-        self.selenium.find_element(*self.locators.pool_unlim_quota_checkbox).click()
+        self.select_dropdown(pool["environment_parent"], \
+            *self.locators.pool_family_parent_field)
+        if self.selenium.find_element(*self.locators.pool_unlim_quota_checkbox).get_attribute('checked'):
+            self.selenium.find_element(*self.locators.pool_unlim_quota_checkbox).click()
         self.find_element(*self.locators.pool_quota_field).clear()
         self.send_text(pool["quota"], *self.locators.pool_quota_field)
-        self.selenium.find_element(*self.locators.pool_save_locator).click()
+        if not self.selenium.find_element(*self.locators.pool_enabled_checkbox).get_attribute('checked'):
+            self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
+        self.selenium.find_element(*self.locators.pool_save_locator).submit()
         logging.info("create pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
 
@@ -282,10 +289,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools/new?pool_family_id=%s" % env['id'])
         name = "%s" % (pool["name"])
         self.send_text(name, *self.locators.pool_name)
-        # enabled by default in 1.1
-        #if pool["enabled"] == True:
-        #    self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
-        self.selenium.find_element(*self.locators.pool_save).click()
+        if not self.selenium.find_element(*self.locators.pool_enabled_checkbox).get_attribute('checked'):
+            self.selenium.find_element(*self.locators.pool_enabled_checkbox).click()
+        self.selenium.find_element(*self.locators.pool_save).submit()
         logging.info("create pool '%s'" % pool['name'])
         return self.get_text(*self.locators.response)
 
@@ -311,8 +317,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         for account in cloud['enabled_provider_accounts']:
             account_id = self.get_provider_id_by_url(account)
             account_locator = (By.ID, "account_checkbox_%s" % account_id)
-            self.selenium.find_element(*account_locator).click()
-        self.selenium.find_element(*self.locators.save_button).click()
+            if not self.selenium.find_element(*account_locator).get_attribute('checked'):
+                self.selenium.find_element(*account_locator).click()
+        self.selenium.find_element(*self.locators.save_button).submit()
         logging.info("Add provider accounts to cloud '%s'" % cloud['name'])
         return self.get_text(*self.locators.response)
 
@@ -326,7 +333,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("catalogs/new")
         self.send_text(catalog["name"], *self.locators.catalog_name_field)
         self.select_dropdown(catalog["pool_parent"], *self.locators.catalog_family_parent_field)
-        self.selenium.find_element(*self.locators.catalog_save_locator).click()
+        self.selenium.find_element(*self.locators.catalog_save_locator).submit()
         logging.info("create catalog '%s'" % catalog['name'])
         return self.get_text(*self.locators.response)
 
@@ -346,7 +353,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(profile["storage"], *self.locators.hwp_storage_field)
         self.select_dropdown(profile["arch"], *self.locators.hwp_arch_field)
         logging.info("create cloud resource profile '%s'" % profile['name'])
-        self.selenium.find_element(*self.locators.save_button).click()
+        self.selenium.find_element(*self.locators.save_button).submit()
 
     def new_image_from_url(self, cloud, image, template_base_url):
         '''
@@ -360,10 +367,16 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(image['name'], *self.locators.new_image_name_field)
         template = template_base_url + image['template']
         self.send_text(template, *self.locators.new_image_url_field)
-        self.selenium.find_element(*self.locators.new_image_edit_box).click()
+        # FIXME: add support for i386 on RHEV.
+        # OPTIONS: 1. edit text box
+        #   self.selenium.find_element(loc).send_keys(Keys.ARROW_DOWN), etc?
+        # 2. Use custom component outline for i386 on RHEV?
+        if self.selenium.find_element(*self.locators.new_image_edit_box).\
+            get_attribute('checked'):
+            self.selenium.find_element(*self.locators.new_image_edit_box).click()
         self.selenium.find_element(*self.locators.new_image_continue_button).click()
         logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
-        self.selenium.find_element(*self.locators.save_button).click()
+        self.selenium.find_element(*self.locators.save_button).submit()
 
     def create_custom_blueprint(self, api_data, static_data):
         '''
@@ -399,7 +412,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(deployable, *self.locators.blueprint_name)
         #self.send_text("description", *self.locators.deployable_description)
         self.send_text(blueprint_file, *self.locators.deployable_xml)
-        self.selenium.find_element(*self.locators.save_button).click()
+        self.selenium.find_element(*self.locators.save_button).submit()
         logging.info("upload custom blueprint %s, file %s, in cloud %s" % \
             (deployable, blueprint_file, api_img['env']))
 
@@ -426,7 +439,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             "('catalog_id_').click();}());")
         logging.info("create default blueprint '%s' in cloud '%s'" % \
             (image['name'], cloud))
-        self.selenium.find_element(*self.locators.save_button).click()
+        self.selenium.find_element(*self.locators.save_button).submit()
 
     def build_image(self, cloud, image):
         '''
@@ -452,7 +465,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
             logging.info("Image built. Ready for push.")
             return True
         else:
-            logging.info("Image not built")
             return False
 
     def push_image(self, cloud, image):
@@ -467,7 +479,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("push image '%s' to all providers in cloud '%s'" % \
             (image, cloud))
 
-
     def verify_image_push(self, catalog, app_name, image):
         '''
         check if image is pushed and ready for launch
@@ -479,7 +490,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
             logging.info("Image pushed. Ready for launch. 3... 2... 1...")
             return True
         else:
-            logging.info("Image not pushed")
             return False
 
     def launch_app(self, catalog, app_name, image, \
@@ -499,9 +509,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
         if image['blueprint'] != "":
-            # using custom blueprint
-            # clear and fill in hostname, katello user and pass and other action
-            # self.selenium.find_element(*self.locators.app_name_field).clear()
             logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification, update params
@@ -560,7 +567,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             self.send_text(cs['endpoint'], *self.locators.configserver_endpoint)
             self.send_text(cs['key'], *self.locators.configserver_key)
             self.send_text(cs['secret'], *self.locators.configserver_secret)
-            self.selenium.find_element(*self.locators.save_button).click()
+            self.selenium.find_element(*self.locators.save_button).submit()
             logging.info("Add configserver to %s, endpoint %s" % \
                 (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
