@@ -348,7 +348,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("create cloud resource profile '%s'" % profile['name'])
         self.selenium.find_element(*self.locators.save_button).click()
 
-    def new_image_from_url(self, cloud, image):
+    def new_image_from_url(self, cloud, image, template_base_url):
         '''
         create new image from url
         '''
@@ -358,7 +358,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", "New Image")
         self.selenium.find_element_by_link_text("From URL").click()
         self.send_text(image['name'], *self.locators.new_image_name_field)
-        self.send_text(image['template_url'], *self.locators.new_image_url_field)
+        template = template_base_url + image['template']
+        self.send_text(template, *self.locators.new_image_url_field)
         self.selenium.find_element(*self.locators.new_image_edit_box).click()
         self.selenium.find_element(*self.locators.new_image_continue_button).click()
         logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
@@ -518,6 +519,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # split each row into dictionary to account for multi-instance apps
         # parse status
 
+        self.go_to_page_view("pools")
         app = app.replace("_", "-")
         self.click_by_text("a", app)
         view = "?details_tab=instances&view=filter"
@@ -538,8 +540,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 logging.info("\n\tInstance: %s\n\tStatus: %s\n\tIP: %s" %\
                     (app['name'], app['status'], app['ip']))
                 return True
+            elif app['status'] == "Stopped":
+                logging.info("Instance: %s %s" % (app['name'], app['status']))
+                return True
             else:
-                logging.info("%s '%s'" % (app['name'], app['status']))
                 return False
 
     def add_configserver_to_provider(self, cloud, cs):
