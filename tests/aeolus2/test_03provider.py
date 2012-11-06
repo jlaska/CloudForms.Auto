@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test
@@ -14,7 +12,7 @@ class TestProvider(Aeolus_Test):
     '''
 
     @pytest.mark.provider_admin
-    @pytest.mark.aeolus_setup
+    @pytest.mark.setup
     def test_provider_connection(self, mozwebqa):
         '''
         test provider connection
@@ -28,7 +26,7 @@ class TestProvider(Aeolus_Test):
                    aeolus_msg['connect_provider']
 
     @pytest.mark.provider_admin
-    @pytest.mark.aeolus_setup
+    @pytest.mark.setup
     def test_create_provider_account(self, mozwebqa):
         '''
         Create provider account and test provider account connection
@@ -60,7 +58,7 @@ class TestProvider(Aeolus_Test):
         #        assert page.delete_provider_account(account) == \
         #               aeolus_msg['delete_provider_acct']
 
-    @pytest.mark.aeolus_setup
+    @pytest.mark.setup
     def test_add_provider_account_cloud(self, mozwebqa):
         '''
         Add provider accounts to clouds
@@ -74,6 +72,7 @@ class TestProvider(Aeolus_Test):
             #    aeolus_msg['add_provider_accts']
             page.add_provider_accounts_cloud(cloud)
 
+    @pytest.mark.setup
     def test_create_resource_profiles(self, mozwebqa):
         '''
         create cloud resource profiles
