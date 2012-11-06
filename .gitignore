@@ -10,3 +10,4 @@ results/
 data/private_data.ini
 sauce_labs.yaml
 Sauce-Connect.jar
+*.egg*
