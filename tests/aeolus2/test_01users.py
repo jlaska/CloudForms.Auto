@@ -14,6 +14,7 @@ def setup_module(module):
 class TestUsers(Aeolus_Test):
     '''
     Create users and groups, then add users to those groups
+    Use default credentials until users, groups and permissions are defined
     '''
 
     def test_create_users(self, mozwebqa):
@@ -21,7 +22,7 @@ class TestUsers(Aeolus_Test):
         Create users
         '''
         page = self.aeolus.load_page('Aeolus')
-        page.login()
+        page.login(user='admin', password='password')
         #assert page.login() == aeolus_msg['login']
 
         for user in Admin.users:
@@ -45,7 +46,7 @@ class TestUsers(Aeolus_Test):
         create user groups
         '''
         page = self.aeolus.load_page('Aeolus')
-        page.login()
+        page.login(user='admin', password='password')
         #assert page.login() == aeolus_msg['login']
 
         for user_group in Admin.user_groups:
@@ -62,10 +63,9 @@ class TestUsers(Aeolus_Test):
     @pytest.mark.skipif("config.getvalue('product_version') == '1.0.1'")
     def test_add_users_to_user_groups(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
-        page.login()
+        page.login(user='admin', password='password')
         #assert page.login() == aeolus_msg['login']
 
-        # move to aeolus_page.py
         # capture user IDs from "/users/" view
         for user in Admin.users:
             user["id"] = page.get_id_by_url("users", user["username"])
@@ -91,6 +91,16 @@ class TestUsers(Aeolus_Test):
          #                    user['id']) == \
          #                    aeolus_msg['delete_user_from_group'] % \
          #                    user['fname'] + ' ' + user['lname']
+
+    def test_add_permissions(self, mozwebqa):
+        page = self.aeolus.load_page('Aeolus')
+        page.login(user='admin', password='password')
+
+        for user_group in Admin.user_groups:
+            page.grant_permissions("group", user_group)
+        for user in Admin.users:
+            page.grant_permissions("user", user)
+
 
     @pytest.mark.xfail
     def test_add_selfservice_quota(self, mozwebqa):
