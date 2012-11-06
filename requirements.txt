@@ -2,6 +2,6 @@
 # on Mozilla WebQA projects
 
 selenium
-pytest>=2.2
-pytest-xdist==1.7
-pytest-mozwebqa==10
+pytest>=2.3.3
+pytest-xdist==1.8
+pytest-mozwebqa==1.0
