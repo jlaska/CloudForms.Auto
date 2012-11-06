@@ -6,7 +6,7 @@ This is the automation testing framework for CloudForms, including SystemEngine,
 This test framework was originally written for Katello and headpin, and extended by the Red Hat CloudForms QE Integration team. Tests use Mozilla's [pytest-mozwebqa plugin](https://github.com/davehunt/pytest-mozwebqa).
 
 ## Documentation
-Current documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/index.html).
+Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/index.html). It is out of date.
 
 ## Dependencies and Installation
 * selenium webdriver or selenium server
@@ -17,16 +17,11 @@ Current documentation is [hosted here](http://eanxgeek.github.com/katello_challe
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
 2. Verify `data/large_dataset.py` is pointed to correct system templates.
-3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords for aeolus and katello projects. See encoding instructions below.
+3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords to `data/private_data.ini` for aeolus and katello projects. You can use `scripts/generate_password.py` to encode passwords.
 4. Rename `data/private_data.template` to `data/private_data.ini` and add `data/private_data.template` to `.gitignore` file
-5. Run tests per `tests/aeolus2/README.md`.
-
-*Base64 encoding:*
-
-    $ python
-    >>> import base64
-    >>> print base64.b64encode("password")
-    >>> cGFzc3dvcmQ= # <-copy this string to private_data.ini file
+5. Update `tests/aeolus2/pytest.ini` with correct args for your environment.
+6. Run tests: `py.test tests/aeolus2`.
+7. Monitor log: `tail -f cloudforms_test.log`.
 
 ## Requirements
 These tests assume a fresh install of the product(s) that are accessible from the machine running the tests.
@@ -54,40 +49,41 @@ See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for m
 * `-k [test_keyword]` Test keyword to run specific tests.
 * `-m <marker>` For running tests tagged with py.test markers.
 
-See [py.test documentation](http://pytest.org/) for more information.
+Run `py.test -h` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation.
 
 ## About the Files
-`tests/` Test code goes here. These are typically simple calls to the more complex operations in` apps/`.
+`tests/` Test code goes here. These are typically simple calls to the more complex operations in `apps/`. Update pytest.ini file to simplify test runs.
 
-`apps/__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
+`apps/`:
+* `__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
 
-`apps/locators.py` Base locator object inherited by project-specific locators.  It's rare to have locators that work across applications.  However, if any exist, they'll live here.
+* `locators.py` Base locator object inherited by project-specific locators.  It's rare to have locators that work across applications.  However, if any exist they'll live here.
 
-`apps/[project]/__init__.py` Project specific handlers.
+* `[project]/__init__.py` Project specific handlers.
 
-`apps/[project]/locators.py` Project specific locators.
+* `[project]/locators.py` Project specific locators.
 
-`pages/` Going away.  The pages/ heirarchy exists for historic purposes.  The apps/ heirarchy is intended to replace the need for pages.
+`pages/` Deprecated.  The pages/ heirarchy exists for historic purposes.  The apps/ heirarchy is intended to replace the need for pages.
 
 `api/` API helper methods.
 
-`api/[project]/api.py` Project-specific API helper methods.
+* `[project]/api.py` Project-specific API helper methods.
 
-`credentials.yaml` Not currently in use. Update `data/private_data.ini` instead.
+`data/`:
+* `large_dataset.py` Dataset that drives the data-driven testing performed.
 
-`conftest.py` Specify custom command-line options.
+* `private_data.ini` Credentials file for users, EC2 provider and configserver. Update before running provider tests.
 
-`mozwebqa.cfg` The mozwebqa plugin will read the parameters in this file and automatically add them onto the py.test command line. It is handy for parameters that are constant like --browsername=firefox
+* `manifests/` Content provider manifest.zip files.
 
-`generate_dataset.py` Standalone script to generate semi-random data file. Data derived from lists in `data/template_data.py`.
+### Configuration
+* `credentials.yaml` Not currently in use. Update `data/private_data.ini` instead.
 
-`data/large_dataset.py` Dataset generated from `generate_dataset.py`.
+* `conftest.py` Specify custom command-line options.
 
-`data/private_data.ini` Credentials file for users, EC2 provider and configserver. Update before running provider tests.
+* `mozwebqa.cfg` The mozwebqa plugin will read the parameters in this file and automatically add them onto the py.test command line. It is handy for parameters that are constant like --browsername=firefox.
 
-`data/manifests/` Content provider manifest.zip files.
+* `requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
 
-`requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
-
-`sauce_labs.yaml` username, password, api-key for Saucelabs testing.
+* `sauce_labs.yaml` username, password, api-key for Saucelabs testing.
 
