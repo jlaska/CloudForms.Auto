@@ -10,15 +10,14 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 
 ## Dependencies and Installation
 * selenium webdriver or selenium server
-* pytest==2.2.3
-* pytest-xdist==1.6
-* pytest-mozwebqa==0.7.1
-* unittestzero
+* pytest==2.3.3
+* pytest-xdist==1.8
+* pytest-mozwebqa==1.0
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Verify `data/large_dataset.py` is pointed to correct system templates.
+2. Update `data/large_dataset.py` if needed.
 3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords to `data/private_data.ini` for aeolus and katello projects. You can use `scripts/generate_password.py` to encode passwords.
-4. Rename `data/private_data.template` to `data/private_data.ini` and add `data/private_data.template` to `.gitignore` file
+4. Rename `data/private_data.template` to `data/private_data.ini`.
 5. Update `tests/aeolus2/pytest.ini` with correct args for your environment.
 6. Run tests: `py.test tests/aeolus2`.
 7. Monitor log: `tail -f cloudforms_test.log`.
@@ -26,7 +25,26 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 ## Requirements
 The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `data/private_data.ini`.
 
-## Executing Tests
+## Options
+* `--driver=firefox` Allows tests to be run without a separate Selenium server running.
+* `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
+* `--sys_templates_url=...` Full URL path to system templates exported from katello. Include trailing slash.
+* `--project=katello|aeolus|katello.cfse|aeolus.cfce` Specify project under test.
+* `-q path/to/test_file.py` Point to dir to run all tests in dir, or single file
+* `-k [test_keyword]` Test keyword to run specific tests.
+* `-m <marker>` For running tests tagged with py.test markers.
+
+Run `py.test -h` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation.
+
+## Different ways to run the tests
+* End-to-end Aeolus workflow: `py.test tests/aeolus2 -m "not saucelabs"`
+* If Aeolus is already set up with users, groups, clouds and providers, omit the setup tests: `py.test tests/aeolus2 -m "not setup"`
+* To just launch apps run `py.test tests/aeolus2 -m launch`
+* To just verify apps are launched run `py.test tests/aeolus2 -m verify`
+* Saucelabs UI testing: `py.test -m saucelabs`
+
+
+## Working with Selenium
 There are two ways to run Selenium tests.
 
 1. Use the Selenium WebDriver. Executing the tests with argument `--driver=firefox` allows for simple test runs. This is the method most commonly used during development.
@@ -36,22 +54,7 @@ To start the Selenium Server for local testing:
 `java -jar /path/to/your/selenium/selenium-X.Y.jar \`
 `-firefoxProfileTemplate /path/to/ff_profile/.mozilla/firefox/[profile]/`
 
-See [Selenium documentation](http://seleniumhq.org/docs/03_webdriver.html) for more details.
-
-### Basic Usage
-`py.test --driver=firefox --baseurl=https://<FQDN>/conductor|katello --project=[project] -q testdir/path/my_test_file.py`
-
-To reduce command line arguments include a `pytest.ini` file in the test directory. See example `tests/aeolus2/pytest.ini`.
-
-### Options
-* `--driver=firefox` Allows tests to be run without a separate Selenium server running.
-* `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
-* `--project=katello|aeolus|katello.cfse|aeolus.cfce` Specify project under test.
-* `-q path/to/test_file.py` Point to dir to run all tests in dir, or single file
-* `-k [test_keyword]` Test keyword to run specific tests.
-* `-m <marker>` For running tests tagged with py.test markers.
-
-Run `py.test -h` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation.
+See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.html) for more details.
 
 ## About the Files
 `tests/` Test code goes here. These are typically simple calls to the more complex operations in `apps/`. Update pytest.ini file to simplify test runs.
