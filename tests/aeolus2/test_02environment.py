@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test
@@ -12,8 +10,7 @@ class TestClouds(Aeolus_Test):
     Create clouds, pools, catalogs and cloud resource profile (front end)
     '''
 
-    @pytest.mark.environment
-    @pytest.mark.aeolus_setup
+    @pytest.mark.setup
     def test_create_clouds(self, mozwebqa):
         '''
         create new clouds
@@ -31,6 +28,7 @@ class TestClouds(Aeolus_Test):
         #        assert page.delete_environment(environment) == \
         #               aeolus_msg['delete_pool_family']
 
+    @pytest.mark.setup
     def test_new_pools(self, mozwebqa):
         '''
         create new pools
@@ -65,6 +63,7 @@ class TestClouds(Aeolus_Test):
         #               aeolus_msg['delete_pool'] % pool["name"]
 
 
+    @pytest.mark.setup
     def test_create_catalogs(self, mozwebqa):
         '''
         create new catalogs
