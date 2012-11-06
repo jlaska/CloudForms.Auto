@@ -1,5 +1,3 @@
-!/usr/bin/env python
-
 # generated from generate_dataset.py
 # based on list definitions in raw_data.py
 
@@ -169,27 +167,27 @@ class Content(object):
 
     images = [
         #{"name" : "ConfigServer",
-        #"template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-configserver.xml",
+        #"template" : "rhel-x86_64-6Server-cf-configserver.xml",
         #"profile" : "small-x86_64",
         #"blueprint" : ""},
 
         {"name" : "rhel-x86_64-6Server",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-6Server-cf-tools.xml",
+        "template" : "rhel-x86_64-6Server-cf-tools.xml",
         "profile" : "small-x86_64",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
         {"name" : "rhel-x86_64-5Serv",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-x86_64-5Server-cf-tools.xml",
+        "template" : "rhel-x86_64-5Server-cf-tools.xml",
         "profile" : "small-x86_64",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
+        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
         {"name" : "rhel-i386-5Serv",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-5Server-cf-tools.xml",
+        "template" : "rhel-i386-5Server-cf-tools.xml",
         "profile" : "small-i386",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
 
         {"name" : "rhel-i386-6Serv",
-        "template_url" : "https://qeblade40.rhq.lab.eng.bos.redhat.com/templates/Dev/rhel-i386-6Server-cf-tools.xml",
+        "template" : "rhel-i386-6Server-cf-tools.xml",
         "profile" : "small-i386",
         "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
 
