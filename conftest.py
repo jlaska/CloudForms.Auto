@@ -8,6 +8,8 @@ def pytest_runtest_setup(item):
     """
     pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
     pytest_mozwebqa.TestSetup.project = item.config.option.project
+    pytest_mozwebqa.TestSetup.loglevel = item.config.option.loglevel
+    pytest_mozwebqa.TestSetup.logfile = item.config.option.logfile
     pytest_mozwebqa.TestSetup.org = item.config.option.org
     pytest_mozwebqa.TestSetup.product_version = item.config.option.product_version
     pytest_mozwebqa.TestSetup.test_cleanup = item.config.option.test_cleanup
@@ -24,6 +26,20 @@ def pytest_addoption(parser):
                      metavar='str',
                      default=None,
                      help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
+
+    parser.addoption("--loglevel",
+                     action="store",
+                     dest='loglevel',
+                     metavar='str',
+                     default='INFO',
+                     help="Log level. 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'. Default: 'INFO'")
+
+    parser.addoption("--logfile",
+                     action="store",
+                     dest='logfile',
+                     metavar='str',
+                     default='cloudforms_test.log',
+                     help="Log file name. Default: 'cloudforms_test.log'")
 
     parser.addoption("--org",
                      action="store",
