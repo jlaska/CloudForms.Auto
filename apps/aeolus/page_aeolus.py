@@ -386,7 +386,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 self.selenium.find_element(*self.locators.new_image_edit_box).click()
             self.selenium.find_element(*self.locators.new_image_continue_button).click()
         self.selenium.find_element(*self.locators.save_button).submit()
-        logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
+        logging.info("create image '%s' in cloud '%s'" % \
+            (image['name'], cloud['name']))
 
 
     def update_component_outline_for_rhev_i386(self, arch):
@@ -399,7 +400,12 @@ class Aeolus(apps.aeolus.Conductor_Page):
             match.text = 'x86_64'
         tree = xmltree.tostring(tree, 'utf-8')
         self.selenium.find_element(*self.locators.new_image_textbox).clear()
-        self.send_characters(tree, *self.locators.new_image_textbox)
+        # Firefox is hanging on large text input so do one character at a time
+        # Chrome is working fine with send_text
+        if self.browsername == 'firefox':
+            self.send_characters(tree, *self.locators.new_image_textbox)
+        else:
+            self.send_text(tree, *self.locators.new_image_textbox)
 
     def create_custom_blueprint(self, api_data, static_data):
         '''
