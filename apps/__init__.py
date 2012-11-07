@@ -246,31 +246,37 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def get_login_from_config(self, role):
+    def parse_configuration(self, section, config_file='data/private_data.ini'):
         '''
-        get user login credentials from data/private_data.ini file
-        assumes minimal base64 encoding of password
-        requires unique username and password for katello and aeolus projects
+        Read and return dictionary from configuration file section
         '''
-        config_file = 'data/private_data.ini'
         from ConfigParser import SafeConfigParser
 
-        parser = SafeConfigParser()
-        # TODO - Ensure that we successfully read from config_file
-        assert len(parser.read(config_file)) > 0, "Unable to load config_file: %s " % config_file
+        parser = SafeConfigParser(allow_no_value=True)
+        assert len(parser.read(config_file)) > 0, \
+            "Unable to load config_file: %s " % config_file
 
+        return parser.items(section)
+
+    def get_login_credentials(self, role):
+        '''
+        get user login credentials
+        assumes minimal base64 encoding of password
+        requires unique username and password defined for 
+        katello and aeolus projects
+        '''
         login = dict()
         items = None
         if self.project.startswith('katello'):
             if role == "user":
-                items = parser.items('katello_user_credentials')
+                items = self.parse_configuration('katello_user_credentials')
             else:
-                items = parser.items('katello_admin_credentials')
+                items = self.parse_configuration('katello_admin_credentials')
         elif self.project.startswith('aeolus'):
             if role == "user":
-                items = parser.items('aeolus_user_credentials')
+                items = self.parse_configuration('aeolus_user_credentials')
             else:
-                items = parser.items('aeolus_admin_credentials')
+                items = self.parse_configuration('aeolus_admin_credentials')
         else:
             raise Exception("No matching administrator configuration found: %s" % config_file)
 
@@ -281,7 +287,7 @@ class BasePage(object):
         return login
 
     def login(self, role="admin", user=None, password=None):
-        login = self.get_login_from_config(role)
+        login = self.get_login_credentials(role)
         if user is None:
             user = login['username']
         if password is None:
@@ -339,6 +345,9 @@ class BasePage(object):
         return self.selenium.title
 
     def send_characters(self, text, *locator):
+        """
+        Sends text to locator, one character at a time.
+        """
         WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_enabled())
         input_locator = self.selenium.find_element(*locator)
         for c in text:
@@ -346,7 +355,7 @@ class BasePage(object):
 
     def send_text(self, text, *locator):
         """
-        Sends text to locator, one character at a time.
+        Sends text to locator
         """
         WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_enabled())
         input_locator = self.selenium.find_element(*locator)
