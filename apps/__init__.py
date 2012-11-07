@@ -236,9 +236,6 @@ class BasePage(object):
     def org(self):
         return self._mozwebqa.org
     @property
-    def sys_templates_url(self):
-        return self._mozwebqa.sys_templates_url
-    @property
     def browsername(self):
         return self.selenium.capabilities['browserName']
     @property

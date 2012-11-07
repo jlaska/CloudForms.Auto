@@ -20,8 +20,9 @@ class TestContent(Aeolus_Test):
 
         for cloud in Environment.clouds:
             for image in Content.images:
+                opts = page.parse_configuration('aeolus')
                 page.new_image_from_url(cloud, image, \
-                    page.sys_templates_url)
+                    opts['sys_templates_baseurl'])
 
     def test_build_images(self, mozwebqa):
         '''
@@ -68,7 +69,7 @@ class TestContent(Aeolus_Test):
                         dataset_img, deployable)
                 else:
                     # custom blueprint, get image uid from api
-                    login = page.get_login_from_config('admin')
+                    login = page.get_login_credentials('admin')
                     api_images = self.api.get_image_list(\
                         login['username'], login['password'])
                     for api_img in api_images:

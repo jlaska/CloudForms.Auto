@@ -28,7 +28,6 @@ The end-to-end test run assumes a fresh default install of the product(s) that a
 ## Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
 * `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
-* `--sys_templates_url=...` Full URL path to system templates exported from katello. Include trailing slash.
 * `--project=katello|aeolus|katello.cfse|aeolus.cfce` Specify project under test.
 * `-q path/to/test_file.py` Point to dir to run all tests in dir, or single file
 * `-k [test_keyword]` Test keyword to run specific tests.
