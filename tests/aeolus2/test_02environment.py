@@ -1,8 +1,8 @@
 import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test
-from data.large_dataset import Environment
-from data.large_dataset import Content
+from data.dataset import Environment
+from data.dataset import Content
 from data.assert_response import *
 
 class TestClouds(Aeolus_Test):
