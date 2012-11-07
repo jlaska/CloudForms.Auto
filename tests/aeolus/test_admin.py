@@ -4,7 +4,7 @@ import pytest
 from unittestzero import Assert
 from pages.aeolus.home import Home
 from pages.aeolus.aeolus_page import Aeolus
-from data.large_dataset import Admin
+from data.dataset import Admin
 from data.assert_messages import *
 import time
 from pprint import pprint
