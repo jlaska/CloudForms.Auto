@@ -15,7 +15,7 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 * pytest-mozwebqa==1.0
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Update `data/large_dataset.py` if needed.
+2. Update `data/dataset.py` if needed.
 3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords to `data/private_data.ini` for aeolus and katello projects. You can use `scripts/generate_password.py` to encode passwords.
 4. Rename `data/private_data.template` to `data/private_data.ini`.
 5. Update `tests/aeolus2/pytest.ini` with correct args for your environment.
@@ -75,7 +75,7 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 * `[project]/api.py` Project-specific API helper methods.
 
 `data/`:
-* `large_dataset.py` Dataset that drives the data-driven testing performed.
+* `dataset.py` Dataset that drives the data-driven testing performed.
 
 * `private_data.ini` Credentials file for users, EC2 provider and configserver. Update before running provider tests.
 

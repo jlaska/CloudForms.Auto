@@ -1,6 +1,6 @@
 import pytest
 import apps
-from data.large_dataset import Admin
+from data.dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 

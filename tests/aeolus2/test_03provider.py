@@ -1,8 +1,8 @@
 import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test
-from data.large_dataset import Provider
-from data.large_dataset import Environment
+from data.dataset import Provider
+from data.dataset import Environment
 from data.assert_response import *
 
 class TestProvider(Aeolus_Test):

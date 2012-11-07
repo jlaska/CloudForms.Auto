@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 import logging
-from data.large_dataset import Admin
+from data.dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 import time
 
 class TestNav(Aeolus_Test):
 
-    @pytest.mark.template
     @pytest.mark.saucelabs
     def test_login_and_nav(self, mozwebqa):
         '''
@@ -67,6 +64,7 @@ class TestNav(Aeolus_Test):
             page.go_to_page_view(view)
             time.sleep(2)
 
+    @pytest.mark.saucelabs
     def test_sauce_debug(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
         page.login()

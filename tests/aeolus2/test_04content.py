@@ -1,7 +1,7 @@
 import pytest
 import apps
-from data.large_dataset import Environment
-from data.large_dataset import Content
+from data.dataset import Environment
+from data.dataset import Content
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 import time
