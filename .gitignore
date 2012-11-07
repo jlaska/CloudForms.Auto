@@ -7,7 +7,7 @@ results/
 .pydevproject
 *.pem
 *.log*
-data/private_data.ini
+data/*.ini
 sauce_labs.yaml
 Sauce-Connect.jar
 *.egg*
