@@ -2,7 +2,7 @@
 
 # author: Aaron Weitekamp
 
-# stand-alone script to create large, semi-random data set
+# stand-alone script to create a semi-random data set
 # for CloudForms.Auto test runs
 # uses lists from data/template_data.py as a template
 # update template_data.py if desired and execute with no arguments
@@ -15,7 +15,7 @@ from random import *
 class Dataset(object):
 
     def __init__(self):
-        self.data_file = 'data/large_dataset.py'
+        self.data_file = 'data/dataset.py'
         self.outfile = open(self.data_file, 'w')
 
         header = '''#!/usr/bin/env python
