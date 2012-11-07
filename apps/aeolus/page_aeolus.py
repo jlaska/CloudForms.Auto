@@ -133,7 +133,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         if filter == "group":
             self.select_dropdown("User Group", \
                 *self.locators.permissions_filter)
-            self.send_text(entity['name'], *self.locators.entities_search)
+            self.send_text_and_wait(entity['name'], \
+                *self.locators.entities_search)
             entity_name = entity['name']
         elif filter == "user":
             self.select_dropdown("User", \
@@ -387,7 +388,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("create image '%s' in cloud '%s'" % (image['name'], cloud))
 
 
-    def hack_component_outline_for_rhev_i386(self, profile):
+    def hack_component_outline_for_rhev_i386(self, arch):
         '''
         crazy hack: edit component outline in textbox.
         Don't try this at home, kids!
@@ -402,7 +403,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         for i in range(4):
             self.selenium.find_element(*self.locators.new_image_textbox).\
                 send_keys(Keys.DELETE)
-        self.send_text("x86_64", *self.locators.new_image_textbox)
+        self.send_text(arch, *self.locators.new_image_textbox)
 
     def create_custom_blueprint(self, api_data, static_data):
         '''
