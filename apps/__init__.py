@@ -366,8 +366,13 @@ class BasePage(object):
         """
         Selects options in locatorid by value.
         """
+        WebDriverWait(self.selenium, 60).until(lambda s: s.find_element(*locator).is_displayed())
         select = Select(self.selenium.find_element(*locator))
         select.select_by_visible_text(value)
+
+        # In the event a form submission occurs after selecting an option, wait
+        # for any page reload to complete
+        self.jquery_wait()
 
     def return_to_previous_page(self):
         """
