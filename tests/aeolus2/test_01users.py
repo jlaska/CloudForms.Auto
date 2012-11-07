@@ -106,10 +106,10 @@ class TestUsers(Aeolus_Test):
 
 
     @pytest.mark.setup
-    @pytest.mark.xfail
     def test_add_selfservice_quota(self, mozwebqa):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        #assert page.add_selfservice_quota(Admin.selfservice_quota) == aeolus_msg['update_settings']
+        assert page.add_selfservice_quota(Admin.selfservice_quota) == \
+            aeolus_msg['update_settings']
         page.add_selfservice_quota(Admin.selfservice_quota)
