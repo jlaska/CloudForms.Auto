@@ -111,7 +111,7 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        creds = page.get_credentials_from_config('configserver_credentials')
+        creds = page.parse_configuration('credentials-configserver')
         for cloud in Environment.clouds:
             assert page.add_configserver_to_provider(cloud, creds) == \
                 aeolus_msg['add_configserver']

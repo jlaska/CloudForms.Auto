@@ -1,0 +1,45 @@
+# passwords must be base64 encoded
+[credentials-aeolus]
+admin_uname=admin
+admin_pass=cGFzc3dvcmQ=
+
+user_uname=my-user
+user_pass=cGFzc3dvcmQ=
+
+[credentials-katello]
+admin_uname=admin
+admin_pass=YWRtaW4=
+
+user_uname=my-user
+user_pass=YWRtaW4=
+
+[credentials-ec2]
+username_access_key=my_ec2_access_key
+password_secret_access_key=my_ec2_secret_access_key
+account_number=1234-1234-1234
+private_key_file=/full/path/to/my/private/pk-file.pem
+public_cert_file=/full/path/to/my/public/cert-file.pem
+
+[credentials-configserver]
+# output from `aeolus-configserver-setup`
+endpoint=https://localhost
+key=my_configserver_key
+secret=my_configserver_secret
+
+[aeolus]
+providers=rhevm ec2 vsphere
+archs=x86_64 i386
+rhelvers=6Server 5Server 6.2 5.8
+sys_templates_baseurl=https://localhost/templates/Dev/
+custom_blueprint=True
+ldap=False
+
+[katello]
+org=redhat
+default_env=Dev
+redhat_repos=6Server 5Server
+custom_repos=cfse-1.1-puddle cfce-1.1-puddle
+ldap=False
+
+[general]
+log_level=DEBUG

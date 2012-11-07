@@ -20,9 +20,11 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 import selenium.webdriver as driver
 
-# FIXME - Use of logging, the logfile and level, should be enabled by the
-# command-line
-logging.basicConfig(filename='cloudforms_test.log', filemode='w', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+logging.basicConfig(filename='cloudforms_test.log', \
+    filemode='w', \
+    format='%(asctime)s %(levelname)s:%(message)s', \
+    datefmt='%Y-%m-%d %H:%M:%S', \
+    level=logging.INFO)
 
 def initializeProduct(mozwebqa):
     '''
@@ -225,6 +227,12 @@ class BasePage(object):
     def project(self):
         return self._mozwebqa.project
     @property
+    def loglevel(self):
+        return self._mozwebqa.loglevel
+    @property
+    def logfile(self):
+        return self._mozwebqa.logfile
+    @property
     def org(self):
         return self._mozwebqa.org
     @property
@@ -246,42 +254,44 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def parse_configuration(self, section, config_file='data/private_data.ini'):
+    def parse_configuration(self, section, config_file='data/configure.ini'):
         '''
         Read and return dictionary from configuration file section
         '''
+        # FIXME: put in some init method so it's available early
         from ConfigParser import SafeConfigParser
 
         parser = SafeConfigParser(allow_no_value=True)
         assert len(parser.read(config_file)) > 0, \
             "Unable to load config_file: %s " % config_file
 
-        return parser.items(section)
+        items = dict()
+        for (key,value) in  parser.items(section):
+            items[key] = value
+        return items
 
     def get_login_credentials(self, role):
         '''
         get user login credentials
-        assumes minimal base64 encoding of password
+        assumes token base64 encoding of password
         requires unique username and password defined for 
         katello and aeolus projects
         '''
-        login = dict()
         items = None
+        login = dict()
         if self.project.startswith('katello'):
-            if role == "user":
-                items = self.parse_configuration('katello_user_credentials')
-            else:
-                items = self.parse_configuration('katello_admin_credentials')
+            items = self.parse_configuration('credentials-katello')
         elif self.project.startswith('aeolus'):
-            if role == "user":
-                items = self.parse_configuration('aeolus_user_credentials')
-            else:
-                items = self.parse_configuration('aeolus_admin_credentials')
+            items = self.parse_configuration('credentials-aeolus')
         else:
             raise Exception("No matching administrator configuration found: %s" % config_file)
 
-        for (key,value) in items:
-            login[key] = value
+        if role == "user":
+            login['username'] = items['user_uname']
+            login['password'] = items['user_pass']
+        else:
+            login['username'] = items['admin_uname']
+            login['password'] = items['admin_pass']
 
         login['password'] = self.decode_string(login['password'])
         return login

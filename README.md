@@ -15,15 +15,15 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 * pytest-mozwebqa==1.0
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Update `data/dataset.py` if needed.
-3. Update `data/private_data.template` file with private provider account details. Add base64 encoded passwords to `data/private_data.ini` for aeolus and katello projects. You can use `scripts/generate_password.py` to encode passwords.
-4. Rename `data/private_data.template` to `data/private_data.ini`.
-5. Update `tests/aeolus2/pytest.ini` with correct args for your environment.
-6. Run tests: `py.test tests/aeolus2`.
+2. Rename `data/configure.template` to `data/configure.ini`.
+3. Update `data/configure.ini` file. Use `scripts/generate_password.py` to encode passwords.
+4. Update `tests/aeolus2/pytest.ini` if needed.
+5. Update `data/dataset.py` if needed.
+6. Run tests from project root dir: `py.test`. See `py.test -h` for options.
 7. Monitor log: `tail -f cloudforms_test.log`.
 
 ## Requirements
-The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `data/private_data.ini`.
+The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `data/configure.ini`.
 
 ## Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
@@ -42,7 +42,6 @@ Run `py.test -h` for help or refer to [py.test documentation](http://pytest.org/
 * To just launch apps run `py.test tests/aeolus2 -m launch`
 * To just verify apps are launched run `py.test tests/aeolus2 -m verify`
 * Saucelabs UI testing: `py.test -m saucelabs`
-
 
 ## Working with Selenium
 There are two ways to run Selenium tests.
@@ -75,14 +74,14 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 * `[project]/api.py` Project-specific API helper methods.
 
 `data/`:
-* `dataset.py` Dataset that drives the data-driven testing performed.
+* `configure.ini` Main configuration file for credentials, product parameters and general preferences.
 
-* `private_data.ini` Credentials file for users, EC2 provider and configserver. Update before running provider tests.
+* `dataset.py` Dataset that drives data-driven testing.
 
 * `manifests/` Content provider manifest.zip files.
 
 ### Configuration
-* `credentials.yaml` Not currently in use. Update `data/private_data.ini` instead.
+* `credentials.yaml` Not currently in use. Update `data/configure.ini` instead.
 
 * `conftest.py` Specify custom command-line options.
 

@@ -174,19 +174,32 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         self.go_to_page_view("providers")
         self.click_by_text("a", acct['provider_name'])
-        self.selenium.find_element(*self.locators.prov_acct_details_locator).click()
-        self.selenium.find_element(*self.locators.prov_acct_new_account_field).click()
-        self.send_text(acct["provider_account_name"], *self.locators.prov_acct_name_field)
-        self.send_text(acct["username_access_key"], *self.locators.prov_acct_access_key_field)
-        self.send_text(acct["password_secret_access_key"], *self.locators.prov_acct_secret_access_key_field)
+        self.selenium.find_element(*self.locators.prov_acct_details_locator)\
+            .click()
+        self.selenium.find_element(*self.locators.prov_acct_new_account_field)\
+            .click()
+        self.send_text(acct["provider_account_name"], \
+            *self.locators.prov_acct_name_field)
+        self.send_text(acct["username_access_key"], \
+            *self.locators.prov_acct_access_key_field)
+        self.send_text(acct["password_secret_access_key"], \
+            *self.locators.prov_acct_secret_access_key_field)
         if acct["type"] == "ec2":
-            self.send_text(acct["account_number"], *self.locators.prov_acct_number_field)
-            self.send_text(acct["private_key_file"], *self.locators.prov_acct_x509_private_field)
-            self.send_text(acct["public_cert_file"], *self.locators.prov_acct_x509_public_field)
-        self.send_text(acct["provider_account_priority"], *self.locators.prov_acct_prior_field)
-        self.send_text(acct["provider_account_quota"], *self.locators.prov_acct_quota_field)
-        self.selenium.find_element(*self.locators.prov_acct_save_locator).submit()
-        logging.info("create provider account '%s'" % acct["provider_account_name"])
+            self.send_text(acct["account_number"], \
+                *self.locators.prov_acct_number_field)
+            self.send_text(acct["private_key_file"], \
+                *self.locators.prov_acct_x509_private_field)
+            self.send_text(acct["public_cert_file"], \
+                *self.locators.prov_acct_x509_public_field)
+        self.send_text(acct["provider_account_priority"], \
+            *self.locators.prov_acct_prior_field)
+        self.selenium.find_element(*self.locators.prov_acct_quota_field).clear()
+        self.send_text(acct["provider_account_quota"], \
+            *self.locators.prov_acct_quota_field)
+        self.selenium.find_element(*self.locators.prov_acct_save_locator)\
+            .submit()
+        logging.info("create provider account '%s'" % \
+            acct["provider_account_name"])
         return self.get_text(*self.locators.response)
 
     def delete_provider_account(self, acct):
@@ -369,10 +382,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(image['name'], *self.locators.new_image_name_field)
         template = template_base_url + image['template']
         self.send_text(template, *self.locators.new_image_url_field)
-        # FIXME: add support for i386 on RHEV.
-        # OPTIONS: 1. edit text box
-        #   self.selenium.find_element(loc).send_keys(Keys.ARROW_DOWN), etc?
-        # 2. Use custom component outline for i386 on RHEV?
         if "rhevm" in cloud['enabled_provider_accounts'] and \
             "i386" in image['profile']:
             if not self.selenium.find_element(*self.locators.new_image_edit_box).get_attribute('checked'):
