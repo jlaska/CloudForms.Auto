@@ -20,12 +20,6 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 import selenium.webdriver as driver
 
-logging.basicConfig(filename='cloudforms_test.log', \
-    filemode='w', \
-    format='%(asctime)s %(levelname)s:%(message)s', \
-    datefmt='%Y-%m-%d %H:%M:%S', \
-    level=logging.INFO)
-
 def initializeProduct(mozwebqa):
     '''
     Return an initialized product class
@@ -226,12 +220,6 @@ class BasePage(object):
     @property
     def project(self):
         return self._mozwebqa.project
-    @property
-    def loglevel(self):
-        return self._mozwebqa.loglevel
-    @property
-    def logfile(self):
-        return self._mozwebqa.logfile
     @property
     def org(self):
         return self._mozwebqa.org
