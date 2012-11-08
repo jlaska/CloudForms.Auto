@@ -65,16 +65,21 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for catalog in Content.catalogs:
-            for dataset_img in Content.images:
+        config = page.parse_configuration('aeolus')
+        dataset_imgs = page.get_image_list(Content.images)
+        clouds = page.get_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            for dataset_img in dataset_imgs:
                 deployable = "%s-%s" % (dataset_img['name'], \
                     catalog['cloud_parent'])
-                if dataset_img['blueprint'] == "":
+                if config['custom_blueprint'] == "":
                     # default blueprint
                     page.new_default_blueprint(catalog['cloud_parent'],\
                         dataset_img, deployable)
                 else:
-                    # custom blueprint, get image uid from api
+                    # custom blueprint, update with image uid from api
                     login = page.get_login_credentials('admin')
                     api_images = self.api.get_image_list(\
                         login['username'], login['password'])
@@ -83,7 +88,7 @@ class TestContent(Aeolus_Test):
                             if catalog['cloud_parent'] == api_img['env']:
                                 blueprint_file = \
                                     page.create_custom_blueprint(api_img, \
-                                        dataset_img)
+                                        dataset_img, config['custom_blueprint'])
                                 page.upload_custom_blueprint(blueprint_file, \
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)
@@ -97,8 +102,12 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for catalog in Content.catalogs:
-            for image in Content.images:
+        images = page.get_image_list(Content.images)
+        clouds = page.get_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            for image in images:
                 if image['name'] == "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
@@ -157,8 +166,12 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for catalog in Content.catalogs:
-            for image in Content.images:
+        images = page.get_image_list(Content.images)
+        clouds = page.get_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            for image in images:
                 if image['name'] != "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
