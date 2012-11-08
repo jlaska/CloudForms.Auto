@@ -27,6 +27,7 @@ key=my_configserver_key
 secret=my_configserver_secret
 
 [aeolus]
+# must match provider account, not provider
 providers=rhevm ec2 vsphere
 archs=x86_64 i386
 rhelvers=6Server 5Server 6.2 5.8
