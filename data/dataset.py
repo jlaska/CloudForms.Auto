@@ -84,7 +84,7 @@ class Provider(object):
         # TODO: support multiple ec2 accounts
         {"type" : "ec2",
         "provider_name" : "ec2-us-east-1",
-        "provider_account_name" : "Public cloud east",
+        "provider_account_name" : "ec2",
         "username_access_key" : "",
         "password_secret_access_key" : "",
         "account_number" : "",
