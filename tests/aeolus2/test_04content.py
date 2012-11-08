@@ -18,8 +18,10 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for cloud in Environment.clouds:
-            for image in Content.images:
+        clouds = page.get_provider_list(Environment.clouds)
+        images = page.get_image_list(Content.images)
+        for cloud in clouds:
+            for image in images:
                 opts = page.parse_configuration('aeolus')
                 page.new_image_from_url(cloud, image, \
                     opts['sys_templates_baseurl'])
@@ -30,9 +32,11 @@ class TestContent(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        
-        for cloud in Environment.clouds:
-            for image in Content.images:
+
+        clouds = page.get_provider_list(Environment.clouds)
+        images = page.get_image_list(Content.images)
+        for cloud in clouds:
+            for image in images:
                 page.build_image(cloud['name'], image['name'])
 
     def test_push_images(self, mozwebqa):
@@ -42,8 +46,10 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for cloud in Environment.clouds:
-            for image in Content.images:
+        clouds = page.get_provider_list(Environment.clouds)
+        images = page.get_image_list(Content.images)
+        for cloud in clouds:
+            for image in images:
                 # 'while not' used to loop until image built
                 # FIXME: better way?
                 while not page.verify_image_build(cloud['name'], image['name']):
@@ -112,8 +118,9 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
+        clouds = page.get_provider_list(Environment.clouds)
         creds = page.parse_configuration('credentials-configserver')
-        for cloud in Environment.clouds:
+        for cloud in clouds:
             assert page.add_configserver_to_provider(cloud, creds) == \
                 aeolus_msg['add_configserver']
 
@@ -125,9 +132,11 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login(role="user")
 
-        # TODO: link catalogs and images more elegantly
-        for catalog in Content.catalogs:
-            for image in Content.images:
+        images = page.get_image_list(Content.images)
+        clouds = page.get_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+        for catalog in catalogs:
+            for image in images:
                 if image['name'] != "ConfigServer":
                     app_name = "%s-%s" % \
                         (image['name'], catalog['cloud_parent'])
