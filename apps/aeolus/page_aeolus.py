@@ -612,3 +612,48 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
 
+    def get_provider_list(self, environments):
+        '''
+        match dataset enabled providers with providers selected in configure.ini
+        '''
+        opts = self.parse_configuration('aeolus')
+        providers = list()
+        # TODO: move this to parse_configuration
+        for key, val in opts.iteritems():
+            opts[key] = re.split(r'[, ]', val)
+        for env in environments:
+            for provider in opts['providers']:
+                for provider_acct in env['enabled_provider_accounts']:
+                    if provider_acct.lower().startswith(provider.lower()):
+                        providers.append(env)
+        return providers
+
+    def get_image_list(self, templates):
+        '''
+        match dataset images with selected arch and rhelver in configure.ini
+        '''
+        opts = self.parse_configuration('aeolus')
+        images = list()
+        # TODO: move this to parse_configuration
+        for key, val in opts.iteritems():
+            opts[key] = re.split(r'[, ]', val)
+        for template in templates:
+            for arch in opts['archs']:
+                for rhelver in opts['rhelvers']:
+                    if re.search(r'%s' % arch, template['profile'], re.I) and \
+                        re.search(r'%s' % rhelver, template['template'], re.I):
+                        images.append(template)
+        return images
+
+    def get_catalog_list(self, catalogs, clouds):
+        '''
+        match enabled providers with catalogs
+        '''
+        enabled_catalogs = list()
+
+        for catalog in catalogs:
+            for cloud in clouds:
+                if catalog['cloud_parent'] == cloud['name']:
+                    enabled_catalogs.append(catalog)
+        return enabled_catalogs
+
