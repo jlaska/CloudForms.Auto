@@ -131,7 +131,7 @@ class Environment(object):
         "enabled_provider_accounts" : ['vsphere']},
         {"name" : "Production",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : ['Public cloud east']}
+        "enabled_provider_accounts" : ['ec2']}
         ]
 
     pools = [
@@ -168,28 +168,23 @@ class Content(object):
     images = [
         #{"name" : "ConfigServer",
         #"template" : "rhel-x86_64-6Server-cf-configserver.xml",
-        #"profile" : "small-x86_64",
-        #"blueprint" : ""},
+        #"profile" : "small-x86_64"},
 
         {"name" : "rhel-x86_64-6Server",
         "template" : "rhel-x86_64-6Server-cf-tools.xml",
-        "profile" : "small-x86_64",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        "profile" : "small-x86_64"},
 
         {"name" : "rhel-x86_64-5Serv",
         "template" : "rhel-x86_64-5Server-cf-tools.xml",
-        "profile" : "small-x86_64",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        "profile" : "small-x86_64"},
 
         {"name" : "rhel-i386-5Serv",
         "template" : "rhel-i386-5Server-cf-tools.xml",
-        "profile" : "small-i386",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"},
+        "profile" : "small-i386"},
 
         {"name" : "rhel-i386-6Serv",
         "template" : "rhel-i386-6Server-cf-tools.xml",
-        "profile" : "small-i386",
-        "blueprint" : "data/blueprint_templates/blueprint_test_cfse_registration.xml"}
+        "profile" : "small-i386"}
 
         ]
 
