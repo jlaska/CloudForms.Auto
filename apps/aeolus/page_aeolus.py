@@ -416,14 +416,14 @@ class Aeolus(apps.aeolus.Conductor_Page):
         else:
             self.send_text(tree, *self.locators.new_image_textbox)
 
-    def create_custom_blueprint(self, api_data, static_data):
+    def create_custom_blueprint(self, api_data, static_data, custom_blueprint):
         '''
         uses data from api to create custom blueprint 
         based on blueprint template found in dataset
         '''
         new_blueprint = tempfile.NamedTemporaryFile(delete=False)
 
-        tree = xmltree.parse(static_data['blueprint'])
+        tree = xmltree.parse(custom_blueprint)
         root = tree.getroot()
         root.set('name', static_data['name'])
         for assembly in root.findall("./assemblies/assembly"):
@@ -443,12 +443,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         upload a custom blueprint from local file
         '''
-        print blueprint_file, catalog, api_img, dataset_img
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
         self.selenium.find_element(*self.locators.new_deployable).click()
         self.send_text(deployable, *self.locators.blueprint_name)
-        #self.send_text("description", *self.locators.deployable_description)
         self.send_text(blueprint_file, *self.locators.deployable_xml)
         self.selenium.find_element(*self.locators.save_button).submit()
         logging.info("upload custom blueprint %s, file %s, in cloud %s" % \
@@ -539,6 +537,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         select image by name, click launch
         create unique app name with otherwise default opts
         '''
+        config = self.parse_configuration('aeolus')
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
         self.click_by_text("a", app_name)
@@ -546,7 +545,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.selenium.find_element(*self.locators.app_name_field).clear()
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
-        if image['blueprint'] != "":
+        if config['custom_blueprint'] != "":
             logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification, update params
