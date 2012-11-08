@@ -263,6 +263,9 @@ class BasePage(object):
             "Unable to load config_file: %s " % config_file
 
         items = dict()
+        # TODO: split values before returning
+        # re.split(r'[, ]', val)
+        # handles ',' or ' ' but not both
         for (key,value) in  parser.items(section):
             items[key] = value
         return items
