@@ -389,6 +389,10 @@ class BasePage(object):
         select = Select(self.selenium.find_element(*locator))
         select.select_by_visible_text(value)
 
+        # In the event a form submission occurs after selecting an option, wait
+        # for any page reload to complete
+        self.jquery_wait()
+
     def return_to_previous_page(self):
         """
         Simulates a Back (Return to prior page).
