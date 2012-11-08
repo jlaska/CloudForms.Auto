@@ -6,16 +6,16 @@ class Admin(object):
     Define users and groups
     '''
     user_groups = [
-        {"name" : "admin", 
+        {"name" : "admin",
         "description" : "Global admins. With great power comes great responsibility",
         "permissions" : ['Global Administrator'] },
-        {"name" : "cfmanagers", 
+        {"name" : "cfmanagers",
         "description" : "Global admins. With great power comes great responsibility",
         "permissions" : ['Global Administrator'] },
-        {"name" : "qe", 
+        {"name" : "qe",
         "description" : "real QE users",
         "permissions" : [] },
-        {"name" : "cfusers", 
+        {"name" : "cfusers",
         "description" : "Limited privilege users",
         "permissions" : ['Global Cloud Resource Zone User'] }
         ]
@@ -72,7 +72,7 @@ class Admin(object):
         ]
 
     selfservice_quota = "10"
-        
+
 class Provider(object):
     '''
     Define providers and provider accounts
