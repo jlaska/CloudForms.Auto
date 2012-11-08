@@ -28,11 +28,14 @@ secret=my_configserver_secret
 
 [aeolus]
 # must match provider account, not provider
+# accepts comma- or space-delimited list, case ignored, match "startswith"
 providers=rhevm ec2 vsphere
 archs=x86_64 i386
-rhelvers=6Server 5Server 6.2 5.8
+rhelvers=6Server 5.9
 sys_templates_baseurl=https://localhost/templates/Dev/
-custom_blueprint=True
+# leave blank for default blueprint
+custom_blueprint=data/blueprint_templates/test_cfse_registration.xml
+launch_configserver=False
 ldap=False
 
 [katello]
@@ -43,4 +46,4 @@ custom_repos=cfse-1.1-puddle cfce-1.1-puddle
 ldap=False
 
 [general]
-log_level=DEBUG
+log_level=INFO
