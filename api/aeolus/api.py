@@ -1,4 +1,3 @@
-from pages.base import Base
 import base64
 import httplib
 import urllib
