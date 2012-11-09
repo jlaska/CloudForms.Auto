@@ -20,7 +20,7 @@ class TestOrganizations(Katello_Test):
     @classmethod
     def teardown_class(self):
         # Remove any left-over orgs
-        if self.testsetup.test_cleanup:
+        if pytest.config.getvalue('test-cleanup')
             for name in self._cleanup_orgs:
                 self.api.destroy_org(name)
 
@@ -34,7 +34,7 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -62,7 +62,7 @@ class TestOrganizations(Katello_Test):
 
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -78,7 +78,7 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -114,7 +114,7 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
         assert home_page.header.is_user_logged_in
@@ -151,7 +151,7 @@ class TestOrganizations(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 

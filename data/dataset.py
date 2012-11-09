@@ -6,18 +6,18 @@ class Admin(object):
     Define users and groups
     '''
     user_groups = [
-        {"name" : "admin", 
+        {"name" : "admin",
         "description" : "Global admins. With great power comes great responsibility",
         "permissions" : ['Global Administrator'] },
-        {"name" : "cfmanagers", 
+        {"name" : "cfmanagers",
         "description" : "Global admins. With great power comes great responsibility",
         "permissions" : ['Global Administrator'] },
-        {"name" : "qe", 
+        {"name" : "qe",
         "description" : "real QE users",
         "permissions" : [] },
-        {"name" : "cfusers", 
+        {"name" : "cfusers",
         "description" : "Limited privilege users",
-        "permissions" : ['Global Cloud Resource Zone User'] }
+        "permissions" : ['Global Cloud Resource Zone User'] },
         ]
 
     users = [
@@ -68,11 +68,11 @@ class Admin(object):
         "passwd" : "redhat",
         "max_instances" : "20",
         "user_groups" : ['qe','cfmanagers'],
-        "permissions" : [] }
+        "permissions" : [] },
         ]
 
     selfservice_quota = "10"
-        
+
 class Provider(object):
     '''
     Define providers and provider accounts
@@ -107,7 +107,7 @@ class Provider(object):
         "username_access_key" : "Administrator",
         "password_secret_access_key" : "R3dhat!",
         "provider_account_priority" : "",
-        "provider_account_quota" : "32" }
+        "provider_account_quota" : "32" },
         ]
 
     resource_profiles = [
@@ -115,7 +115,7 @@ class Provider(object):
         "memory" : "512",
         "cpu_count" : "1",
         "storage" : "",
-        "arch" : "i386"}
+        "arch" : "i386"},
         ]
 
 class Environment(object):
@@ -131,7 +131,7 @@ class Environment(object):
         "enabled_provider_accounts" : ['vsphere']},
         {"name" : "Production",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : ['ec2']}
+        "enabled_provider_accounts" : ['ec2']},
         ]
 
     pools = [
@@ -146,7 +146,7 @@ class Environment(object):
         {"name" : "CloudForms-prod",
         "environment_parent" : ['Production'],
         "quota" : "10",
-        "enabled" : True}
+        "enabled" : True},
         ]
 
 class Content(object):
@@ -162,7 +162,7 @@ class Content(object):
         "cloud_parent" : "Test"},
         {"name" : "CF tools-prod",
         "pool_parent" : 'CloudForms-prod',
-        "cloud_parent" : "Production"}
+        "cloud_parent" : "Production"},
         ]
 
     images = [
@@ -170,21 +170,67 @@ class Content(object):
         #"template" : "rhel-x86_64-6Server-cf-configserver.xml",
         #"profile" : "small-x86_64"},
 
+        # RHEL-6Server
+        {"name" : "rhel-i386-6Server",
+        "template" : "rhel-i386-6Server-cf-tools.xml",
+        "profile" : "small-i386"},
+
         {"name" : "rhel-x86_64-6Server",
         "template" : "rhel-x86_64-6Server-cf-tools.xml",
         "profile" : "small-x86_64"},
 
-        {"name" : "rhel-x86_64-5Serv",
-        "template" : "rhel-x86_64-5Server-cf-tools.xml",
+        # RHEL-6.3
+        {"name" : "rhel-i386-6.3",
+        "template" : "rhel-i386-6.3-cf-tools.xml",
+        "profile" : "small-i386"},
+
+        {"name" : "rhel-x86_64-6.3",
+        "template" : "rhel-x86_64-6.3-cf-tools.xml",
         "profile" : "small-x86_64"},
 
-        {"name" : "rhel-i386-5Serv",
+        # RHEL-6.2
+        {"name" : "rhel-i386-6.2",
+        "template" : "rhel-i386-6.2-cf-tools.xml",
+        "profile" : "small-i386"},
+
+        {"name" : "rhel-x86_64-6.2",
+        "template" : "rhel-x86_64-6.2-cf-tools.xml",
+        "profile" : "small-x86_64"},
+
+        # RHEL-5Server
+        {"name" : "rhel-i386-5Server",
         "template" : "rhel-i386-5Server-cf-tools.xml",
         "profile" : "small-i386"},
 
-        {"name" : "rhel-i386-6Serv",
-        "template" : "rhel-i386-6Server-cf-tools.xml",
-        "profile" : "small-i386"}
+        {"name" : "rhel-x86_64-5Server",
+        "template" : "rhel-x86_64-5Server-cf-tools.xml",
+        "profile" : "small-x86_64"},
+
+        # RHEL-5.9
+        {"name" : "rhel-i386-5.9",
+        "template" : "rhel-i386-5.9-cf-tools.xml",
+        "profile" : "small-i386"},
+
+        {"name" : "rhel-x86_64-5.9",
+        "template" : "rhel-x86_64-5.9-cf-tools.xml",
+        "profile" : "small-x86_64"},
+
+        # RHEL-5.8
+        {"name" : "rhel-i386-5.8",
+        "template" : "rhel-i386-5.8-cf-tools.xml",
+        "profile" : "small-i386"},
+
+        {"name" : "rhel-x86_64-5.8",
+        "template" : "rhel-x86_64-5.8-cf-tools.xml",
+        "profile" : "small-x86_64"},
+
+        # RHEL-5.7
+        {"name" : "rhel-i386-5.7",
+        "template" : "rhel-i386-5.7-cf-tools.xml",
+        "profile" : "small-i386"},
+
+        {"name" : "rhel-x86_64-5.7",
+        "template" : "rhel-x86_64-5.7-cf-tools.xml",
+        "profile" : "small-x86_64"},
 
         ]
-

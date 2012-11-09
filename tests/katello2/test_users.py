@@ -1,5 +1,6 @@
 import pytest
 import apps
+import logging
 from tests.katello2 import Katello_Test
 
 class TestUsers(Katello_Test):
@@ -14,7 +15,7 @@ class TestUsers(Katello_Test):
     @classmethod
     def teardown_class(self):
         # Remove any left-over user accounts
-        if self.testsetup.test_cleanup:
+        if pytest.config.getvalue('test-cleanup'):
             for name in self._cleanup_users:
                 for match in self.api.list_users(name=name):
                     self.api.destroy_user(match['id'])
@@ -31,7 +32,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -62,7 +63,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -86,7 +87,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -121,7 +122,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -152,7 +153,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -177,7 +178,7 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -203,6 +204,6 @@ class TestUsers(Katello_Test):
         home_page = self.load_page('Home')
         home_page.login(new_user_name, password)
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
