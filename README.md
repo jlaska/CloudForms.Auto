@@ -66,8 +66,6 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 
 * `[project]/locators.py` Project specific locators.
 
-`pages/` Deprecated.  The pages/ heirarchy exists for historic purposes.  The apps/ heirarchy is intended to replace the need for pages.
-
 `api/` API helper methods.
 
 * `[project]/api.py` Project-specific API helper methods.
