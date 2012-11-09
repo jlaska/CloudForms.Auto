@@ -72,7 +72,7 @@ class TestContent(Aeolus_Test):
 
         for catalog in catalogs:
             for dataset_img in dataset_imgs:
-                deployable = "%s-%s" % (dataset_img['name'], \
+                deployable = page.get_app_name(dataset_img['name'], \
                     catalog['cloud_parent'])
                 if config['custom_blueprint'] == "":
                     # default blueprint
@@ -93,12 +93,10 @@ class TestContent(Aeolus_Test):
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)
 
-    @pytest.mark.skipif("1 == 1")
     def test_launch_configserver(self, mozwebqa):
         '''
-        Launch configserver
+        Launch configserver to enabled provider accounts
         '''
-        # skipping. manual configserver assumed
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
@@ -109,16 +107,22 @@ class TestContent(Aeolus_Test):
         for catalog in catalogs:
             for image in images:
                 if image['name'] == "ConfigServer":
-                    app_name = "%s-%s" % \
-                        (image['name'], catalog['cloud_parent'])
+                    app_name = page.get_app_name(image['name'], \
+                        catalog['cloud_parent'])
                     page.launch_app(catalog['name'], app_name, image)
                     # TODO: configure via cli, ssh...
 
-    # Manual steps required: configure config server
-    # if ec2 get key, chmod
-    # ssh
-    # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
-    # nav to cloud provider account, enter url, key, secret, assert notification
+    def test_configure_configserver(self, mozwebqa):
+        '''
+        Verify configserver launch,
+        run `aeolus-configserver-setup`,
+        store credentials
+        '''
+        # Manual steps required: configure config server
+        # if ec2 get key, chmod
+        # ssh
+        # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
+        # nav to cloud provider account, enter url, key, secret, assert notification
 
     def test_add_configserver(self, mozwebqa):
         '''
@@ -147,8 +151,8 @@ class TestContent(Aeolus_Test):
         for catalog in catalogs:
             for image in images:
                 if image['name'] != "ConfigServer":
-                    app_name = "%s-%s" % \
-                        (image['name'], catalog['cloud_parent'])
+                    app_name = page.get_app_name(image['name'], \
+                        catalog['cloud_parent'])
                     # 'while not' used to loop until image pushed
                     # FIXME: better way?
                     while not page.verify_image_push(catalog['name'], app_name, image):
@@ -173,13 +177,14 @@ class TestContent(Aeolus_Test):
         for catalog in catalogs:
             for image in images:
                 if image['name'] != "ConfigServer":
-                    app_name = "%s-%s" % \
-                        (image['name'], catalog['cloud_parent'])
+                    app_name = page.get_app_name(image['name'], \
+                        catalog['cloud_parent'])
                     # 'while not' used to loop until image pushed
                     # FIXME: better way?
                     while not page.verify_launch(app_name):
                         time.sleep(10)
 
+    @pytest.mark.verify
     def test_get_launch_status(self, mozwebqa):
         '''
         Get status of all apps regardless of dataset
@@ -211,4 +216,5 @@ class TestContent(Aeolus_Test):
         for target_image_id in target_images:
             target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
             print "%s (%s)" % (target_image_detail['template'], target_image_id)
+
 

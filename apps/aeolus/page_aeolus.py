@@ -416,6 +416,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         else:
             self.send_text(tree, *self.locators.new_image_textbox)
 
+    def get_app_name(self, image, cloud):
+        return "%s-%s" % (image, cloud)
+
     def create_custom_blueprint(self, api_data, static_data, custom_blueprint):
         '''
         uses data from api to create custom blueprint 
