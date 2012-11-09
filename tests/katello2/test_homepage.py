@@ -20,7 +20,7 @@ class TestHomePage(tests.katello2.Katello_Test):
         # login
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 
@@ -42,7 +42,7 @@ class TestHomePage(tests.katello2.Katello_Test):
         # login
         home_page.login()
         assert home_page.is_successful
-        if self.testsetup.product_version == '1.1':
+        if pytest.config.getvalue('project-version') == '1.1':
             home_page.select_org(self.testsetup.org)
         assert home_page.is_dialog_cleared
 

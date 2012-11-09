@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import optparse
 import logging
 import py
 
@@ -44,8 +45,6 @@ def pytest_runtest_setup(item):
     pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
     pytest_mozwebqa.TestSetup.project = item.config.option.project
     pytest_mozwebqa.TestSetup.org = item.config.option.org
-    pytest_mozwebqa.TestSetup.product_version = item.config.option.product_version
-    pytest_mozwebqa.TestSetup.test_cleanup = item.config.option.test_cleanup
 
     # Setup test logging
     setup_logger(item.config.option.verbose,
@@ -57,41 +56,42 @@ def pytest_addoption(parser):
     Add option to the py.test command line, option is specific to
     this project.
     """
-    parser.addoption("--project",
-                     action="store",
-                     dest='project',
-                     metavar='str',
-                     default=None,
-                     help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
 
-    parser.addoption("--logfile",
-                     action="store",
-                     dest='logfile',
-                     metavar='str',
-                     default='cloudforms_test.log',
-                     help="Specify a file to record logging information (default: %default)")
+    # Add --logfile option to existing 'termincal reporting' option group
+    optgrp = parser.getgroup("terminal reporting")
+    optgrp.addoption("--logfile", action="store", dest='logfile',
+            default='cloudforms_test.log',
+            help="Specify a file to record logging information (default: %default)")
 
-    parser.addoption("--org",
-                     action="store",
-                     dest='org',
-                     metavar='str',
-                     default="ACME_Corporation",
-                     help="Specify an organization to use for testing (default: %default)")
+    # Create a general test options
+    optgrp = parser.getgroup('general_options', "General Test Options")
+    optgrp.addoption("--project", action="store", dest='project', default=None,
+            help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
 
-    parser.addoption("--product_version",
-                     action="store",
-                     dest='product_version',
-                     metavar='str',
-                     default='1.1',
-                     help="Specify product version number (default: %default)")
+    optgrp.addoption("--project-version", action="store",
+            dest='project-version', default='1.1',
+            help="Specify project version number (default: %default)")
 
-    parser.addoption("--test_cleanup",
-                     action="store_true",
-                     dest='test_cleanup',
-                     metavar='bool',
-                     default=False,
-                     help="Specify whether to cleanup after test completion (default: %default)")
+    optgrp.addoption("--test-cleanup", action="store_true",
+            dest='test-cleanup', default=False,
+            help="Specify whether to cleanup after test completion (default: %default)")
 
+    # TODO - add parameters for each configure.ini [katello] option
+    optgrp = parser.getgroup('katello_options', "Katello Test Options (--project=katello)")
+    optgrp.addoption("--org", action="store", dest='org',
+            default="ACME_Corporation",
+            help="Specify an organization to use for testing (default: %default)")
+    optgrp.addoption("--env", action="store", dest='env', default="Dev",
+            help="Specify an environment to use for testing (default: %default)")
+
+    # TODO - add parameters for each configure.ini [aeolus] option
+    optgrp = parser.getgroup('aeolus_options', "Aeolus Test Options (--project=aeolus)")
+    optgrp.addoption("--releasever", action="append", dest='releasever',
+            default=['6Server', '5Server'],
+            help="Specify which RHEL $releasever values to use when testing images (default: %default)")
+    optgrp.addoption("--basearch", action="append", dest='basearch',
+            default=['i386', 'x86_64'],
+            help="Specify which RHEL $basearch values to use when testing images (default: %default)")
 
 def pytest_funcarg__mozwebqa(request):
     """Load mozwebqa plugin
