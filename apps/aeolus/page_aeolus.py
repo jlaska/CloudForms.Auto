@@ -555,44 +555,68 @@ class Aeolus(apps.aeolus.Conductor_Page):
             (app_name, catalog))
         self.selenium.find_element(*self.locators.launch).click()
 
-    def verify_launch(self, app):
-        '''
-        Verify app has launched
-        '''
-        # go to table view, grab full text of table, split into rows,
-        # split each row into dictionary to account for multi-instance apps
-        # parse status
+    def log_launch_status(self, app):
+        logging.info("""
+    Instance: %s
+    Status: %s
+    IP: %s
+    Owner: %s""" % (app['name'], app['status'], app['ip'], app['owner']))
 
-        self.go_to_page_view("pools")
-        # HACK - Workaround https://bugzilla.redhat.com/show_bug.cgi?id=874828
-        app = re.sub(r'[._]', '-', app)
-        self.click_by_text("a", app)
-        view = "?details_tab=instances&view=filter"
-        url = self.get_url_current_page()
-        self.go_to_url(url + view)
-        table = self.selenium.find_element(*self.locators.app_table)
-        table = table.text
-        rows = table.split("\n")
-        rows.pop(0)
-        apps = []
-        for row in rows:
-            row = row.split(" ")
-            apps.append({"name" : row[0], "ip" : row[1], "status" : row[2], 
-                          "cloud" : row[3], "owner" : row[4]})
+    def verify_launch(self, app_name):
+        '''
+        Verify single app has launched
+        '''
+
+        apps = self.get_launch_status(app_name)
+        if apps == None:
+            return True
+
         # FIXME: will return true if _any_ instances in that app is running
         for app in apps:
             # We're only checking if it's a pending or new launch
             # otherwise it's running or failed and we're moving on
             if app['status'] == "Running":
-                logging.info("\n\tInstance: %s\n\tStatus: \033[1;32m%s\033[0m\
-                    \n\tIP: %s" % (app['name'], app['status'], app['ip']))
+                self.log_launch_status(app)
                 return True
             elif app['status'] == "Pending" or app['status'] == "New":
                 return False
             else:
-                logging.info("\n\tInstance: %s\n\tStatus: \033[1;31m%s\033[0m" \
-                    % (app['name'], app['status']))
+                self.log_launch_status(app)
                 return True
+
+    def get_launch_status(self, app_name=None):
+        '''
+        Return status of all launched apps, or single app if app_name provided
+        '''
+        self.go_to_page_view("pools")
+        # HACK - Workaround https://bugzilla.redhat.com/show_bug.cgi?id=874828
+        if app_name != None:
+            app_name = re.sub(r'[._]', '-', app_name)
+            loc = (By.LINK_TEXT, app_name)
+            if not self.is_element_visible(*loc):
+                status = {"name" : app_name,
+                    "ip" : "n/a",
+                    "status" : "App not found. Deleted?",
+                    "owner" : "n/a"}
+                self.log_launch_status(status)
+                return
+            self.click_by_text("a", app_name)
+        view = "?details_tab=instances&view=filter"
+        self.go_to_url(self.get_url_current_page() + view)
+        table = self.selenium.find_element(*self.locators.app_table).text
+        rows = table.split("\n")
+        rows.pop(0)
+        apps = []
+        for row in rows:
+            row = row.split(" ")
+            apps.append({"name" : row[0], 
+                "ip" : row[1], 
+                "status" : row[2],
+                "cloud" : row[3], 
+                "owner" : row[4]})
+            if app_name == None:
+                self.log_launch_status(apps[-1])
+        return apps
 
     def add_configserver_to_provider(self, cloud, cs):
         '''

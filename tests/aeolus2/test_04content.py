@@ -180,6 +180,15 @@ class TestContent(Aeolus_Test):
                     while not page.verify_launch(app_name):
                         time.sleep(10)
 
+    def test_get_launch_status(self, mozwebqa):
+        '''
+        Get status of all apps regardless of dataset
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        page.get_launch_status()
+
     ###
     # TODO: 
     # api function for reference
