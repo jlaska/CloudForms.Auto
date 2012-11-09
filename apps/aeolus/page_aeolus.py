@@ -123,27 +123,27 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("delete user '%s' from group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
-    def grant_permissions(self, filter, entity):
+    def grant_permissions(self, filter_type, entity):
         '''
         Add permissions to user or group
         '''
         self.go_to_page_view("permissions/new")
         # init var for logging purposes
         entity_name = None
-        if filter == "group":
+        if filter_type == "group":
             self.select_dropdown("User Group", \
                 *self.locators.permissions_filter)
             self.send_text_and_wait(entity['name'], \
                 *self.locators.entities_search)
             entity_name = entity['name']
-        elif filter == "user":
+        elif filter_type == "user":
             self.select_dropdown("User", \
                 *self.locators.permissions_filter) 
             self.send_text_and_wait(entity['username'], \
                 *self.locators.entities_search)
             entity_name = entity['username']
         else:
-            logging.info("No matching filter found: %s" % filter)
+            logging.info("No matching filter found: %s" % filter_type)
 
         self.selenium.find_element(*self.locators.entities_search).\
             send_keys(Keys.RETURN)
@@ -152,7 +152,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             self.select_dropdown(permission, *self.locators.role_dropdown)
             self.selenium.find_element(*self.locators.save_button).click()
             logging.info("added permissions '%s' to %s '%s'" %\
-                (permission, filter, entity_name))
+                (permission, filter_type, entity_name))
 
     def add_selfservice_quota(self, quota):
         '''
@@ -586,7 +586,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 logging.info("\n\tInstance: %s\n\tStatus: \033[1;32m%s\033[0m\
                     \n\tIP: %s" % (app['name'], app['status'], app['ip']))
                 return True
-            elif app['status'] in ["Pending", "New"]:
+            elif app['status'] == "Pending" or app['status'] == "New":
                 return False
             else:
                 logging.info("\n\tInstance: %s\n\tStatus: \033[1;31m%s\033[0m" \
