@@ -564,7 +564,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # parse status
 
         self.go_to_page_view("pools")
-        app = app.replace("_", "-")
+        # HACK - Workaround https://bugzilla.redhat.com/show_bug.cgi?id=874828
+        app = re.sub(r'[._]', '-', app)
         self.click_by_text("a", app)
         view = "?details_tab=instances&view=filter"
         url = self.get_url_current_page()
