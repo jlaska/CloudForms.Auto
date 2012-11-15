@@ -20,7 +20,7 @@ class TestOrganizations(Katello_Test):
     @classmethod
     def teardown_class(self):
         # Remove any left-over orgs
-        if pytest.config.getvalue('test-cleanup')
+        if pytest.config.getvalue('test-cleanup'):
             for name in self._cleanup_orgs:
                 self.api.destroy_org(name)
 
