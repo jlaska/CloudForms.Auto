@@ -6,8 +6,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import xml.etree.ElementTree as xmltree
+import requests
+import os
+import stat
 import tempfile
 from data.assert_response import *
+import subprocess
 
 class Aeolus(apps.aeolus.Conductor_Page):
 
@@ -416,8 +420,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
         else:
             self.send_text(tree, *self.locators.new_image_textbox)
 
+    def clean_app_name(self, app_name):
+        '''
+        Remove illegal characters from app name
+        Only lower-case and upper-case letters, numbers, '_', '-' allowed
+        '''
+        app_name = re.sub(r'[.,_!@#$%^&*()+=~`<>?/:;{}|\\\[\]]', '-', app_name)
+        return app_name
+        
     def get_app_name(self, image, cloud):
-        return "%s-%s" % (image, cloud)
+        app_name = "%s-%s" % (image, cloud)
+        app_name = self.clean_app_name(app_name)
+        return app_name
 
     def create_custom_blueprint(self, api_data, static_data, custom_blueprint):
         '''
@@ -548,7 +562,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.selenium.find_element(*self.locators.app_name_field).clear()
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
-        if config['custom_blueprint'] != "":
+        # if not product.startswith('apps.'):
+        if config['custom_blueprint'] != "" and not \
+            app_name.lower().startswith('configserver'):
             logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification, update params
@@ -559,17 +575,25 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.launch).click()
 
     def log_launch_status(self, app):
+        '''
+        write app status to log
+        '''
         logging.info("""
     Instance: %s
     Status: %s
-    IP: %s
-    Owner: %s""" % (app['name'], app['status'], app['ip'], app['owner']))
+    IP: %s""" % (app['name'], app['status'], app['ip']))
+
+    def get_ip_addr(self, app_name):
+        '''
+        return app IP address
+        '''
+        status = self.verify_launch(app_name)
+        return status['ip']
 
     def verify_launch(self, app_name):
         '''
         Verify single app has launched
         '''
-
         apps = self.get_launch_status(app_name)
         if apps == None:
             return True
@@ -580,7 +604,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             # otherwise it's running or failed and we're moving on
             if app['status'] == "Running":
                 self.log_launch_status(app)
-                return True
+                return app
             elif app['status'] == "Pending" or app['status'] == "New":
                 return False
             else:
@@ -594,13 +618,12 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools")
         # HACK - Workaround https://bugzilla.redhat.com/show_bug.cgi?id=874828
         if app_name != None:
-            app_name = re.sub(r'[._]', '-', app_name)
+            app_name = self.clean_app_name(app_name)
             loc = (By.LINK_TEXT, app_name)
             if not self.is_element_visible(*loc):
                 status = {"name" : app_name,
                     "ip" : "n/a",
-                    "status" : "App not found. Deleted?",
-                    "owner" : "n/a"}
+                    "status" : "App not found. Deleted?"}
                 self.log_launch_status(status)
                 return
             self.click_by_text("a", app_name)
@@ -615,11 +638,87 @@ class Aeolus(apps.aeolus.Conductor_Page):
             apps.append({"name" : row[0], 
                 "ip" : row[1], 
                 "status" : row[2],
-                "cloud" : row[3], 
-                "owner" : row[4]})
+                "cloud" : row[3]})
+                # owner sometimes null resulting in out of bounds key error 
+                #"owner" : row[4]})
             if app_name == None:
                 self.log_launch_status(apps[-1])
         return apps
+
+    def download_ec2_key(self, app_name):
+        login = self.get_login_credentials('admin')
+
+        self.go_to_page_view("pools")
+        self.click_by_text("a", app_name)
+        url = self.url_by_text("a", "Download key")
+        ec2_key_string = requests.get(url, verify=False, \
+            auth=(login['username'], login['password'])).text
+        ec2_key_file = tempfile.NamedTemporaryFile(delete=False)
+        ec2_key_file.write(ec2_key_string)
+
+        return ec2_key_file.name
+
+    def get_ssh_cmd_template(self, ip_addr, ec2_key_file):
+        '''
+        return base SSH command template
+        '''
+        config = self.parse_configuration('general')
+
+        cmd_template = None
+        if ec2_key_file != None:
+            cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" \
+                % (ec2_key_file, ip_addr)
+        else: 
+            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % (config['instance_passwd'], ip_addr)
+        return cmd_template
+
+    def setup_configserver(self, ip_addr, ec2_key_file=None):
+        '''
+        run aeolus-configserver-setup
+        uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
+        '''
+        cmd_template = self.get_ssh_cmd_template(ip_addr, ec2_key_file)
+
+        configserver_cmd = cmd_template + \
+            " 'echo y | aeolus-configserver-setup'"
+        try:
+            subprocess.check_call(configserver_cmd, shell=True)
+        # FIXME: is this right?
+        except subprocess.CalledProcessError:
+            print "Error running aeolus-configserver-setup"
+            return False
+
+    def get_configserver_credentials(self, ip_addr, ec2_key_file=None):
+        '''
+        return configserver credentials
+        uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
+        '''
+        creds = dict()
+        cmd_template = self.get_ssh_cmd_template(ip_addr, ec2_key_file)
+
+        key_cmd = cmd_template + \
+            " 'ls -1 /var/lib/aeolus-configserver/configs/oauth/'"
+        p1 = subprocess.Popen(key_cmd, shell=True, stdout=subprocess.PIPE)
+        creds['key'] = p1.stdout.read().rstrip('\n')
+        secret_cmd = cmd_template + \
+            " 'cat /var/lib/aeolus-configserver/configs/oauth/%s'" % \
+            creds['key']
+        p2 = subprocess.Popen(secret_cmd, shell=True, stdout=subprocess.PIPE)
+        creds['secret'] = p2.stdout.read()
+        return creds
+
+    def get_configserver_version(self, ip_addr):
+        '''
+        return configserver version
+        '''
+        url = "https://%s/version" % ip_addr
+        configserver_xml = requests.get(url, verify=False)
+        if configserver_xml.status_code != requests.codes.ok:
+            return "Response code not OK: %s" % configserver_xml.status_code
+        else:
+            tree = xmltree.fromstring(configserver_xml.text)
+            version = tree.find("application-version").text
+            return version
 
     def add_configserver_to_provider(self, cloud, cs):
         '''
@@ -638,6 +737,38 @@ class Aeolus(apps.aeolus.Conductor_Page):
             logging.info("Add configserver to %s, endpoint %s" % \
                 (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
+
+    def run_shell_command(self, shell_cmd, ip_addr, ec2_key_file=None):
+        '''
+        generic method to run any shell command such as 'hostname'
+        uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
+        '''
+        cmd_template = self.get_ssh_cmd_template(ip_addr, ec2_key_file)
+        cmd = "%s '%s'" % (cmd_template, shell_cmd)
+
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = process.stdout.read().rstrip('\n')
+        return ret
+
+    def get_configserver_provider_list(self, environments):
+        '''
+        match dataset enabled configserver providers with 
+        providers selected in configure.ini
+        '''
+        opts = self.parse_configuration('aeolus')
+        if opts['configserver'] == "":
+            return False
+
+        providers = list()
+        # TODO: move this to parse_configuration
+        for key, val in opts.iteritems():
+            opts[key] = re.split(r'[, ]', val)
+        for env in environments:
+            for provider in opts['configserver']:
+                for provider_acct in env['enabled_provider_accounts']:
+                    if provider_acct.lower().startswith(provider.lower()):
+                        providers.append(env)
+        return providers
 
     def get_provider_list(self, environments):
         '''

@@ -165,11 +165,12 @@ class Content(object):
         "cloud_parent" : "Production"},
         ]
 
-    images = [
-        #{"name" : "ConfigServer",
-        #"template" : "rhel-x86_64-6Server-cf-configserver.xml",
-        #"profile" : "small-x86_64"},
+    configserver = {"name" : "ConfigServer",
+        "template" : "rhel-x86_64-6Server-cf-configserver.xml",
+        "version" : "0.4.11",
+        "profile" : "small-x86_64"}
 
+    images = [
         # RHEL-6Server
         {"name" : "rhel-i386-6Server",
         "template" : "rhel-i386-6Server-cf-tools.xml",
@@ -234,3 +235,5 @@ class Content(object):
         "profile" : "small-x86_64"},
 
         ]
+
+
