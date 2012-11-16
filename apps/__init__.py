@@ -25,10 +25,10 @@ def initializeProduct(mozwebqa):
     Return an initialized product class
     '''
 
-    assert hasattr(mozwebqa, 'project'), "Expecting project attribute"
+    assert hasattr(mozwebqa.config.option, 'project'), "Expecting project attribute"
 
-    return getProductClass(mozwebqa.project, \
-        getattr(mozwebqa, 'version', None))(mozwebqa)
+    return getProductClass(mozwebqa.config.option.project, \
+        getattr(mozwebqa.config.option, 'version', None))(mozwebqa)
 
 def getProductClass(product=None, version=None):
     '''
@@ -194,7 +194,6 @@ class BasePage(object):
     :param base_url: url of the application.
     :param timeout: default is 10, can be overridden.
     :param project: Name of project to be tested (sam, headpin, cfse, katello)
-    :param org: org selector for katello
     """
     def __init__(self, **kwargs):
         assert kwargs.has_key('mozwebqa'), "Initialized without 'mozwebqa' keyword"
@@ -213,16 +212,21 @@ class BasePage(object):
         return self._mozwebqa.selenium
     @property
     def base_url(self):
-        return self._mozwebqa.base_url
+        return self._mozwebqa.config.option.base_url
+    @property
+    def cfgfile(self):
+        return self._mozwebqa.cfgfile
     @property
     def timeout(self):
         return self._mozwebqa.timeout
     @property
     def project(self):
-        return self._mozwebqa.project
+        return self._mozwebqa.config.option.project
+
+    # FIXME - get ride of this!! (or move it to apps/katello/__init__.py)
     @property
     def org(self):
-        return self._mozwebqa.org
+        return self._mozwebqa.config.option.org
     @property
     def browsername(self):
         return self.selenium.capabilities['browserName']
@@ -239,57 +243,36 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def parse_configuration(self, section, config_file='data/configure.ini'):
-        '''
-        Read and return dictionary from configuration file section
-        '''
-        # FIXME: put in some init method so it's available early
-        from ConfigParser import SafeConfigParser
-
-        parser = SafeConfigParser(allow_no_value=True)
-        assert len(parser.read(config_file)) > 0, \
-            "Unable to load config_file: %s " % config_file
-
-        items = dict()
-        # TODO: split values before returning
-        # re.split(r'[, ]', val)
-        # handles ',' or ' ' but not both
-        for (key,value) in  parser.items(section):
-            items[key] = value
-        return items
-
-    def get_login_credentials(self, role):
+    def get_login_credentials(self, role='admin'):
         '''
         get user login credentials
         assumes token base64 encoding of password
-        requires unique username and password defined for 
+        requires unique username and password defined for
         katello and aeolus projects
         '''
-        items = None
-        login = dict()
+
+        # FIXME: references to katello or aeolus should be moved to a sub-class
         if self.project.startswith('katello'):
-            items = self.parse_configuration('credentials-katello')
+            section = 'credentials-katello'
         elif self.project.startswith('aeolus'):
-            items = self.parse_configuration('credentials-aeolus')
+            section = 'credentials-aeolus'
         else:
-            raise Exception("No matching administrator configuration found: %s" % config_file)
+            raise Exception("No credentials configuration found for project %s" % self.project)
 
-        if role == "user":
-            login['username'] = items['user_uname']
-            login['password'] = items['user_pass']
-        else:
-            login['username'] = items['admin_uname']
-            login['password'] = items['admin_pass']
+        assert not self.cfgfile.has_option(section, '%s-login'), "Missing login credentials for role: %s" % role
+        assert not self.cfgfile.has_option(section, '%s-password'), "Missing password credentials for role: %s" % role
 
-        login['password'] = self.decode_string(login['password'])
-        return login
+        # Base64 decode the password
+        password = self.decode_string(self.cfgfile.get(section, '%s-password' % role))
+
+        return (self.cfgfile.get(section, '%s-login' % role), password)
 
     def login(self, role="admin", user=None, password=None):
-        login = self.get_login_credentials(role)
+        (default_user, default_pass) = self.get_login_credentials(role)
         if user is None:
-            user = login['username']
+            user = default_user
         if password is None:
-            password = login['password']
+            password = default_pass
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
@@ -299,7 +282,7 @@ class BasePage(object):
     def spin_assert(self, msg, assertion):
         for i in xrange(50):
             try:
-                logging.info(msg)            
+                logging.info(msg)
                 assert assertion()
                 return
             except Exception, e:

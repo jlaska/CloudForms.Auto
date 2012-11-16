@@ -540,7 +540,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         select image by name, click launch
         create unique app name with otherwise default opts
         '''
-        config = self.parse_configuration('aeolus')
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
         self.click_by_text("a", app_name)
@@ -548,7 +547,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.selenium.find_element(*self.locators.app_name_field).clear()
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
-        if config['custom_blueprint'] != "":
+        if self.cfgfile.get('aeolus', 'custom_blueprint', '') != '':
             logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification, update params
@@ -643,13 +642,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         match dataset enabled providers with providers selected in configure.ini
         '''
-        opts = self.parse_configuration('aeolus')
-        providers = list()
-        # TODO: move this to parse_configuration
-        for key, val in opts.iteritems():
-            opts[key] = re.split(r'[, ]', val)
+        providers = self.cfgfile.getlist('aeolus', 'providers')
         for env in environments:
-            for provider in opts['providers']:
+            for provider in providers:
                 for provider_acct in env['enabled_provider_accounts']:
                     if provider_acct.lower().startswith(provider.lower()):
                         providers.append(env)
@@ -659,14 +654,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         match dataset images with selected arch and rhelver in configure.ini
         '''
-        opts = self.parse_configuration('aeolus')
         images = list()
-        # TODO: move this to parse_configuration
-        for key, val in opts.iteritems():
-            opts[key] = re.split(r'[, ]', val)
         for template in templates:
-            for arch in opts['archs']:
-                for rhelver in opts['rhelvers']:
+            for arch in self.cfgfile.getlist('aeolus', 'archs'):
+                for rhelver in self.cfgfile.getlist('aeolus', 'rhelvers'):
                     if re.search(r'%s' % arch, template['profile'], re.I) and \
                         re.search(r'%s' % rhelver, template['template'], re.I):
                         images.append(template)

@@ -3,7 +3,36 @@
 import sys
 import optparse
 import logging
-import py
+import ConfigParser
+import requests
+import re
+import string
+import pytest
+
+# Load test config file
+class CloudFormsConfigParser(ConfigParser.SafeConfigParser):
+    def getlist(self, section, option):
+        return re.split(r'[,\s]+', self.get(section, option))
+
+test_config = CloudFormsConfigParser()
+# cfg_file = 'data/configure.ini'
+cfg_file = 'setup.cfg'
+
+# Determine if an alternate .cfg file was requested via --config
+for i,arg in enumerate(sys.argv):
+    if re.search(r'^--config\b', arg):
+        try:
+            cfg_file = arg.split('=',1)[1]
+            print cfg_file
+        except IndexError:
+            cfg_file = sys.argv[i+1]
+            print cfg_file
+        break
+
+# Read configuration, fail is missing
+if len(test_config.read(cfg_file)) == 0:
+    print "Unable to load config file: %s" % cfg_file
+    sys.exit(1)
 
 def setup_logger(verbose=False, debug=False, logfile=None):
     '''setup logging'''
@@ -38,24 +67,83 @@ def setup_logger(verbose=False, debug=False, logfile=None):
     else:
         logger.setLevel(logging.WARN)
 
+def pytest_configure(config):
+
+    # This is weird, but handy ...
+    # Interpolate any ConfigParser style variables in --aeolus-url and --katello-url
+    for key in ['aeolus-url', 'katello-url']:
+        # Convert ConfigParser interpolation syntax to str.format() friendly syntax
+        url = re.sub(r'%\(([^\)]+)\)s', '{\\1}', config.getoption(key))
+        url = url.format(baseurl=config.option.base_url)
+
+        # Update the mozwebqa object
+        setattr(config.option, key, url)
+
+        # Update the ConfigParser object
+        test_config.set(key.replace('-url',''), key, url)
+
+    # TODO: This should probably move into apps/$app/__init__.py
+    # Replace --baseurl with value appropriate for the specified --project
+    if config.option.project and not config.option.collectonly:
+        project = config.option.project.split('.',1)[0]
+        config.option.base_url = getattr(config.option, '%s-url' % project)
+
+    # TODO - Update test_config with any --keyval
+    for param in config.option.keyval:
+        try:
+            (sect, key, val) = re.match(r'^([\w_-]*):?\b([\w_-]+)=(.*)$', param).groups()
+        except AttributeError:
+            raise Exception("Improper format for --keyval value '%s'" % param)
+
+        # Update mozwebqa object
+        if hasattr(config.option, key):
+            setattr(config.option, key, val)
+
+        # Update ConfigParser object
+        if test_config.has_option(sect, key):
+            test_config.set(sect, key, val)
+
+    # Setup test logging
+    setup_logger(config.option.verbose,
+        config.option.debug,
+        config.option.logfile)
+
 def pytest_runtest_setup(item):
     """
     pytest setup
     """
-    pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
-    pytest_mozwebqa.TestSetup.project = item.config.option.project
-    pytest_mozwebqa.TestSetup.org = item.config.option.org
 
-    # Setup test logging
-    setup_logger(item.config.option.verbose,
-        item.config.option.debug,
-        item.config.option.logfile)
+    # ['Class', 'File', 'Function', 'Instance', 'Item', 'Module', '__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_args', '_evalxfail', '_fixtureinfo', '_genid', '_getcustomclass', '_getfslineno', '_getobj', '_isyieldedfunction', '_location', '_makeid', '_memoizedcall', '_nodeid', '_obj', '_prunetraceback', '_pyfuncitem', '_repr_failure_py', '_request', 'cls', 'config', 'fixturenames', 'fspath', 'funcargnames', 'funcargs', 'function', 'getmodpath', 'getparent', 'getplugins', 'ihook', 'instance', 'keywords', 'listchain', 'listnames', 'location', 'module', 'name', 'nextitem', 'nodeid', 'obj', 'outerr', 'parent', 'reportinfo', 'repr_failure', 'runtest', 'session', 'setup', 'teardown']
+
+    setattr(item, 'cfgfile', test_config)
+    pytest_mozwebqa = pytest.config.pluginmanager.getplugin("mozwebqa")
+    pytest_mozwebqa.TestSetup.config = item.config
+    pytest_mozwebqa.TestSetup.cfgfile = item.cfgfile
+
+    print "item: %s, %s" % ( item.__module__, item.__class__)
+    print "dir(item): %s" % dir(item)
+    print "item: %s" % item
 
 def pytest_addoption(parser):
     """
     Add option to the py.test command line, option is specific to
     this project.
     """
+
+    def is_true(val):
+        '''
+        return whether the provided string is intended to mean boolean True
+        '''
+        return re.match(r'^(true|yes|1|on)$', val, re.IGNORECASE) is not None
+
+    # Update .default and .help for '--baseurl' option
+    group = parser.getgroup('selenium', 'selenium')
+    for opt in group.options:
+        if opt.dest == 'base_url' and opt.default == '':
+            if test_config.has_option('DEFAULT', 'baseurl'):
+                opt.default = test_config.get('DEFAULT', 'baseurl')
+            opt.help = opt.help + " (default: %default)" #% opt.default
+            break
 
     # Add --logfile option to existing 'termincal reporting' option group
     optgrp = parser.getgroup("terminal reporting")
@@ -65,6 +153,10 @@ def pytest_addoption(parser):
 
     # Create a general test options
     optgrp = parser.getgroup('general_options', "General Test Options")
+    optgrp.addoption("--config", action="store", dest='cfg_file',
+            default=cfg_file,
+            help="Specify test configuration file (default: %default)")
+
     optgrp.addoption("--project", action="store", dest='project', default=None,
             help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
 
@@ -72,29 +164,32 @@ def pytest_addoption(parser):
             dest='project-version', default='1.1',
             help="Specify project version number (default: %default)")
 
+    optgrp.addoption("--enable-ldap", action="store_true", dest='enable-ldap',
+            default=test_config.getboolean('DEFAULT', 'enable-ldap'),
+            help="Specify whether LDAP authentication is enabled (default: %default)")
+
     optgrp.addoption("--test-cleanup", action="store_true",
             dest='test-cleanup', default=False,
             help="Specify whether to cleanup after test completion (default: %default)")
 
+    optgrp.addoption("--keyval", action="append",
+            dest='keyval', default=[],
+            help="Specify key=val pairs to override config values")
+
     # TODO - add parameters for each configure.ini [katello] option
     optgrp = parser.getgroup('katello_options', "Katello Test Options (--project=katello)")
-    optgrp.addoption("--org", action="store", dest='org',
-            default="ACME_Corporation",
-            help="Specify an organization to use for testing (default: %default)")
-    optgrp.addoption("--env", action="store", dest='env', default="Dev",
-            help="Specify an environment to use for testing (default: %default)")
+    optgrp.addoption("--katello-url", action="store", dest='katello-url',
+            default=test_config.get('katello', 'katello-url', raw=True),
+            help="Specify URL for katello (default: %default)")
 
     # TODO - add parameters for each configure.ini [aeolus] option
     optgrp = parser.getgroup('aeolus_options', "Aeolus Test Options (--project=aeolus)")
-    optgrp.addoption("--releasever", action="append", dest='releasever',
-            default=['6Server', '5Server'],
-            help="Specify which RHEL $releasever values to use when testing images (default: %default)")
-    optgrp.addoption("--basearch", action="append", dest='basearch',
-            default=['i386', 'x86_64'],
-            help="Specify which RHEL $basearch values to use when testing images (default: %default)")
+    optgrp.addoption("--aeolus-url", action="store", dest='aeolus-url',
+            default=test_config.get('aeolus', 'aeolus-url', raw=True),
+            help="Specify URL for aeolus (default: %default)")
 
 def pytest_funcarg__mozwebqa(request):
     """Load mozwebqa plugin
     """
-    pytest_mozwebqa = py.test.config.pluginmanager.getplugin("mozwebqa")
+    pytest_mozwebqa = pytest.config.pluginmanager.getplugin("mozwebqa")
     return pytest_mozwebqa.TestSetup(request)

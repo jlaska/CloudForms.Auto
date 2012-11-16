@@ -4,19 +4,18 @@ from data.dataset import Admin
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
 
-def setup_module(module):
-    test_setup = pytest.config.pluginmanager.getplugin("mozwebqa")
-    module.TestUsers.aeolus = apps.initializeProduct(test_setup.TestSetup)
-
-@pytest.mark.nonldap
+# FIXME - the following causes pytest to skip all methods in 'Aeolus_Test'
+## @pytest.mark.skipif("config.getvalue('enable-ldap')")
 class TestUsers(Aeolus_Test):
     '''
     Create users and groups, then add users to those groups
     Use default credentials until users, groups and permissions are defined
     '''
 
+    pytestmark = pytest.mark.skipif("config.getvalue('enable-ldap')")
+
     @pytest.mark.setup
-    def test_create_users(self, mozwebqa):
+    def test_create_users(self):
         '''
         Create users
         '''
@@ -42,7 +41,7 @@ class TestUsers(Aeolus_Test):
 
     @pytest.mark.setup
     @pytest.mark.skipif("config.getvalue('project-version') == '1.0.1'")
-    def test_create_user_groups(self, mozwebqa):
+    def test_create_user_groups(self):
         '''
         create user groups
         '''
@@ -63,7 +62,7 @@ class TestUsers(Aeolus_Test):
 
     @pytest.mark.setup
     @pytest.mark.skipif("config.getvalue('project-version') == '1.0.1'")
-    def test_add_users_to_user_groups(self, mozwebqa):
+    def test_add_users_to_user_groups(self):
         page = self.aeolus.load_page('Aeolus')
         page.login(user='admin', password='password')
         #assert page.login() == aeolus_msg['login']
@@ -95,7 +94,7 @@ class TestUsers(Aeolus_Test):
          #                    user['fname'] + ' ' + user['lname']
 
     @pytest.mark.setup
-    def test_add_permissions(self, mozwebqa):
+    def test_add_permissions(self):
         page = self.aeolus.load_page('Aeolus')
         page.login(user='admin', password='password')
 
@@ -106,7 +105,7 @@ class TestUsers(Aeolus_Test):
 
 
     @pytest.mark.setup
-    def test_add_selfservice_quota(self, mozwebqa):
+    def test_add_selfservice_quota(self):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
