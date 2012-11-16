@@ -104,8 +104,8 @@ def pytest_configure(config):
             test_config.set(sect, key, val)
 
     # Setup test logging
-    setup_logger(config.option.verbose,
-        config.option.debug,
+    setup_logger(config.option.verbose or test_config.get('general', 'log_level', '') == 'INFO',
+        config.option.debug or test_config.get('general', 'log_level', '') == 'DEBUG',
         config.option.logfile)
 
 def pytest_runtest_setup(item):
@@ -113,16 +113,10 @@ def pytest_runtest_setup(item):
     pytest setup
     """
 
-    # ['Class', 'File', 'Function', 'Instance', 'Item', 'Module', '__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_args', '_evalxfail', '_fixtureinfo', '_genid', '_getcustomclass', '_getfslineno', '_getobj', '_isyieldedfunction', '_location', '_makeid', '_memoizedcall', '_nodeid', '_obj', '_prunetraceback', '_pyfuncitem', '_repr_failure_py', '_request', 'cls', 'config', 'fixturenames', 'fspath', 'funcargnames', 'funcargs', 'function', 'getmodpath', 'getparent', 'getplugins', 'ihook', 'instance', 'keywords', 'listchain', 'listnames', 'location', 'module', 'name', 'nextitem', 'nodeid', 'obj', 'outerr', 'parent', 'reportinfo', 'repr_failure', 'runtest', 'session', 'setup', 'teardown']
-
     setattr(item, 'cfgfile', test_config)
     pytest_mozwebqa = pytest.config.pluginmanager.getplugin("mozwebqa")
     pytest_mozwebqa.TestSetup.config = item.config
     pytest_mozwebqa.TestSetup.cfgfile = item.cfgfile
-
-    print "item: %s, %s" % ( item.__module__, item.__class__)
-    print "dir(item): %s" % dir(item)
-    print "item: %s" % item
 
 def pytest_addoption(parser):
     """
@@ -140,15 +134,15 @@ def pytest_addoption(parser):
     group = parser.getgroup('selenium', 'selenium')
     for opt in group.options:
         if opt.dest == 'base_url' and opt.default == '':
-            if test_config.has_option('DEFAULT', 'baseurl'):
-                opt.default = test_config.get('DEFAULT', 'baseurl')
+            if test_config.has_option('general', 'baseurl'):
+                opt.default = test_config.get('general', 'baseurl')
             opt.help = opt.help + " (default: %default)" #% opt.default
             break
 
     # Add --logfile option to existing 'termincal reporting' option group
     optgrp = parser.getgroup("terminal reporting")
     optgrp.addoption("--logfile", action="store", dest='logfile',
-            default='cloudforms_test.log',
+            default=test_config.getboolean('general', 'log-file'),
             help="Specify a file to record logging information (default: %default)")
 
     # Create a general test options
@@ -165,7 +159,7 @@ def pytest_addoption(parser):
             help="Specify project version number (default: %default)")
 
     optgrp.addoption("--enable-ldap", action="store_true", dest='enable-ldap',
-            default=test_config.getboolean('DEFAULT', 'enable-ldap'),
+            default=test_config.getboolean('general', 'enable-ldap'),
             help="Specify whether LDAP authentication is enabled (default: %default)")
 
     optgrp.addoption("--test-cleanup", action="store_true",
