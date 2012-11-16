@@ -142,7 +142,7 @@ def pytest_addoption(parser):
     # Add --logfile option to existing 'termincal reporting' option group
     optgrp = parser.getgroup("terminal reporting")
     optgrp.addoption("--logfile", action="store", dest='logfile',
-            default=test_config.getboolean('general', 'log-file'),
+            default=test_config.get('general', 'log_file', ''),
             help="Specify a file to record logging information (default: %default)")
 
     # Create a general test options
