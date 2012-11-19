@@ -67,6 +67,9 @@ def setup_logger(verbose=False, debug=False, logfile=None):
         logger.setLevel(logging.WARN)
 
 def pytest_configure(config):
+    '''
+    Merge .cfg and --param settings
+    '''
 
     # This is weird, but handy ...
     # Interpolate any ConfigParser style variables in --aeolus-url and --katello-url
@@ -102,10 +105,15 @@ def pytest_configure(config):
         if test_config.has_option(sect, key):
             test_config.set(sect, key, val)
 
+    # Turn on verbosity / debugging if specified in .cfg
+    for opt in ['verbose', 'debug']:
+        if test_config.has_option('general', opt):
+            setattr(config.option, opt, test_config.getboolean('general', opt))
+
     # Setup test logging
-    setup_logger(config.option.verbose or test_config.get('general', 'log_level', '') == 'INFO',
-        config.option.debug or test_config.get('general', 'log_level', '') == 'DEBUG',
-        config.option.logfile)
+    setup_logger(config.option.verbose, \
+            config.option.debug, \
+            config.option.logfile)
 
 def pytest_runtest_setup(item):
     """
