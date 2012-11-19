@@ -11,6 +11,207 @@ class TestContent(Aeolus_Test):
     Create images, build, push, launch
     '''
 
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_create_configserver_images(self, mozwebqa):
+        '''
+        Create component outlines for configserver images
+        Supports a single configserver image
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        opts = page.parse_configuration('aeolus')
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        if clouds == False:
+            pytest.fail("No configserver providers specified.")
+        for cloud in clouds:
+            page.new_image_from_url(cloud, Content.configserver, \
+                opts['sys_templates_baseurl'])
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_build_configserver(self, mozwebqa):
+        '''
+        Build configserver images
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        for cloud in clouds:
+            page.build_image(cloud['name'], Content.configserver['name'])
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_create_configserver_blueprint(self, mozwebqa):
+        '''
+        create default configserver blueprints
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            deployable = page.get_app_name(Content.configserver['name'], \
+                catalog['cloud_parent'])
+            page.new_default_blueprint(catalog['cloud_parent'],\
+                Content.configserver, deployable)
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_push_configserver(self, mozwebqa):
+        '''
+        Push configserver images
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        for cloud in clouds:
+            while not page.verify_image_build(cloud['name'], \
+                Content.configserver['name']):
+                time.sleep(30)
+            else:
+                page.push_image(cloud['name'], Content.configserver['name'])
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_launch_configserver(self, mozwebqa):
+        '''
+        Launch configserver to enabled provider accounts
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            app_name = page.get_app_name(Content.configserver['name'], \
+                catalog['cloud_parent'])
+            while not page.verify_image_push(catalog['name'], app_name, \
+                Content.configserver):
+                time.sleep(30)
+            else:
+                page.launch_app(catalog['name'], app_name, Content.configserver)
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_verify_configserver_launch(self, mozwebqa):
+        '''
+        verify configserver launch
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            app_name = page.get_app_name(Content.configserver['name'], \
+                catalog['cloud_parent'])
+            while not page.verify_launch(app_name):
+                time.sleep(10)
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_setup_configservers(self, mozwebqa):
+        '''
+        Run aeolus-configserver-setup and add to provider
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        for cloud in clouds:
+            app_name = page.get_app_name(Content.configserver['name'], \
+                cloud['name'])
+
+            ip_addr = page.get_ip_addr(app_name)
+            while not page.verify_launch(app_name):
+                time.sleep(10)
+            else:
+                ec2_key_file = None
+                if 'ec2' in cloud['enabled_provider_accounts']:
+                    ec2_key_file = page.download_ec2_key(app_name)
+                page.setup_configserver(ip_addr, ec2_key_file)
+                # assert true?
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_verify_configservers(self, mozwebqa):
+        '''
+        Verify configserver version
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+        catalogs = page.get_catalog_list(Content.catalogs, clouds)
+
+        for catalog in catalogs:
+            app_name = page.get_app_name(Content.configserver['name'], \
+                catalog['cloud_parent'])
+            ip_addr = page.get_ip_addr(app_name)
+            assert Content.configserver['version'] == \
+                page.get_configserver_version(ip_addr)
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    def test_add_configserver_to_provider(self, mozwebqa):
+        '''
+        Run aeolus-configserver-setup and add to provider
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        for cloud in clouds:
+            app_name = page.get_app_name(Content.configserver['name'], \
+                cloud['name'])
+
+            ip_addr = page.get_ip_addr(app_name)
+            ec2_key = None
+            if 'ec2' in cloud['enabled_provider_accounts']:
+                ec2_key = page.download_ec2_key(app_name)
+            creds = page.get_configserver_credentials(ip_addr, ec2_key)
+            creds['endpoint'] = "https://%s" % ip_addr
+            assert page.add_configserver_to_provider(cloud, creds) == \
+                aeolus_msg['add_configserver']
+
+    @pytest.mark.setup
+    @pytest.mark.configserver
+    @pytest.mark.skipif("1 == 1")
+    def test_setup_ec2_tunnel(self, mozwebqa):
+        '''
+        Setup tunnel for configserver to communicate with katello
+        '''
+        page = self.aeolus.load_page('Aeolus')
+
+        clouds = page.get_configserver_provider_list(Environment.clouds)
+
+        for cloud in clouds:
+            # FIXME: returning ec2 if only ec2 in list
+            # skips if other providers listed along with ec2
+            if 'ec2' in cloud['enabled_provider_accounts']:
+                page.login()
+                app_name = page.get_app_name(Content.configserver['name'], \
+                    cloud['name'])
+                ip_addr = page.get_ip_addr(app_name)
+                # TODO: actually implement tunnel :)
+                print "EC2 configserver IP: %s" % ip_addr
+            else:
+                pytest.skip("No EC2 configserver. No tunnel required.")
+
+    @pytest.mark.content
     def test_create_images(self, mozwebqa):
         '''
         Create component outlines from images
@@ -20,11 +221,13 @@ class TestContent(Aeolus_Test):
 
         clouds = page.get_provider_list(Environment.clouds)
         images = page.get_image_list(Content.images)
+        opts = page.parse_configuration('aeolus')
         for cloud in clouds:
             for image in images:
                 page.new_image_from_url(cloud, image, \
                     page.cfgfile.get('aeolus', 'sys_templates_baseurl'))
 
+    @pytest.mark.content
     def test_build_images(self, mozwebqa):
         '''
         Build images
@@ -38,6 +241,7 @@ class TestContent(Aeolus_Test):
             for image in images:
                 page.build_image(cloud['name'], image['name'])
 
+    @pytest.mark.content
     def test_push_images(self, mozwebqa):
         '''
         Push images
@@ -56,6 +260,7 @@ class TestContent(Aeolus_Test):
                 else:
                     page.push_image(cloud['name'], image['name'])
 
+    @pytest.mark.content
     def test_create_blueprint(self, mozwebqa):
         '''
         create custom blueprints if defined in dataset
@@ -90,51 +295,7 @@ class TestContent(Aeolus_Test):
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)
 
-    def test_launch_configserver(self, mozwebqa):
-        '''
-        Launch configserver to enabled provider accounts
-        '''
-        page = self.aeolus.load_page('Aeolus')
-        page.login()
-
-        images = page.get_image_list(Content.images)
-        clouds = page.get_provider_list(Environment.clouds)
-        catalogs = page.get_catalog_list(Content.catalogs, clouds)
-
-        for catalog in catalogs:
-            for image in images:
-                if image['name'] == "ConfigServer":
-                    app_name = page.get_app_name(image['name'], \
-                        catalog['cloud_parent'])
-                    page.launch_app(catalog['name'], app_name, image)
-                    # TODO: configure via cli, ssh...
-
-    def test_configure_configserver(self, mozwebqa):
-        '''
-        Verify configserver launch,
-        run `aeolus-configserver-setup`,
-        store credentials
-        '''
-        # Manual steps required: configure config server
-        # if ec2 get key, chmod
-        # ssh
-        # `aeolus-configserver-setup`, 'y', default, grab consumer key and secret
-        # nav to cloud provider account, enter url, key, secret, assert notification
-
-    @pytest.mark.setup
-    def test_add_configserver(self, mozwebqa):
-        '''
-        Add configserver to enabled provider accounts
-        '''
-        page = self.aeolus.load_page('Aeolus')
-        page.login()
-
-        clouds = page.get_provider_list(Environment.clouds)
-        creds = page.cfgfile.items('aeolus', 'credentials-configserver')
-        for cloud in clouds:
-            assert page.add_configserver_to_provider(cloud, creds) == \
-                aeolus_msg['add_configserver']
-
+    @pytest.mark.content
     @pytest.mark.launch
     def test_launch_apps(self, mozwebqa):
         '''
@@ -148,17 +309,17 @@ class TestContent(Aeolus_Test):
         catalogs = page.get_catalog_list(Content.catalogs, clouds)
         for catalog in catalogs:
             for image in images:
-                if image['name'] != "ConfigServer":
-                    app_name = page.get_app_name(image['name'], \
-                        catalog['cloud_parent'])
-                    # 'while not' used to loop until image pushed
-                    # FIXME: better way?
-                    while not page.verify_image_push(catalog['name'], app_name, image):
-                        time.sleep(30)
-                    else:
-                        page.launch_app(catalog['name'], app_name, image)
+                app_name = page.get_app_name(image['name'], \
+                    catalog['cloud_parent'])
+                # 'while not' used to loop until image pushed
+                # FIXME: better way?
+                while not page.verify_image_push(catalog['name'], app_name, image):
+                    time.sleep(30)
+                else:
+                    page.launch_app(catalog['name'], app_name, image)
 
     @pytest.mark.nondestructive
+    @pytest.mark.content
     @pytest.mark.verify
     @pytest.mark.launch
     def test_verify_launch(self, mozwebqa):
@@ -174,13 +335,12 @@ class TestContent(Aeolus_Test):
 
         for catalog in catalogs:
             for image in images:
-                if image['name'] != "ConfigServer":
-                    app_name = page.get_app_name(image['name'], \
-                        catalog['cloud_parent'])
-                    # 'while not' used to loop until image pushed
-                    # FIXME: better way?
-                    while not page.verify_launch(app_name):
-                        time.sleep(10)
+                app_name = page.get_app_name(image['name'], \
+                    catalog['cloud_parent'])
+                # 'while not' used to loop until image pushed
+                # FIXME: better way?
+                while not page.verify_launch(app_name):
+                    time.sleep(10)
 
     @pytest.mark.verify
     def test_get_launch_status(self, mozwebqa):
@@ -190,29 +350,28 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        page.get_launch_status()
+        print page.get_launch_status()
 
-    ###
-    # TODO: 
-    # api function for reference
-    # use/extend for polling status
-    ###
-    @pytest.mark.skipif("1 == 1")
-    def test_poll_images(self, mozwebqa):
+    @pytest.mark.verify
+    @pytest.mark.registration
+    def test_verify_registration(self, mozwebqa):
         '''
-        poll image build and return status
+        Get hostname and confirm instance registered in katello
         '''
-        print "### Images ###"
-        images = self.api.get_element_id_list("images", "image")
-        for image_id in images:
-            image_detail = self.api.get_detailed_info("images", image_id)
-            print "%s (%s)" % (image_detail['name'], image_id)
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
 
-        # return XML more complex, not verified
-        print "### Target Images ###"
-        target_images = self.api.get_element_id_list("target_images", "target_image")
-        for target_image_id in target_images:
-            target_image_detail = self.api.get_detailed_info("target_images", target_image_id)
-            print "%s (%s)" % (target_image_detail['template'], target_image_id)
+        clouds = page.get_provider_list(Environment.clouds)
 
+        for cloud in clouds:
+            app_name = page.get_app_name(image['name'], \
+                catalog['cloud_parent'])
+            ip_addr = page.get_ip_addr(app_name)
+            ec2_key_file = None
+            if 'ec2' in cloud['enabled_provider_accounts']:
+                ec2_key_file = page.download_ec2_key(app_name)
 
+            for cmd in ['hostname', 'arch', 'uname -r', 'uname -s']:
+                print page.run_shell_command(cmd, ip_addr, ec2_key_file)
+            # TODO:
+            # assert hostname == katello.api.get_hostname(ip_addr)

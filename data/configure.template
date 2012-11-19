@@ -21,6 +21,7 @@ private_key_file=/full/path/to/my/private/pk-file.pem
 public_cert_file=/full/path/to/my/public/cert-file.pem
 
 [credentials-configserver]
+# not used. configserver setup is now automated. use '-m configserver'
 # output from `aeolus-configserver-setup`
 endpoint=https://localhost
 key=my_configserver_key
@@ -35,7 +36,7 @@ rhelvers=6Server 5.9
 sys_templates_baseurl=https://localhost/templates/Dev/
 # leave blank for default blueprint
 custom_blueprint=data/blueprint_templates/test_cfse_registration.xml
-launch_configserver=False
+configserver=ec2 rhevm vsphere
 ldap=False
 
 [katello]
@@ -46,4 +47,6 @@ custom_repos=cfse-1.1-puddle cfce-1.1-puddle
 ldap=False
 
 [general]
-log_level=INFO
+instance_passwd=redhat
+# TODO: must match hard-coded blueprint values
+ec2_tunnel_ports=5674 1443
