@@ -7,6 +7,7 @@ results/
 .pydevproject
 *.pem
 *.log*
+*.ini
 cloudforms.cfg
 sauce_labs.yaml
 Sauce-Connect.jar
