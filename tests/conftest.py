@@ -17,15 +17,14 @@ class CloudFormsConfigParser(ConfigParser.SafeConfigParser):
 test_config = CloudFormsConfigParser()
 cfg_file = 'cloudforms.cfg'
 
-# Determine if an alternate .cfg file was requested via --config
+# Determine if an alternate .cfg file was requested via --config.
+# Configuration is loaded prior to inspection of command-line options.
 for i,arg in enumerate(sys.argv):
     if re.search(r'^--config\b', arg):
         try:
             cfg_file = arg.split('=',1)[1]
-            print cfg_file
         except IndexError:
             cfg_file = sys.argv[i+1]
-            print cfg_file
         break
 
 # Read configuration, fail is missing
