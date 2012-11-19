@@ -640,7 +640,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
     def get_provider_list(self, environments):
         '''
-        match dataset enabled providers with providers selected in configure.ini
+        match dataset enabled providers with providers enabled in cloudforms.cfg
         '''
         providers = self.cfgfile.getlist('aeolus', 'providers')
         for env in environments:
@@ -652,7 +652,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
     def get_image_list(self, templates):
         '''
-        match dataset images with selected arch and rhelver in configure.ini
+        match dataset images with selected arch and rhelver in cloudforms.cfg
         '''
         images = list()
         for template in templates:
