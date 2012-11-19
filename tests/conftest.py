@@ -16,7 +16,7 @@ class CloudFormsConfigParser(ConfigParser.SafeConfigParser):
 
 test_config = CloudFormsConfigParser()
 # cfg_file = 'data/configure.ini'
-cfg_file = 'setup.cfg'
+cfg_file = 'cloudforms.cfg'
 
 # Determine if an alternate .cfg file was requested via --config
 for i,arg in enumerate(sys.argv):
