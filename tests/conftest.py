@@ -106,7 +106,8 @@ def pytest_configure(config):
 
     # Turn on verbosity / debugging if specified in .cfg
     for opt in ['verbose', 'debug']:
-        if test_config.has_option('general', opt):
+        if not getattr(config.option, opt) \
+                and test_config.has_option('general', opt):
             setattr(config.option, opt, test_config.getboolean('general', opt))
 
     # Setup test logging
