@@ -28,8 +28,7 @@ class TestNav(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-
-        time.sleep(15)
+        assert not page.is_failed
 
         workflow = ['users', 'users/new', 'users/1', 'users/1/edit',
                     'user_groups', 'user_groups/new', 'user_groups/1', 
@@ -43,12 +42,15 @@ class TestNav(Aeolus_Test):
                     'hardware_profiles/new', 'hardware_profiles/1',
                     'hardware_profiles/1/edit', 'providers', 'providers/new',
                     'providers/1', 'providers/1/edit',
-                    'settings', 'logs', 'logout']
+                    'settings', 'logs',
+                    # 400 (bad request), 403 (forbidden), 404 (not found)
+                    '%400_bad_request%', '404_not_found',
+                    'users/1/unknown_action', 'logout', 
+                    'users/403_forbidden','404_not_found']
         for view in workflow:
             page.go_to_page_view(view)
-            time.sleep(1)
+            assert not page.is_failed
 
-    @pytest.mark.saucelabs
     def test_error_pages(self, mozwebqa):
         '''
         Login and cycle through known error pages:
@@ -56,20 +58,12 @@ class TestNav(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
+        assert not page.is_failed
 
         workflow = ['%400_bad_request%', '404_not_found', 
         'users/1/unknown_action', 'logout', 'users/403_forbidden', 
         '404_not_found']
         for view in workflow:
             page.go_to_page_view(view)
-            time.sleep(2)
-
-    @pytest.mark.saucelabs
-    def test_sauce_debug(self, mozwebqa):
-        page = self.aeolus.load_page('Aeolus')
-        page.login()
-        self.wait_for_title("CloudForms Cloud Engine")
-        assert page.page_title == "CloudForms Cloud Engine"
-        page.go_to_page_view('images')
-        page.go_to_page_view('logout')
+            assert not page.is_failed
 

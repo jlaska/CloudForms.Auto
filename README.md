@@ -15,15 +15,15 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 * pytest-mozwebqa==1.0
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Rename `data/configure.template` to `data/configure.ini`.
-3. Update `data/configure.ini` file. Use `scripts/generate_password.py` to encode passwords.
+2. Rename `cloudforms.template` to `cloudforms.cfg`.
+3. Update `cloudforms.cfg` file as desired.  Use `scripts/generate_password.py` to encode passwords.
 4. Update `tests/aeolus2/pytest.ini` if needed.
 5. Update `data/dataset.py` if needed.
 6. Run tests from project root dir: `py.test`. See `py.test -h` for options.
 7. Monitor log: `tail -f cloudforms_test.log`.
 
 ## Requirements
-The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `data/configure.ini`.
+The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `cloudforms.cfg`.
 
 ## Options
 * `--driver=firefox` Allows tests to be run without a separate Selenium server running.
@@ -71,16 +71,16 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 * `[project]/api.py` Project-specific API helper methods.
 
 `data/`:
-* `configure.ini` Main configuration file for credentials, product parameters and general preferences.
-
 * `dataset.py` Dataset that drives data-driven testing.
 
 * `manifests/` Content provider manifest.zip files.
 
 ### Configuration
-* `credentials.yaml` Not currently in use. Update `data/configure.ini` instead.
+* `cloudforms.cfg` Main configuration file for credentials, product parameters and general preferences.
 
-* `conftest.py` Specify custom command-line options.
+* `credentials.yaml` Not currently in use. Update `cloudforms.cfg` instead.
+
+* `tests/conftest.py` Specify custom command-line options and argument handling.
 
 * `mozwebqa.cfg` The mozwebqa plugin will read the parameters in this file and automatically add them onto the py.test command line. It is handy for parameters that are constant like --browsername=firefox.
 

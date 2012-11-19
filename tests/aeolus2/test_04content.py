@@ -225,7 +225,7 @@ class TestContent(Aeolus_Test):
         for cloud in clouds:
             for image in images:
                 page.new_image_from_url(cloud, image, \
-                    opts['sys_templates_baseurl'])
+                    page.cfgfile.get('aeolus', 'sys_templates_baseurl'))
 
     @pytest.mark.content
     def test_build_images(self, mozwebqa):
@@ -269,7 +269,6 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        config = page.parse_configuration('aeolus')
         dataset_imgs = page.get_image_list(Content.images)
         clouds = page.get_provider_list(Environment.clouds)
         catalogs = page.get_catalog_list(Content.catalogs, clouds)
@@ -278,21 +277,20 @@ class TestContent(Aeolus_Test):
             for dataset_img in dataset_imgs:
                 deployable = page.get_app_name(dataset_img['name'], \
                     catalog['cloud_parent'])
-                if config['custom_blueprint'] == "":
+                if page.cfgfile.get('aeolus', 'custom_blueprint', '') == '':
                     # default blueprint
                     page.new_default_blueprint(catalog['cloud_parent'],\
                         dataset_img, deployable)
                 else:
                     # custom blueprint, update with image uid from api
-                    login = page.get_login_credentials('admin')
-                    api_images = self.api.get_image_list(\
-                        login['username'], login['password'])
+                    (login_user, login_pass) = page.get_login_credentials('admin')
+                    api_images = self.api.get_image_list(login_user, login_pass)
                     for api_img in api_images:
                         if dataset_img['name'] == api_img['name']:
                             if catalog['cloud_parent'] == api_img['env']:
                                 blueprint_file = \
                                     page.create_custom_blueprint(api_img, \
-                                        dataset_img, config['custom_blueprint'])
+                                        dataset_img, page.cfgfile.get('aeolus', 'custom_blueprint'))
                                 page.upload_custom_blueprint(blueprint_file, \
                                     catalog['name'], api_img, \
                                     dataset_img, deployable)

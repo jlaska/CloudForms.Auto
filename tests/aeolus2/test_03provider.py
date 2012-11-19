@@ -40,8 +40,7 @@ class TestProvider(Aeolus_Test):
         # create provider account
         for account in Provider.accounts:
             if account["type"] == "ec2":
-                #creds = page.get_credentials_from_config('ec2_credentials')
-                creds = page.parse_configuration('credentials-ec2')
+                creds = page.cfgfile.items('credentials-ec2')
                 for (key, val) in creds.iteritems():
                     account[key] = val
 

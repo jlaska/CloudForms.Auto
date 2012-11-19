@@ -113,7 +113,6 @@ class ApiTasks(object):
             env = image.find('environment').text
             build = image.get('id')
             image_list.append(dict(name=name, env=env, build=build))
-        print "Got image list: %s" % image_list
         return image_list
 
     # FIXME: could stand improvement.

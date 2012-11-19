@@ -554,7 +554,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         select image by name, click launch
         create unique app name with otherwise default opts
         '''
-        config = self.parse_configuration('aeolus')
         self.go_to_page_view("catalogs")
         self.click_by_text("a", catalog)
         self.click_by_text("a", app_name)
@@ -562,9 +561,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         #self.selenium.find_element(*self.locators.app_name_field).clear()
         #self.send_text(image['apps'][0], *self.locators.app_name_field)
         self.selenium.find_element(*self.locators.next_button).click()
+
         # if not product.startswith('apps.'):
-        if config['custom_blueprint'] != "" and not \
-            app_name.lower().startswith('configserver'):
+        if self.cfgfile.get('aeolus', 'custom_blueprint', '') != '' and \
+                not app_name.lower().startswith('configserver'):
             logging.info("Using custom blueprint")
             self.selenium.find_element(*self.locators.katello_register_tab).click()
             # sleep for manual verification, update params
@@ -668,8 +668,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         if ec2_key_file != None:
             cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" \
                 % (ec2_key_file, ip_addr)
-        else: 
-            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % (config['instance_passwd'], ip_addr)
+        else:
+            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % \
+                    (self.cfgfile.get('general', 'instance_passwd'), ip_addr)
         return cmd_template
 
     def setup_configserver(self, ip_addr, ec2_key_file=None):
@@ -770,13 +771,12 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
     def get_provider_list(self, environments):
         '''
-        match dataset enabled providers with providers selected in configure.ini
+        match dataset enabled providers with providers enabled in cloudforms.cfg
         '''
-        opts = self.parse_configuration('aeolus')
-        providers = list()
-        opts['providers'] = self.split_params(opts['providers'])
+        providers = self.cfgfile.getlist('aeolus', 'providers')
+        providers = self.split_params('providers')
         for env in environments:
-            for provider in opts['providers']:
+            for provider in providers:
                 for provider_acct in env['enabled_provider_accounts']:
                     if provider_acct.lower().startswith(provider.lower()):
                         providers.append(env)
@@ -784,15 +784,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
     def get_image_list(self, templates):
         '''
-        match dataset images with selected arch and rhelver in configure.ini
+        match dataset images with selected arch and rhelver in cloudforms.cfg
         '''
-        opts = self.parse_configuration('aeolus')
         images = list()
-        opts['archs'] = self.split_params(opts['archs'])
-        opts['rhelvers'] = self.split_params(opts['rhelvers'])
+
+        archs = self.cfgfile.getlist('aeolus', 'archs')
+        archs = self.split_params('archs')
+        rhelvers = self.cfgfile.getlist('aeolus', 'rhelvers')
+        rhelvers = self.split_params('rhelvers')
+
         for template in templates:
-            for arch in opts['archs']:
-                for rhelver in opts['rhelvers']:
+            for arch in archs:
+                for rhelver in rhelvers:
                     if re.search(r'%s' % arch, template['profile'], re.I) and \
                         re.search(r'%s' % rhelver, template['template'], re.I):
                         images.append(template)

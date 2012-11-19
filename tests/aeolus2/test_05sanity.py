@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pytest
 import apps
 from tests.aeolus2 import Aeolus_Test

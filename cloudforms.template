@@ -1,0 +1,55 @@
+[general]
+log_file = cloudforms.log
+verbose = 0
+debug = 0
+baseurl = https://localhost
+enable-ldap = True
+instance_passwd = redhat
+# TODO: must match hard-coded blueprint values
+ec2_tunnel_ports = 5674 1443
+
+[katello]
+katello-url = %(baseurl)s/katello
+org = redhat
+default_env = Dev
+redhat_repos = 6Server 5Server
+custom_repos = cfse-1.1-puddle cfce-1.1-puddle
+
+[aeolus]
+# must match provider account, not provider
+# accepts comma- or space-delimited list, case ignored, match "startswith"
+aeolus-url = %(baseurl)s/conductor
+providers = rhevm ec2 vsphere
+archs = x86_64 i386
+rhelvers = 6Server 5.9
+sys_templates_baseurl = https://localhost/templates/Dev/
+# leave blank for default blueprint
+custom_blueprint = data/blueprint_templates/test_cfse_registration.xml
+configserver = ec2 rhevm vsphere
+
+# passwords must be base64 encoded
+[credentials-aeolus]
+admin-login = admin
+admin-password = cGFzc3dvcmQ=
+user-login= my-user
+user-password= cGFzc3dvcmQ=
+
+[credentials-katello]
+admin-login = admin
+admin-password = YWRtaW4=
+user-login= my-user
+user-password= YWRtaW4=
+
+[credentials-ec2]
+username_access_key = my_ec2_access_key
+password_secret_access_key = my_ec2_secret_access_key
+account_number = 1234-1234-1234
+private_key_file = /full/path/to/my/private/pk-file.pem
+public_cert_file = /full/path/to/my/public/cert-file.pem
+
+[credentials-configserver]
+# not used. configserver setup is now automated. use '-m configserver'
+# output from `aeolus-configserver-setup`
+endpoint = https://localhost
+key = my_configserver_key
+secret = my_configserver_secret

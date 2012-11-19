@@ -13,16 +13,30 @@ def setup_module(module):
 
 class TestNav(Katello_Test):
 
-    @pytest.mark.template
     @pytest.mark.saucelabs
     def test_login_and_nav(self, mozwebqa):
         '''
-        Login and cycle through select pages
-        to test browser rendering
+        Login and cycle through select pages to test browser rendering
+
+        Page views:
+        users, new user, single user, edit user,
+        roles, new role, single role,
+        organizations, single org, edit org,
+        subscriptions, new subscription, activation keys, new activation key,
+        subscriptions history, 
+        providers, new provider, Red Hat provider, product repositories,
+        filters, new filter, GPG keys, new GPG key, sync schedules
+        content search, system templates, new sys template,
+        promotions, single promotion, new promotion,
+        changesets, single changeset, notices,
+        systems, new systems, system groups, new system group
+        environments, new environment
         '''
         page = self.katello.load_page('Home')
         page.login()
+        #time.sleep(15)
         page.select_org(self.testsetup.org)
+        assert not page.is_failed
 
         workflow = ['users', 'users#panel=new', 
             'users#panel=user_1&panelpage=edit',
@@ -42,13 +56,13 @@ class TestNav(Katello_Test):
             'changesets', 'changesets#env_id=3', 'notices', 'systems', 
             'systems#panel=new', 'system_groups', 'system_groups#panel=new',
             'systems/environments', 'systems/environments#panel=new'
+            # 400 (bad request), 403 (forbidden), 404 (not found)
+            '%400_bad_request%', '404_not_found', 'roles/unknown_action'
             ]
         for view in workflow:
             page.go_to_page_view(view)
-            logging.info('nav to page "/%s"' % view)
-            time.sleep(1)
+            assert not page.is_failed
 
-    @pytest.mark.saucelabs
     def test_error_pages(self, mozwebqa):
         '''
         Login and cycle through known error pages:
@@ -61,6 +75,13 @@ class TestNav(Katello_Test):
         'roles/unknown_action']
         for view in workflow:
             page.go_to_page_view(view)
-            logging.info('nav to page "/%s"' % view)
-            time.sleep(2)
+            assert not page.is_failed
+
+    def test_sauce_debug(self, mozwebqa):
+        page = self.katello.load_page('Home')
+        page.login()
+        page.wait_for_id("Dashboard")
+        assert page.page_title == "CloudForms System Engine - Open Source Systems Management"
+        page.go_to_page_view("systems")
+        time.sleep(3)
 
