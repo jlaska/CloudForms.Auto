@@ -761,7 +761,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             return False
 
         providers = list()
-        opts['configserver'] = self.split_params(opts['configserver'])
+        opts['configserver'] = self.cfgfile.getlist(opts['configserver'])
         for env in environments:
             for provider in opts['configserver']:
                 for provider_acct in env['enabled_provider_accounts']:
@@ -774,7 +774,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         match dataset enabled providers with providers enabled in cloudforms.cfg
         '''
         providers = self.cfgfile.getlist('aeolus', 'providers')
-        providers = self.split_params('providers')
         for env in environments:
             for provider in providers:
                 for provider_acct in env['enabled_provider_accounts']:
@@ -788,14 +787,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         images = list()
 
-        archs = self.cfgfile.getlist('aeolus', 'archs')
-        archs = self.split_params('archs')
-        rhelvers = self.cfgfile.getlist('aeolus', 'rhelvers')
-        rhelvers = self.split_params('rhelvers')
-
         for template in templates:
-            for arch in archs:
-                for rhelver in rhelvers:
+            for arch in self.cfgfile.getlist('aeolus', 'archs'):
+                for rhelver in self.cfgfile.getlist('aeolus', 'rhelvers'):
                     if re.search(r'%s' % arch, template['profile'], re.I) and \
                         re.search(r'%s' % rhelver, template['template'], re.I):
                         images.append(template)

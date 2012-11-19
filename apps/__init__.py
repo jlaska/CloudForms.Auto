@@ -244,13 +244,6 @@ class BasePage(object):
         '''
         return base64.b64decode(string)
 
-    def split_params(self, s):
-        '''
-        split space or comma-delimited string into list
-        '''
-        params = re.split(r'[,\s*]', s)
-        return params
-
     def get_login_credentials(self, role='admin'):
         '''
         get user login credentials
