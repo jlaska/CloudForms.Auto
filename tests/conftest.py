@@ -15,7 +15,6 @@ class CloudFormsConfigParser(ConfigParser.SafeConfigParser):
         return re.split(r'[,\s]+', self.get(section, option))
 
 test_config = CloudFormsConfigParser()
-# cfg_file = 'data/configure.ini'
 cfg_file = 'cloudforms.cfg'
 
 # Determine if an alternate .cfg file was requested via --config
@@ -166,17 +165,18 @@ def pytest_addoption(parser):
             dest='test-cleanup', default=False,
             help="Specify whether to cleanup after test completion (default: %default)")
 
+    # Allow generic access to all parameters within cloudforms.cfg
     optgrp.addoption("--keyval", action="append",
             dest='keyval', default=[],
             help="Specify key=val pairs to override config values")
 
-    # TODO - add parameters for each configure.ini [katello] option
+    # TODO - add parameters for each cloudforms.cfg [katello] option
     optgrp = parser.getgroup('katello_options', "Katello Test Options (--project=katello)")
     optgrp.addoption("--katello-url", action="store", dest='katello-url',
             default=test_config.get('katello', 'katello-url', raw=True),
             help="Specify URL for katello (default: %default)")
 
-    # TODO - add parameters for each configure.ini [aeolus] option
+    # TODO - add parameters for each cloudforms.cfg [aeolus] option
     optgrp = parser.getgroup('aeolus_options', "Aeolus Test Options (--project=aeolus)")
     optgrp.addoption("--aeolus-url", action="store", dest='aeolus-url',
             default=test_config.get('aeolus', 'aeolus-url', raw=True),
