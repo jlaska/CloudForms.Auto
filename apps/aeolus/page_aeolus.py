@@ -760,9 +760,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             return False
 
         providers = list()
-        # TODO: move this to parse_configuration
-        for key, val in opts.iteritems():
-            opts[key] = re.split(r'[, ]', val)
+        opts['configserver'] = self.split_params(opts['configserver'])
         for env in environments:
             for provider in opts['configserver']:
                 for provider_acct in env['enabled_provider_accounts']:
@@ -776,9 +774,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         opts = self.parse_configuration('aeolus')
         providers = list()
-        # TODO: move this to parse_configuration
-        for key, val in opts.iteritems():
-            opts[key] = re.split(r'[, ]', val)
+        opts['providers'] = self.split_params(opts['providers'])
         for env in environments:
             for provider in opts['providers']:
                 for provider_acct in env['enabled_provider_accounts']:
@@ -792,9 +788,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         opts = self.parse_configuration('aeolus')
         images = list()
-        # TODO: move this to parse_configuration
-        for key, val in opts.iteritems():
-            opts[key] = re.split(r'[, ]', val)
+        opts['archs'] = self.split_params(opts['archs'])
+        opts['rhelvers'] = self.split_params(opts['rhelvers'])
         for template in templates:
             for arch in opts['archs']:
                 for rhelver in opts['rhelvers']:
