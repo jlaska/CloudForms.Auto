@@ -81,15 +81,45 @@ class Provider(object):
     # valid account types: "ec2", "rhevm", "vsphere"
     accounts = [
 
-        # TODO: support multiple ec2 accounts
+        {"type" : "ec2",
+        "provider_name" : "ec2-ap-northeast-1",
+        "provider_account_name" : "ec2-ap-northeast-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "ec2",
+        "provider_name" : "ec2-ap-southeast-1",
+        "provider_account_name" : "ec2-ap-southeast-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "ec2",
+        "provider_name" : "ec2-eu-west-1",
+        "provider_account_name" : "ec2-eu-west-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "ec2",
+        "provider_name" : "ec2-sa-east-1",
+        "provider_account_name" : "ec2-sa-east-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
         {"type" : "ec2",
         "provider_name" : "ec2-us-east-1",
-        "provider_account_name" : "ec2",
-        "username_access_key" : "",
-        "password_secret_access_key" : "",
-        "account_number" : "",
-        "key_file" : "",
-        "key_cert_file" : "",
+        "provider_account_name" : "ec2-us-east-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "ec2",
+        "provider_name" : "ec2-us-west-1",
+        "provider_account_name" : "ec2-us-west-1",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "ec2",
+        "provider_name" : "ec2-us-west-2",
+        "provider_account_name" : "ec2-us-west-2",
         "provider_account_priority" : "",
         "provider_account_quota" : "32" },
 
@@ -125,13 +155,13 @@ class Environment(object):
     clouds = [
         {"name" : "Dev",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : ['rhevm']},
+        "enabled_provider_accounts" : [Provider.accounts[0]['provider_name']]},
         {"name" : "Test",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : ['vsphere']},
+        "enabled_provider_accounts" : [Provider.accounts[1]['provider_name']]},
         {"name" : "Production",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : ['ec2']},
+        "enabled_provider_accounts" : [Provider.accounts[2]['provider_name']]}
         ]
 
     pools = [

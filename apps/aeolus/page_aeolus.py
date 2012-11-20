@@ -652,26 +652,68 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", app_name)
         url = self.url_by_text("a", "Download key")
         ec2_key_string = requests.get(url, verify=False, \
-            auth=(login['username'], login['password'])).text
+            auth=(login[0], login[1])).text
         ec2_key_file = tempfile.NamedTemporaryFile(delete=False)
         ec2_key_file.write(ec2_key_string)
 
         return ec2_key_file.name
 
-    def get_ssh_cmd_template(self, ip_addr, ec2_key_file):
+    def setup_ec2_tunnel_proxy(self, app_name):
         '''
-        return base SSH command template
+        Run commands to enable configserver SSH tunnel proxy
         '''
-        config = self.parse_configuration('general')
+        ip_addr = self.get_ip_addr(app_name)
+        ec2_key_file = self.download_ec2_key(app_name)
+        ports = self.cfgfile.getlist('general', 'ec2_tunnel_ports')
 
-        cmd_template = None
-        if ec2_key_file != None:
-            cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" \
-                % (ec2_key_file, ip_addr)
-        else:
-            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % \
-                    (self.cfgfile.get('general', 'instance_passwd'), ip_addr)
-        return cmd_template
+        # 'iptables-save' prints running config to stdout
+        # 'service iptables save' makes changes permanent
+        cmds = ["sed -i \"s/GatewayPorts no/GatewayPorts yes/g\" /etc/ssh/sshd_config",
+            "grep -i gatewa /etc/ssh/sshd_config",
+            "service sshd restart",
+            "iptables-save",
+            "iptables -A INPUT -p tcp --dport %s -j ACCEPT" % ports[0],
+            "iptables -A INPUT -p tcp --dport %s -j ACCEPT" % ports[1],
+            "iptables -A INPUT -p tcp --dport 8080 -j ACCEPT",
+            "iptables-save",
+            "service iptables save",
+            "service iptables restart"]
+        for cmd in cmds:
+            print "Running '%s'" % cmd
+            self.run_shell_command(cmd, ip_addr, ec2_key_file)
+        # TODO: how to confirm changes? Probe ports?
+
+    def bind_cfse_ports(self, app_name):
+        '''
+        open ssh tunnel from CFSE to EC2 configserver
+        '''
+        # FIXME: This is... a mess (not working)
+        # We need the EC2 key on the CFSE host (scp?)
+        # and then run ssh on CFSE host to open tunnel to EC2 configserver
+        # It would probably be better to send a shell script over 
+        # to the CFSE host and execute it from there
+        ip_addr = self.get_ip_addr(app_name)
+        ec2_key_file = self.download_ec2_key(app_name)
+        se_host = self.cfgfile.get('katello', 'katello-url').replace("/katello", "")
+        se_host = se_host.replace("https://", "")
+        # ec2_tunnel_ports = 1443 5674
+        ports = self.cfgfile.getlist('general', 'ec2_tunnel_ports')
+        cmd_template = "ssh -i {key} -o StrictHostKeyChecking=no -R :8080:{cfse}:80 -R :{port1}:{cfse}:443 -R :{port2}:{cfse}:{port2} root@{ec2_ip}"
+        bind_cmd = cmd_template.format(key=ec2_key_file, cfse=se_host, \
+            port1=ports[0], port2=ports[1], ec2_ip=ip_addr)
+        copy_ec2_cmd = "sshpass -p {passwd} scp {key} root@{host}:/tmp/\."
+        copy_ec2_cmd = copy_ec2_cmd.format(
+            passwd=self.cfgfile.get('general', 'instance_passwd'),
+            key=ec2_key_file,
+            host=se_host)
+        print copy_ec2_cmd
+        os.system(copy_ec2_cmd)
+        cmds = ["cat /etc/ssh/ssh_config",
+            bind_cmd,
+            "cat /etc/ssh/ssh_config"]
+        for cmd in cmds:
+            print "Runnning '%s'" % cmd
+            self.run_shell_command(cmd, se_host)
 
     def setup_configserver(self, ip_addr, ec2_key_file=None):
         '''
@@ -739,31 +781,18 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 (account, cs['endpoint']))
         return self.get_text(*self.locators.response)
 
-    def run_shell_command(self, shell_cmd, ip_addr, ec2_key_file=None):
-        '''
-        generic method to run any shell command such as 'hostname'
-        uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
-        '''
-        cmd_template = self.get_ssh_cmd_template(ip_addr, ec2_key_file)
-        cmd = "%s '%s'" % (cmd_template, shell_cmd)
-
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        ret = process.stdout.read().rstrip('\n')
-        return ret
-
     def get_configserver_provider_list(self, environments):
         '''
         match dataset enabled configserver providers with 
         providers selected in configure.ini
         '''
-        opts = self.parse_configuration('aeolus')
-        if opts['configserver'] == "":
+        configserver = self.cfgfile.getlist('aeolus', 'configserver')
+        if len(configserver) < 1:
             return False
 
         providers = list()
-        opts['configserver'] = self.cfgfile.getlist(opts['configserver'])
         for env in environments:
-            for provider in opts['configserver']:
+            for provider in configserver:
                 for provider_acct in env['enabled_provider_accounts']:
                     if provider_acct.lower().startswith(provider.lower()):
                         providers.append(env)
@@ -774,12 +803,13 @@ class Aeolus(apps.aeolus.Conductor_Page):
         match dataset enabled providers with providers enabled in cloudforms.cfg
         '''
         providers = self.cfgfile.getlist('aeolus', 'providers')
+        prov_list = list()
         for env in environments:
             for provider in providers:
                 for provider_acct in env['enabled_provider_accounts']:
                     if provider_acct.lower().startswith(provider.lower()):
-                        providers.append(env)
-        return providers
+                        prov_list.append(env)
+        return prov_list
 
     def get_image_list(self, templates):
         '''

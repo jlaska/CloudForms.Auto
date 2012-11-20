@@ -10,6 +10,7 @@ import apps.locators
 import datetime
 import time
 import re
+import subprocess
 
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
@@ -565,6 +566,31 @@ class BasePage(object):
         :param tab: str tab to click
         """
         self.click_and_wait(*self.locators.tab_elements[tab])
+
+    def get_ssh_cmd_template(self, ip_addr, ec2_key_file=None):
+        '''
+        return base SSH command template
+        '''
+        cmd_template = None
+        if ec2_key_file != None:
+            cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" \
+                % (ec2_key_file, ip_addr)
+        else:
+            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % (self.cfgfile.get('general', 'instance_passwd'), ip_addr)
+        return cmd_template
+
+    def run_shell_command(self, shell_cmd, ip_addr, ec2_key_file=None):
+        '''
+        generic method to run any shell command
+        uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
+        '''
+        cmd_template = self.get_ssh_cmd_template(ip_addr, ec2_key_file)
+        cmd = "%s '%s'" % (cmd_template, shell_cmd)
+        print cmd
+        # TODO: check return code
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = process.stdout.read().rstrip('\n')
+        return ret
 
     #
     # UI elements
