@@ -23,7 +23,7 @@ class KatelloLocators(apps.locators.BaseLocators):
     dashboard_nofications_locator = (By.ID, "dashboard_notifications")
 
     # Account controller
-    account_controller_locator = (By.CSS_SELECTOR, "li.hello")
+    account_controller_locator = (By.XPATH, "//a[@id='user_id']")
 
     # Org switcher
     org_switcher_locator = (By.XPATH, "//a[@id='switcherButton']/div")
