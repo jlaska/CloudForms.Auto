@@ -8,6 +8,7 @@ import requests
 import re
 import string
 import pytest
+from distutils.version import StrictVersion
 
 # Load test config file
 class CloudFormsConfigParser(ConfigParser.SafeConfigParser):
@@ -69,6 +70,14 @@ def pytest_configure(config):
     '''
     Merge .cfg and --param settings
     '''
+
+    # Add method to determine if the version being tested is the same as, or
+    # newer, than the version provided.  This is helpful for ensuring a test
+    # only runs when support for a new feature exists.  For example:
+    #    return  1 if x < --project-version   (1.0  < 1.1)
+    #    return  0 if x == --project-version  (1.0 == 1.1)
+    #    return -1 if x > --project-version   (1.2  > 1.1)
+    config.version_cmp = lambda x: StrictVersion(config.getoption('project-version')).__cmp__(x)
 
     # This is weird, but handy ...
     # Interpolate any ConfigParser style variables in --aeolus-url and --katello-url

@@ -20,8 +20,9 @@ class TestHomePage(tests.katello2.Katello_Test):
         # login
         home_page.login()
         assert home_page.is_successful
-        if pytest.config.getvalue('project-version') == '1.1':
-            home_page.select_org(self.testsetup.org)
+        # Select org from interstitial
+        if pytest.config.version_cmp('1.1') >= 0:
+            home_page.select_org(pytest.config.getvalue('katello-org'))
         assert home_page.is_dialog_cleared
 
         # Still have branding?
@@ -42,8 +43,10 @@ class TestHomePage(tests.katello2.Katello_Test):
         # login
         home_page.login()
         assert home_page.is_successful
-        if pytest.config.getvalue('project-version') == '1.1':
-            home_page.select_org(self.testsetup.org)
+
+        # Select org from interstitial
+        if pytest.config.version_cmp('1.1') >= 0:
+            home_page.select_org(pytest.config.getvalue('katello-org'))
         assert home_page.is_dialog_cleared
 
         # logout
@@ -55,15 +58,40 @@ class TestHomePage(tests.katello2.Katello_Test):
         assert home_page.is_password_field_present
         assert home_page.is_login_button_present
 
+    @pytest.mark.skipif("pytest.config.version_cmp('1.1') < 0")
+    def test_admin_login_search_org(self):
+        home_page = self.katello.load_page('Home')
+
+        # login
+        home_page.login()
+        assert home_page.is_successful
+        # assert home_page.is_dialog_cleared
+
+        # Filter org list
+        org = pytest.config.getvalue('katello-org')
+        home_page.header.filter_org_in_switcher(org)
+
+        # Make sure our filtered value is visible
+        assert org in [o.name for o in home_page.selectable_orgs()]
+
+        # Now select it filtered item
+        home_page.header.click_filtered_result(org)
+
+        # Are we logged in?
+        assert home_page.header.is_user_logged_in
+
+        # Is the org we chose still selected?
+        assert home_page.header.get_text_from_switcher == org
+
     def test_invalid_login(self):
         home_page = self.katello.load_page('Home')
-        home_page.login("admin", "badpassword")
+        home_page.login(password="bogus_password")
         assert home_page.is_failed
         home_page.click_notification_close()
         assert home_page.is_dialog_cleared
 
         home_page = self.katello.load_page('Home')
-        home_page.login("bogus_username", "password")
+        home_page.login(user="bogus_username")
         assert home_page.is_failed
         home_page.click_notification_close()
         assert home_page.is_dialog_cleared
