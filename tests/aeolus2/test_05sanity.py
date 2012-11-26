@@ -28,11 +28,11 @@ class TestLogin(Aeolus_Test):
 
     def test_invalid_login(self):
         page = self.load_page('Aeolus')
-        page.login("admin", "badpassword")
+        page.login(password="badpassword")
         assert page.is_failed
 
         page = self.load_page('Aeolus')
-        page.login("baduser", "password")
+        page.login(user="baduser")
         assert page.is_failed
 
     def test_verify_login_fields(self):
