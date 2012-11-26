@@ -263,8 +263,12 @@ class BasePage(object):
         assert not self.cfgfile.has_option(section, '%s-login'), "Missing login credentials for role: %s" % role
         assert not self.cfgfile.has_option(section, '%s-password'), "Missing password credentials for role: %s" % role
 
-        # Base64 decode the password
-        password = self.decode_string(self.cfgfile.get(section, '%s-password' % role))
+        # Attempt to Base64 decode the password
+        try:
+            password = self.decode_string(self.cfgfile.get(section, '%s-password' % role))
+        # If decoding failed, just use the password as-is
+        except TypeError:
+            password = self.cfgfile.get(section, '%s-password' % role)
 
         return (self.cfgfile.get(section, '%s-login' % role), password)
 
