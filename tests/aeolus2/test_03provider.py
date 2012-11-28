@@ -5,14 +5,14 @@ from data.dataset import Provider
 from data.dataset import Environment
 from data.assert_response import *
 
+@pytest.mark.setup
 class TestProvider(Aeolus_Test):
     '''
     Test provider connections, create provider accounts and test connection,
     add or enable provider accounts to clouds
     '''
 
-    @pytest.mark.provider_admin
-    @pytest.mark.setup
+    @pytest.mark.provider
     def test_provider_connection(self, mozwebqa):
         '''
         test provider connection
@@ -25,8 +25,7 @@ class TestProvider(Aeolus_Test):
             assert page.connection_test_provider(account) == \
                    aeolus_msg['connect_provider']
 
-    @pytest.mark.provider_admin
-    @pytest.mark.setup
+    @pytest.mark.provider
     def test_create_provider_account(self, mozwebqa):
         '''
         Create provider account and test provider account connection
@@ -41,11 +40,12 @@ class TestProvider(Aeolus_Test):
         for account in Provider.accounts:
             if account["type"] == "ec2":
                 creds = page.cfgfile.items('credentials-ec2')
-                for (key, val) in creds.iteritems():
+                for (key, val) in creds:
                     account[key] = val
 
             assert page.create_provider_account(account) == \
-                   aeolus_msg['add_provider_acct'] % account["provider_account_name"]
+                   aeolus_msg['add_provider_acct'] % \
+                       account["provider_account_name"]
 
         # test provider account
         for account in Provider.accounts:
@@ -58,7 +58,7 @@ class TestProvider(Aeolus_Test):
         #        assert page.delete_provider_account(account) == \
         #               aeolus_msg['delete_provider_acct']
 
-    @pytest.mark.setup
+    @pytest.mark.provider
     def test_add_provider_account_cloud(self, mozwebqa):
         '''
         Add provider accounts to clouds
@@ -72,7 +72,6 @@ class TestProvider(Aeolus_Test):
             #    aeolus_msg['add_provider_accts']
             page.add_provider_accounts_cloud(cloud)
 
-    @pytest.mark.setup
     def test_create_resource_profiles(self, mozwebqa):
         '''
         create cloud resource profiles
@@ -82,3 +81,14 @@ class TestProvider(Aeolus_Test):
 
         for profile in Provider.resource_profiles:
             page.new_cloud_resource_profile(profile)
+
+    def test_create_cloud_resource_clusters(self):
+        '''
+        create cloud resource clusters
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        for cluster in Provider.cloud_resource_clusters:
+            assert page.new_cloud_resource_cluster(cluster) == \
+                aeolus_msg['add_cluster_mapping']

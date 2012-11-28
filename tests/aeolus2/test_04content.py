@@ -21,14 +21,13 @@ class TestContent(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        opts = page.parse_configuration('aeolus')
         clouds = page.get_configserver_provider_list(Environment.clouds)
 
         if clouds == False:
             pytest.fail("No configserver providers specified.")
         for cloud in clouds:
             page.new_image_from_url(cloud, Content.configserver, \
-                opts['sys_templates_baseurl'])
+                page.cfgfile.get('aeolus', 'sys_templates_baseurl'))
 
     @pytest.mark.setup
     @pytest.mark.configserver
@@ -189,25 +188,26 @@ class TestContent(Aeolus_Test):
 
     @pytest.mark.setup
     @pytest.mark.configserver
-    @pytest.mark.skipif("1 == 1")
     def test_setup_ec2_tunnel(self, mozwebqa):
         '''
         Setup tunnel for configserver to communicate with katello
+        See https://docspace.corp.redhat.com/docs/DOC-93629
         '''
         page = self.aeolus.load_page('Aeolus')
+        page.login()
 
         clouds = page.get_configserver_provider_list(Environment.clouds)
 
         for cloud in clouds:
-            # FIXME: returning ec2 if only ec2 in list
-            # skips if other providers listed along with ec2
-            if 'ec2' in cloud['enabled_provider_accounts']:
-                page.login()
+            if [acct.startswith('ec2') \
+                for acct in cloud['enabled_provider_accounts']]:
                 app_name = page.get_app_name(Content.configserver['name'], \
                     cloud['name'])
-                ip_addr = page.get_ip_addr(app_name)
-                # TODO: actually implement tunnel :)
-                print "EC2 configserver IP: %s" % ip_addr
+                # commands run on configserver
+                page.setup_ec2_tunnel_proxy(app_name)
+                # command run on CFSE
+                # FIXME: need to manually create tunnel on CFSE
+                #page.bind_cfse_ports(app_name)
             else:
                 pytest.skip("No EC2 configserver. No tunnel required.")
 
@@ -221,7 +221,6 @@ class TestContent(Aeolus_Test):
 
         clouds = page.get_provider_list(Environment.clouds)
         images = page.get_image_list(Content.images)
-        opts = page.parse_configuration('aeolus')
         for cloud in clouds:
             for image in images:
                 page.new_image_from_url(cloud, image, \
@@ -322,7 +321,7 @@ class TestContent(Aeolus_Test):
     @pytest.mark.content
     @pytest.mark.verify
     @pytest.mark.launch
-    def test_verify_launch(self, mozwebqa):
+    def test_verify_running_status(self, mozwebqa):
         '''
         verify app launch
         '''
@@ -341,15 +340,45 @@ class TestContent(Aeolus_Test):
                 # FIXME: better way?
                 while not page.verify_launch(app_name):
                     time.sleep(10)
+                else:
+                    app = page.verify_launch(app_name)
+                    assert app['status'] == aeolus_msg['running']
 
+    @pytest.mark.nondestructive
+    @pytest.mark.content
     @pytest.mark.verify
-    def test_get_launch_status(self, mozwebqa):
+    @pytest.mark.launch
+    def test_remote_command(self, mozwebqa):
         '''
-        Get status of all apps regardless of dataset
+        Run command on remote guest
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
+        clouds = page.get_provider_list(Environment.clouds)
+        images = page.get_image_list(Content.images)
+
+        for cloud in clouds:
+            for image in images:
+                app_name = page.get_app_name(image['name'], \
+                    cloud['name'])
+                ip_addr = page.get_ip_addr(app_name)
+                ec2_key_file = None
+                if [acct.startswith('ec2') \
+                    for acct in cloud['enabled_provider_accounts']]:
+                    ec2_key_file = page.download_ec2_key(app_name)
+                assert page.run_shell_command('uname -s', ip_addr, \
+                    ec2_key_file) == aeolus_msg['kernel']
+
+    @pytest.mark.verify
+    def test_get_launch_status(self, mozwebqa):
+        '''
+        Get status table of all apps regardless of dataset
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        # TODO: make this useful or discard
         print page.get_launch_status()
 
     @pytest.mark.verify

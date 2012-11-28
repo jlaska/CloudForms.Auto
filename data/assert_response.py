@@ -26,8 +26,11 @@ aeolus_msg = {
     # partial string, invalid assert
     'add_blueprint' : 'Application Blueprint added to Catalog %s.',
     'add_configserver' : 'Config Server added.',
+    'add_cluster_mapping' : 'Cloud Resource Cluster mapping was added.',
     'update_blueprint' : 'Application Blueprint updated successfully',
-    'launch_ready' : 'All Images are pushed and recent.'
+    'launch_ready' : 'All Images are pushed and recent.',
+    'running' : 'Running',
+    'kernel' : 'Linux'
     }
 
 # see src/app/controllers for message text source
