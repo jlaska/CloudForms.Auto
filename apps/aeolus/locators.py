@@ -93,6 +93,14 @@ class AeolusLocators(apps.locators.BaseLocators):
     hwp_storage_field = (By.ID, "hardware_profile_storage_attributes_value")
     hwp_arch_field = (By.ID, "hardware_profile_architecture_attributes_value")
 
+    # new cluster
+    cluster_name = (By.ID, "frontend_realm_name")
+    cluster_desc = (By.ID, "frontend_realm_description")
+    cluster_save = (By.ID, "frontend_realm_submit")
+    cluster_map_provider = (By.ID, "mapping_to_provider_button")
+    cluster_provider_select = (By.ID, "realm_backend_target_realm_or_provider_id")
+    cluster_provider_submit = (By.ID, "realm_backend_target_submit")
+
     # new image
     image_details = (By.ID, "details_images")
     #new_image_name_field = (By.ID, "name")

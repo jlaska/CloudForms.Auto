@@ -374,6 +374,26 @@ class Aeolus(apps.aeolus.Conductor_Page):
         logging.info("create cloud resource profile '%s'" % profile['name'])
         self.selenium.find_element(*self.locators.save_button).submit()
 
+    def new_cloud_resource_cluster(self, cluster):
+        self.go_to_page_view("realms/new")
+        self.send_text(cluster["name"], *self.locators.cluster_name)
+        self.send_text(cluster["description"], *self.locators.cluster_desc)
+        self.selenium.find_element(*self.locators.cluster_save).submit()
+        logging.info("create cloud resource cluster '%s'" % cluster['name'])
+        response = self.add_cloud_resource_cluster_mapping(cluster)
+        logging.info("added mapping to cloud resource cluster '%s'" % \
+            cluster['name'])
+        return response
+
+    def add_cloud_resource_cluster_mapping(self, cluster):
+        self.go_to_page_view("realms")
+        self.click_by_text("a", cluster['name'])
+        self.selenium.find_element(*self.locators.cluster_map_provider).click()
+        self.select_dropdown(cluster["provider"], *self.locators.cluster_provider_select)
+        self.selenium.find_element(*self.locators.cluster_provider_submit).submit()
+        return self.get_text(*self.locators.response)
+
+
     def new_image_from_url(self, cloud, image, template_base_url):
         '''
         create new image from url
@@ -606,6 +626,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 self.log_launch_status(app)
                 return app
             elif app['status'] == "Pending" or app['status'] == "New":
+                # FIXME: mixed return value, expects status dict(), not False
                 return False
             else:
                 self.log_launch_status(app)

@@ -81,6 +81,22 @@ class Provider(object):
     # valid account types: "ec2", "rhevm", "vsphere"
     accounts = [
 
+        {"type" : "rhevm",
+        "provider_name" : "rhevm-default",
+        "provider_account_name" : "rhevm",
+        "username_access_key" : "admin@internal",
+        "password_secret_access_key" : "dog8code",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
+        {"type" : "vsphere",
+        "provider_name" : "vsphere-default",
+        "provider_account_name" : "vsphere",
+        "username_access_key" : "Administrator",
+        "password_secret_access_key" : "R3dhat!",
+        "provider_account_priority" : "",
+        "provider_account_quota" : "32" },
+
         {"type" : "ec2",
         "provider_name" : "ec2-ap-northeast-1",
         "provider_account_name" : "ec2-ap-northeast-1",
@@ -121,23 +137,8 @@ class Provider(object):
         "provider_name" : "ec2-us-west-2",
         "provider_account_name" : "ec2-us-west-2",
         "provider_account_priority" : "",
-        "provider_account_quota" : "32" },
+        "provider_account_quota" : "32" }
 
-        {"type" : "rhevm",
-        "provider_name" : "rhevm-default",
-        "provider_account_name" : "rhevm",
-        "username_access_key" : "admin@internal",
-        "password_secret_access_key" : "dog8code",
-        "provider_account_priority" : "",
-        "provider_account_quota" : "32" },
-
-        {"type" : "vsphere",
-        "provider_name" : "vsphere-default",
-        "provider_account_name" : "vsphere",
-        "username_access_key" : "Administrator",
-        "password_secret_access_key" : "R3dhat!",
-        "provider_account_priority" : "",
-        "provider_account_quota" : "32" },
         ]
 
     resource_profiles = [
@@ -145,7 +146,19 @@ class Provider(object):
         "memory" : "512",
         "cpu_count" : "1",
         "storage" : "",
-        "arch" : "i386"},
+        "arch" : "i386"}
+        ]
+
+    cloud_resource_clusters = [
+        {"name" : "RHEV",
+        "description" : "Private cloud provider",
+        "provider" : accounts[0]['provider_name']},
+        {"name" : "VSphere",
+        "description" : "Private cloud provider",
+        "provider" : accounts[1]['provider_name']},
+        {"name" : "EC2",
+        "description" : "Public cloud provider",
+        "provider" : accounts[6]['provider_name']}
         ]
 
 class Environment(object):
@@ -153,30 +166,58 @@ class Environment(object):
     Define environments and pools
     '''
     clouds = [
-        {"name" : "Dev",
+        {"name" : "Private",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : [Provider.accounts[0]['provider_name']]},
-        {"name" : "Test",
+        "enabled_provider_accounts" : [
+            Provider.accounts[0]['provider_account_name'],
+            Provider.accounts[1]['provider_account_name']
+            ]},
+        {"name" : "Public_EC2",
         "max_running_instances" : "24",
-        "enabled_provider_accounts" : [Provider.accounts[1]['provider_name']]},
-        {"name" : "Production",
-        "max_running_instances" : "24",
-        "enabled_provider_accounts" : [Provider.accounts[2]['provider_name']]}
+        "enabled_provider_accounts" : [
+            Provider.accounts[4]['provider_account_name'],
+            Provider.accounts[6]['provider_account_name']
+            ]}
         ]
 
     pools = [
-        {"name" : "CloudForms-dev",
-        "environment_parent" : ['Dev'],
+        {"name" : "RHEV",
+        "environment_parent" : [clouds[0]['name']],
         "quota" : "10",
         "enabled" : True},
-        {"name" : "CloudForms-test",
-        "environment_parent" : ['Test'],
+        {"name" : "VSphere",
+        "environment_parent" : [clouds[0]['name']],
         "quota" : "10",
         "enabled" : True},
-        {"name" : "CloudForms-prod",
-        "environment_parent" : ['Production'],
+        {"name" : "APAC-NE",
+        "environment_parent" : [clouds[1]['name']],
         "quota" : "10",
         "enabled" : True},
+        {"name" : "APAC-SE",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True},
+        {"name" : "EU",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True},
+        {"name" : "SouthAmerica",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True},
+        {"name" : "US-East",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True},
+        {"name" : "US-West1",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True},
+        {"name" : "US-West2",
+        "environment_parent" : [clouds[1]['name']],
+        "quota" : "10",
+        "enabled" : True}
+
         ]
 
 class Content(object):
@@ -184,15 +225,34 @@ class Content(object):
     Define catalogs, images and deployables
     '''
     catalogs = [
-        {"name" : "CF tools-dev",
-        "pool_parent" : 'CloudForms-dev',
-        "cloud_parent" : "Dev"},
-        {"name" : "CF tools-test",
-        "pool_parent" : 'CloudForms-test',
-        "cloud_parent" : "Test"},
-        {"name" : "CF tools-prod",
-        "pool_parent" : 'CloudForms-prod',
-        "cloud_parent" : "Production"},
+        {"name" : "CF tools-rhev",
+        "pool_parent" : Environment.pools[0]['name'],
+        "cloud_parent" : "Private"},
+        {"name" : "CF tools-vsphere",
+        "pool_parent" : Environment.pools[1]['name'],
+        "cloud_parent" : "Private"},
+        {"name" : "Public apps-APNE",
+        "pool_parent" : Environment.pools[2]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-APSE",
+        "pool_parent" : Environment.pools[3]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-EU",
+        "pool_parent" : Environment.pools[4]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-SA",
+        "pool_parent" : Environment.pools[5]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-US-East",
+        "pool_parent" : Environment.pools[6]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-US-West1",
+        "pool_parent" : Environment.pools[7]['name'],
+        "cloud_parent" : "Public_EC2"},
+        {"name" : "Public apps-US-West2",
+        "pool_parent" : Environment.pools[8]['name'],
+        "cloud_parent" : "Public_EC2"}
+
         ]
 
     configserver = {"name" : "ConfigServer",

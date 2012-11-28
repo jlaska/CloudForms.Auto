@@ -81,3 +81,14 @@ class TestProvider(Aeolus_Test):
 
         for profile in Provider.resource_profiles:
             page.new_cloud_resource_profile(profile)
+
+    def test_create_cloud_resource_clusters(self):
+        '''
+        create cloud resource clusters
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        for cluster in Provider.cloud_resource_clusters:
+            assert page.new_cloud_resource_cluster(cluster) == \
+                aeolus_msg['add_cluster_mapping']
