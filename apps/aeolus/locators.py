@@ -65,6 +65,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     env_name_field = (By.ID, "pool_family_name")
     env_max_running_instances_field = (By.ID, "pool_family_quota_attributes_maximum_running_instances")
     env_submit_locator = (By.ID, "pool_family_submit")
+    pool_family_create_locator = (By.ID, "new_pool_family_button")
     pool_family_delete_locator = (By.ID, "delete_pool_family_button")
     env_prov_acct_details = (By.ID, "details_provider_accounts")
     env_add_prov_acct_button = (By.ID, "add_provider_accounts_button")
@@ -80,6 +81,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     pool_deleter = (By.ID, "delete_pool_button")
 
     # new catalog
+    catalog_new_button = (By.ID, "new_catalog_button")
     catalog_name_field = (By.ID, "catalog_name")
     catalog_family_parent_field = (By.ID, "catalog_pool_id")
     # dup of save_button
