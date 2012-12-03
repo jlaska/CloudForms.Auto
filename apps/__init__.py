@@ -1,6 +1,5 @@
 import os
 import sys
-import base64
 import importlib
 import inspect
 import glob
@@ -216,9 +215,6 @@ class BasePage(object):
     def base_url(self):
         return self._mozwebqa.config.option.base_url
     @property
-    def cfgfile(self):
-        return self._mozwebqa.cfgfile
-    @property
     def timeout(self):
         return self._mozwebqa.timeout
     @property
@@ -239,39 +235,24 @@ class BasePage(object):
     def platform(self):
         return self.selenium.capabilities['platform']
 
-    def decode_string(self, string):
-        '''
-        base64 decode
-        '''
-        return base64.b64decode(string)
-
     def get_login_credentials(self, role='admin'):
         '''
         get user login credentials
-        assumes token base64 encoding of password
         requires unique username and password defined for
         katello and aeolus projects
         '''
 
         # FIXME: references to katello or aeolus should be moved to a sub-class
         if self.project.startswith('katello'):
-            section = 'credentials-katello'
+            creds = self._mozwebqa.credentials.get('katello-%s' % role, None)
         elif self.project.startswith('aeolus'):
-            section = 'credentials-aeolus'
+            creds = self._mozwebqa.credentials.get('aeolus-%s' % role, None)
         else:
             raise Exception("No credentials configuration found for project %s" % self.project)
 
-        assert not self.cfgfile.has_option(section, '%s-login'), "Missing login credentials for role: %s" % role
-        assert not self.cfgfile.has_option(section, '%s-password'), "Missing password credentials for role: %s" % role
-
-        # Attempt to Base64 decode the password
-        try:
-            password = self.decode_string(self.cfgfile.get(section, '%s-password' % role))
-        # If decoding failed, just use the password as-is
-        except TypeError:
-            password = self.cfgfile.get(section, '%s-password' % role)
-
-        return (self.cfgfile.get(section, '%s-login' % role), password)
+        assert creds.has_key('username'), "Missing username for role: %s" % role
+        assert creds.has_key('password'), "Missing password for role: %s" % role
+        return (creds.get('username'), creds.get('password'))
 
     def login(self, role="admin", user=None, password=None):
         (default_user, default_pass) = self.get_login_credentials(role)
@@ -279,10 +260,11 @@ class BasePage(object):
             user = default_user
         if password is None:
             password = default_pass
+        logging.info('login as user "%s" (role: "%s")' % (user, role))
+
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
         self.click(*self.locators.login_locator)
-        logging.info('login as user "%s" (role: "%s")' % (user, role))
 
     # method per http://sauceio.com/index.php/2011/04/how-to-lose-races-and-win-at-selenium/
     def spin_assert(self, msg, assertion):
@@ -442,40 +424,40 @@ class BasePage(object):
         """
         return(self.selenium.current_url)
 
-    def is_element_present(self, *locator):
+    def is_element_present(self, *locator, **kwargs):
         """
         Returns True if locator is present.
         """
         try:
-            WebDriverWait(self.selenium, 5).until(lambda s: s.find_element(*locator))
+            WebDriverWait(self.selenium, kwargs.get('wait',5)).until(lambda s: s.find_element(*locator))
             return True
         except Exception as e:
             return False
 
-    def is_text_present(self, text, *locator):
+    def is_text_present(self, text, *locator, **kwargs):
         """
         Returns True if text is present.
         """
         try:
-            WebDriverWait(self.selenium, 5).until(lambda s: text == s.find_element(*locator).text)
+            WebDriverWait(self.selenium, kwargs.get('wait', 5)).until(lambda s: text == s.find_element(*locator).text)
             return True
         except Exception as e:
             return False
 
-    def is_element_visible(self, *locator):
+    def is_element_visible(self, *locator, **kwargs):
         """
         Returns True if locator is visible.
         """
         try:
-            return WebDriverWait(self.selenium, 10).until(lambda s: s.find_element(*locator).is_displayed())
+            return WebDriverWait(self.selenium, kwargs.get('wait',10)).until(lambda s: s.find_element(*locator).is_displayed())
         except Exception as e:
             return False
 
-    def is_element_editable(self, *locator):
+    def is_element_editable(self, *locator, **kwargs):
         """
         Returns True if the element can be edited.
         """
-        return WebDriverWait(self.selenium, 10).until(lambda s: s.find_element(*locator).is_enabled())
+        return WebDriverWait(self.selenium, kwargs.get('wait', 10)).until(lambda s: s.find_element(*locator).is_enabled())
 
     def get_location(self, *locator):
         """
@@ -502,8 +484,8 @@ class BasePage(object):
 
     def go_to_page_view(self, view):
         # pass in view, e.g. system for katello/system
-        self.selenium.get(self.base_url + "/" + view)
         logging.info("nav to page '/%s'" % view)
+        self.selenium.get(self.base_url + "/" + view)
 
     def url_by_text(self, css, name):
         _text_locator = (By.XPATH, "//%s[text() = '%s']" % (css, name))
