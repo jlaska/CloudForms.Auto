@@ -356,6 +356,7 @@ class BasePage(object):
         """
         Simulates a Back (Return to prior page).
         """
+        logging.info("nav: back")
         self.selenium.back()
 
     def mouse_to_element(self, *locator):
@@ -429,9 +430,20 @@ class BasePage(object):
         Returns True if locator is present.
         """
         try:
-            WebDriverWait(self.selenium, kwargs.get('wait',5)).until(lambda s: s.find_element(*locator))
-            return True
+            return WebDriverWait(self.selenium, kwargs.get('wait',5)).until(lambda s: s.find_element(*locator))
         except Exception as e:
+            logging.exception(e)
+            return False
+
+    def is_attribute_present(self, key, value, *locator, **kwargs):
+        """
+        Returns True if text is present.
+        """
+        try:
+            element = WebDriverWait(self.selenium, kwargs.get('wait',5)).until(lambda s: s.find_element(*locator))
+            return element.get_attribute(key) == value
+        except Exception as e:
+            logging.exception(e)
             return False
 
     def is_text_present(self, text, *locator, **kwargs):
@@ -439,9 +451,9 @@ class BasePage(object):
         Returns True if text is present.
         """
         try:
-            WebDriverWait(self.selenium, kwargs.get('wait', 5)).until(lambda s: text == s.find_element(*locator).text)
-            return True
+            return WebDriverWait(self.selenium, kwargs.get('wait',5)).until(lambda s: s.find_element(*locator).text == text)
         except Exception as e:
+            logging.exception(e)
             return False
 
     def is_element_visible(self, *locator, **kwargs):
@@ -451,6 +463,7 @@ class BasePage(object):
         try:
             return WebDriverWait(self.selenium, kwargs.get('wait',10)).until(lambda s: s.find_element(*locator).is_displayed())
         except Exception as e:
+            logging.exception(e)
             return False
 
     def is_element_editable(self, *locator, **kwargs):
