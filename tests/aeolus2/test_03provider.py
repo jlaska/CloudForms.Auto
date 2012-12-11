@@ -13,82 +13,72 @@ class TestProvider(Aeolus_Test):
     '''
 
     @pytest.mark.provider
-    def test_provider_connection(self, mozwebqa):
+    def test_connection(self, provider_account):
         '''
         test provider connection
         '''
         page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
         page.login()
 
-        for account in Provider.accounts:
-            assert page.connection_test_provider(account) == \
-                   aeolus_msg['connect_provider']
+        response = page.connection_test_provider(provider_account)
+        assert response == aeolus_msg['connect_provider']
 
     @pytest.mark.provider
-    def test_create_provider_account(self, mozwebqa):
+    def test_create_account(self, provider_account):
         '''
         Create provider account and test provider account connection
         '''
         page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
         page.login()
 
-        # TODO: delete mock provider account to prevent launching to mock
+        # Merge credentials into provider dict
+        creds = self.testsetup.credentials.get(provider_account['type'], {})
+        provider_account.update(creds)
 
-        # create provider account
-        for account in Provider.accounts:
-            if account["type"] == "ec2":
-                creds = page.cfgfile.items('credentials-ec2')
-                for (key, val) in creds:
-                    account[key] = val
-
-            assert page.create_provider_account(account) == \
-                   aeolus_msg['add_provider_acct'] % \
-                       account["provider_account_name"]
-
-        # test provider account
-        for account in Provider.accounts:
-            assert page.connection_test_provider_account(account) == \
-                   aeolus_msg['connect_provider_acct']
-
-        # test cleanup
-        #if page.test_cleanup == True:
-        #    for account in Provider.accounts:
-        #        assert page.delete_provider_account(account) == \
-        #               aeolus_msg['delete_provider_acct']
+        # Create account
+        response = page.create_provider_account(provider_account)
+        assert response == aeolus_msg['add_provider_acct'] % \
+            provider_account["provider_account_name"]
 
     @pytest.mark.provider
-    def test_add_provider_account_cloud(self, mozwebqa):
+    def test_account_connection(self, provider_account):
+        '''
+        Test provider account connection
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        # test provider account
+        response =  page.connection_test_provider_account(provider_account)
+        assert response == aeolus_msg['connect_provider_acct']
+
+    @pytest.mark.provider
+    def test_add_accounts_to_cloud(self, cloud):
         '''
         Add provider accounts to clouds
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for cloud in Environment.clouds:
-            # tricky assert: string includes list of accts added
-            #assert page.add_provider_accounts_cloud(environment['name']) ==\
-            #    aeolus_msg['add_provider_accts']
-            page.add_provider_accounts_cloud(cloud)
+        page.add_provider_accounts_cloud(cloud)
 
-    def test_create_resource_profiles(self, mozwebqa):
+    def test_create_resource_profile(self, resource_profile):
         '''
         create cloud resource profiles
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for profile in Provider.resource_profiles:
-            page.new_cloud_resource_profile(profile)
+        page.new_cloud_resource_profile(resource_profile)
 
-    def test_create_cloud_resource_clusters(self):
+        # FIXME - assert?
+
+    def test_create_cloud_resource_cluster(self, resource_cluster):
         '''
         create cloud resource clusters
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for cluster in Provider.cloud_resource_clusters:
-            assert page.new_cloud_resource_cluster(cluster) == \
-                aeolus_msg['add_cluster_mapping']
+        assert page.new_cloud_resource_cluster(resource_cluster) == \
+            aeolus_msg['add_cluster_mapping']
