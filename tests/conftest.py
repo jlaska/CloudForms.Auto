@@ -98,7 +98,7 @@ def pytest_configure(config):
         project = config.option.project.split('.',1)[0]
         config.option.base_url = getattr(config.option, '%s-url' % project)
 
-    # TODO - Update test_config with any --keyval
+    # Update test_config with any --keyval
     for param in config.option.keyval:
         try:
             (sect, key, val) = re.match(r'^([\w_-]*):?\b([\w_-]+)=(.*)$', param).groups()
@@ -113,8 +113,10 @@ def pytest_configure(config):
         if test_config.has_option(sect, key):
             test_config.set(sect, key, val)
 
-    # Turn on verbosity / debugging if specified in .cfg
+    # Determine whether loglevel is specified in .cfg
     for opt in ['verbose', 'debug']:
+        # If --verbose or --debug wasn't supplied, see if a value was provided
+        # in .cfg
         if not getattr(config.option, opt) \
                 and test_config.has_option('general', opt):
             setattr(config.option, opt, test_config.getboolean('general', opt))
@@ -124,16 +126,16 @@ def pytest_configure(config):
             config.option.debug, \
             config.option.logfile)
 
+# Add mozwebqa plugin to all tests
 def pytest_runtest_setup(item):
     """
     pytest setup
     """
 
-    setattr(item, 'cfgfile', test_config)
     pytest_mozwebqa = pytest.config.pluginmanager.getplugin("mozwebqa")
     pytest_mozwebqa.TestSetup.config = item.config
-    pytest_mozwebqa.TestSetup.cfgfile = item.cfgfile
 
+# Customize command-line arguments
 def pytest_addoption(parser):
     """
     Add option to the py.test command line, option is specific to
@@ -146,6 +148,13 @@ def pytest_addoption(parser):
         '''
         return re.match(r'^(true|yes|1|on)$', val, re.IGNORECASE) is not None
 
+    # Update .default and .help for '--credentials' option
+    group = parser.getgroup('credentials', 'credentials')
+    for opt in group.options:
+        if opt.dest == 'credentials_file' and opt.default == optparse.NO_DEFAULT:
+            opt.default = 'credentials.yaml'
+            opt.help = opt.help + " (default: %default)"
+
     # Update .default and .help for '--baseurl' option
     group = parser.getgroup('selenium', 'selenium')
     for opt in group.options:
@@ -154,6 +163,18 @@ def pytest_addoption(parser):
                 opt.default = test_config.get('general', 'baseurl')
             opt.help = opt.help + " (default: %default)" #% opt.default
             break
+
+    def list_callback(option, opt_str, value, parser, *args, **kwargs):
+        '''
+        Alters the built-in action='append' behavior by replacing the
+        defaults, with any values provided on the command-line.
+        '''
+        # Start with a fresh-hot list
+        values = [value]
+        # If the current option value isn't the default, append
+        if getattr(parser.values, option.dest) != option.default:
+            values += getattr(parser.values, option.dest)
+        setattr(parser.values, option.dest, values)
 
     # Add --logfile option to existing 'termincal reporting' option group
     optgrp = parser.getgroup("terminal reporting")
@@ -167,6 +188,7 @@ def pytest_addoption(parser):
             default=cfg_file,
             help="Specify test configuration file (default: %default)")
 
+    # TODO - Move to app-specific optgrp
     optgrp.addoption("--project", action="store", dest='project', default=None,
             help="Specify project (e.g. sam, headpin, katello, katello.cfse, aeolus, cfce)")
 
@@ -182,6 +204,21 @@ def pytest_addoption(parser):
             dest='test-cleanup', default=False,
             help="Specify whether to cleanup after test completion (default: %default)")
 
+    optgrp.addoption("--releasever", dest='releasevers', type="string",
+            action="callback", callback=list_callback,
+            default=test_config.getlist('general', 'releasevers'),
+            help="Specify the release of the desired system templates (default: %default)")
+
+    optgrp.addoption("--arch", "--basearch", dest='basearchs', type="string",
+            action="callback", callback=list_callback,
+            default=test_config.getlist('general', 'basearchs'),
+            help="Specify the architecture of the desired system templates (default: %default)")
+
+    optgrp.addoption("--instance-password", dest='instance-password',
+            type="string", action="store",
+            default=test_config.get('general', 'instance-password'),
+            help="Specify the default password for applications (default: %default)")
+
     # Allow generic access to all parameters within cloudforms.cfg
     optgrp.addoption("--keyval", action="append",
             dest='keyval', default=[],
@@ -193,14 +230,198 @@ def pytest_addoption(parser):
             default=test_config.get('katello', 'katello-url', raw=True),
             help="Specify URL for katello (default: %default)")
 
+    optgrp.addoption("--katello-org", action="store", dest='katello-org',
+            default=test_config.get('katello', 'org'),
+            help="Specify default organization (default: %default)")
+
     # TODO - add parameters for each cloudforms.cfg [aeolus] option
     optgrp = parser.getgroup('aeolus_options', "Aeolus Test Options (--project=aeolus)")
     optgrp.addoption("--aeolus-url", action="store", dest='aeolus-url',
             default=test_config.get('aeolus', 'aeolus-url', raw=True),
             help="Specify URL for aeolus (default: %default)")
 
+    optgrp.addoption("--aeolus-provider", dest='providers', type="string",
+            action="callback", callback=list_callback,
+            default=test_config.getlist('aeolus', 'providers'),
+            help="Specify which cloud providers will be tested (default: %default)")
+
+    optgrp.addoption("--aeolus-configserver", dest='configservers', type="string",
+            action="callback", callback=list_callback,
+            default=test_config.getlist('aeolus', 'configserver'),
+            help="Specify which providers to build a configserver in (default: %default)")
+
+    optgrp.addoption("--aeolus-template-url", action="store",
+            dest='aeolus-template-url', default=test_config.get('aeolus', 'template-url'),
+            help="Specify URL format string for system templates (default: %default)")
+
+    optgrp.addoption("--aeolus-custom-blueprint", action="store",
+            dest='aeolus-custom-blueprint', default=test_config.get('aeolus', 'custom-blueprint'),
+            help="Specify custom application blueprint template (default: %default)")
+
+# Add pytest function argument: mozwebqa
 def pytest_funcarg__mozwebqa(request):
     """Load mozwebqa plugin
     """
     pytest_mozwebqa = pytest.config.pluginmanager.getplugin("mozwebqa")
     return pytest_mozwebqa.TestSetup(request)
+
+# Helper method for accessing a specific attribute of a cloud
+def _get_cloud_attribute(name, key):
+    from data.dataset import Environment
+    for cloud in Environment.clouds:
+        if cloud.get('name') == name:
+            return cloud.get(key)
+    logging.warn("Unable to discover cloud attribute '%s' for cloud '%s'" %
+            (key, cloud))
+    return None
+
+# Add pytest function argument: max_running_instances
+def pytest_funcarg__max_running_instances(request):
+    return _get_cloud_attribute(
+            request.getfuncargvalue("cloud"),
+            'max_running_instances')
+
+# Add pytest function argument: provider_accounts
+def pytest_funcarg__provider_accounts(request):
+    '''
+    Determine which provider_accounts are enabled for the current value of pool_family
+    '''
+    return _get_cloud_attribute(
+            request.getfuncargvalue("cloud"),
+            'enabled_provider_accounts')
+
+# Add pytest function argument: catalogs
+def pytest_funcarg__catalogs(request):
+    '''
+    Determine the appropriate catalogs based on the current value of cloud
+    '''
+
+    # Hacky-hackity-hack
+    if "cloud" in request.funcargnames:
+        cloud = request.getfuncargvalue("cloud")
+    elif "cloud_by_account_type" in funcargnames:
+        (cloud, account) = request.getfuncargvalue("cloud_by_account_type")
+
+    from data.dataset import Content
+    catalog_list = list()
+    for catalog in Content.catalogs:
+        if catalog.get('cloud_parent') == cloud['name']:
+            catalog_list.append(catalog)
+
+    if len(catalog_list) == 0:
+        logging.warn('Unable to discover funcarg__catalog')
+
+    return catalog_list
+
+# Add pytest function argument: configserver
+def pytest_funcarg__configserver(request):
+    from data.dataset import Content
+    return Content.configserver
+
+# Parameterize tests when specific arguments are requested
+def pytest_generate_tests(metafunc):
+
+    # Used when building images
+    if 'cloud_by_account_type' in metafunc.funcargnames:
+        from data.dataset import Environment, Provider
+        test_set = list()
+        id_list = list()
+        account_providers_seen = list()
+        for c in Environment.clouds:
+            for a in Provider.accounts:
+                if a.get('type') in account_providers_seen:
+                    '''ignore if we've already seen this provider account type'''
+                    continue
+                if a.get('provider_account_name') in c.get('enabled_provider_accounts', []):
+                    id_list.append("%s-%s" % (c.get('name'), a.get('type')))
+                    test_set.append((c, a))
+                    account_providers_seen.append(a.get('type'))
+
+        metafunc.parametrize('cloud_by_account_type', test_set, ids=id_list)
+
+    # Used when pushing images
+    if 'cloud_by_account' in metafunc.funcargnames:
+        from data.dataset import Environment, Provider
+        test_set = list()
+        id_list = list()
+        for c in Environment.clouds:
+            for a in Provider.accounts:
+                if a.get('provider_account_name') in c.get('enabled_provider_accounts', []):
+                    id_list.append("%s-%s" % (c.get('name'), a.get('provider_account_name')))
+                    test_set.append((c, a))
+
+        metafunc.parametrize('cloud_by_account', test_set, ids=id_list)
+
+    # Used when launching images
+    if 'zone_by_catalog' in metafunc.funcargnames:
+        from data.dataset import Environment, Content, Provider
+        # ids=[rp.get('name') for rp in Provider.cloud_resource_clusters])
+        test_set = list()
+        id_list = list()
+        for cat in Content.catalogs:
+            for pool in Environment.pools:
+                for cloud in Environment.clouds:
+                    if cat.get('pool_parent') == pool.get('name') \
+                            and cat.get('cloud_parent') == cloud.get('name'):
+                        id_list.append("%s-%s-%s" % (cloud.get('name'), pool.get('name'), cat.get('name')))
+                        test_set.append((cloud, pool, cat))
+        metafunc.parametrize('zone_by_catalog', test_set, ids=id_list)
+
+    # If *just* cloud is used, enumerate
+    if 'cloud' in metafunc.funcargnames:
+        from data.dataset import Environment
+        metafunc.parametrize("cloud", \
+                Environment.clouds, \
+                ids=[c.get('name') for c in Environment.clouds])
+
+    # If *just* resource_zone is used, enumerate
+    if 'resource_zone' in metafunc.funcargnames:
+        from data.dataset import Environment
+        metafunc.parametrize("resource_zone", \
+                Environment.pools, \
+                ids=[p.get('name') for p in Environment.pools])
+
+    if 'catalog' in metafunc.funcargnames:
+        from data.dataset import Content
+        metafunc.parametrize("catalog", \
+                Content.catalogs, \
+                ids=[c.get('name') for c in Content.catalogs])
+
+    if 'resource_cluster' in metafunc.funcargnames:
+        from data.dataset import Provider
+        metafunc.parametrize("resource_cluster", \
+                Provider.cloud_resource_clusters, \
+                ids=[rp.get('name') for rp in Provider.cloud_resource_clusters])
+
+    if 'resource_profile' in metafunc.funcargnames:
+        from data.dataset import Provider
+        metafunc.parametrize("resource_profile", \
+                Provider.resource_profiles, \
+                ids=[rp.get('name') for rp in Provider.resource_profiles])
+
+    if 'provider_account' in metafunc.funcargnames:
+        from data.dataset import Provider
+        metafunc.parametrize("provider_account", \
+                Provider.accounts, \
+                ids=[p.get('provider_account_name') for p in Provider.accounts])
+
+    if 'provider' in metafunc.funcargnames:
+        metafunc.parametrize("provider", metafunc.config.getoption('providers'))
+
+    if 'releasever' in metafunc.funcargnames:
+        metafunc.parametrize("releasever", metafunc.config.getoption('releasevers'))
+
+    if 'basearch' in metafunc.funcargnames:
+        metafunc.parametrize("basearch", metafunc.config.getoption('basearchs'))
+
+    if 'image' in metafunc.funcargnames:
+        image_list = list()
+        # NOTE, instead of guessing the profile name, we should inspect 'resource_profiles'
+        for releasever in metafunc.config.getoption('releasevers'):
+            for basearch in metafunc.config.getoption('basearchs'):
+                image_list.append(dict(
+                    name="rhel-{basearch}-{releasever}".format(releasever=releasever, basearch=basearch),
+                    profile="small-{basearch}".format(basearch=basearch),
+                    releasever=releasever,
+                    basearch=basearch))
+        metafunc.parametrize("image", image_list, ids=[i.get('name') for i in image_list])
