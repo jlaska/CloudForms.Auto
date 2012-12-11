@@ -125,8 +125,11 @@ class AeolusLocators(apps.locators.BaseLocators):
     build_all = (By.XPATH, "(//input[@value='Build'])")
     push_all = (By.XPATH, "(//input[@value='Push all'])")
     blueprint_name = (By.ID, "deployable_name")
+    blueprint_select = (By.ID, "deployable_id")
+    cluster_select = (By.ID, "deployment_frontend_realm_id")
     resource_profile_dropdown = (By.ID, "hardware_profile")
     launch = (By.ID, "launch_deployment_button")
+    launch_blueprint = (By.ID, "launch_deployment_button")
     app_name_field = (By.ID, "deployment_name")
     next_button = (By.ID, "next_button")
 
@@ -137,13 +140,13 @@ class AeolusLocators(apps.locators.BaseLocators):
     configserver_secret = (By.ID, "config_server_secret")
 
     # blueprint
-    new_deployable = (By.ID, "new_deployable_button")
+    new_deployable = (By.ID, "new_deployment_button")
     #deployable_name = (By.ID, "deployable_name")
     deployable_description = (By.ID, "deployable_description")
     deployable_url = (By.ID, "url")
     deployable_xml = (By.ID, "deployable_xml")
-    new_deployable = (By.ID, "new_deployable_button")
-    edit_xml = (By.ID, "edit_xml_button")
+    deployable_add_catalog_button = (By.ID, "add_catalog")
+    edit_xml_button = (By.ID, "edit_xml_button")
 
     # special blueprint params
     katello_register_tab = (By.ID, "KATELLO_REGISTER")
