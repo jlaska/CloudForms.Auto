@@ -5,77 +5,44 @@ from data.dataset import Environment
 from data.dataset import Content
 from data.assert_response import *
 
-class TestClouds(Aeolus_Test):
+class Test_Environment(Aeolus_Test):
     '''
     Create clouds, pools, catalogs and cloud resource profile (front end)
     '''
 
     @pytest.mark.setup
-    def test_create_clouds(self, mozwebqa):
+    def test_create_cloud(self, cloud):
         '''
-        create new clouds
+        create a new cloud
         '''
         page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
         page.login()
 
-        for cloud in Environment.clouds:
-            assert page.new_environment(cloud) == aeolus_msg['add_pool_family']
-
-        # test cleanup
-        #if self.testsetup.test_cleanup:
-        #    for environment in Environment.pool_family_environments:
-        #        assert page.delete_environment(environment) == \
-        #               aeolus_msg['delete_pool_family']
+        response = page.new_environment(cloud)
+        assert response == aeolus_msg['add_pool_family']
 
     @pytest.mark.setup
-    def test_new_pools(self, mozwebqa):
+    def test_create_zone(self, resource_zone):
         '''
-        create new pools
+        create a cloud resource zone
         '''
         page = self.aeolus.load_page('Aeolus')
-        #assert page.login() == aeolus_msg['login']
         page.login()
 
         # workaround. Select dropdown not working
         # capture pool_family_environment IDs from "/pool_families/" view
-        for cloud in Environment.clouds:
-            cloud['id'] = page.get_id_by_url("pool_families", cloud['name'])
+        cloud_id = page.get_id_by_url("pool_families",
+                resource_zone['environment_parent'])
 
-        for cloud in Environment.clouds:
-            for pool in Environment.pools:
-                if cloud['name'] in pool['environment_parent']:
-                    assert page.new_pool_by_id(cloud, pool) == \
-                        aeolus_msg['add_pool']
-
-        #for pool in Environment.pools:
-        #    assert page.new_pool_by_id(pool) == aeolus_msg['add_pool']
-
-        # select dropdown not working
-        #for pool in Environment.pools:
-        #    page.get_id_by_url("pool_families", pool)
-        #    assert page.new_pool(pool) == aeolus_msg['add_pool']
-
-        # test cleanup
-        #if self.testsetup.test_cleanup:
-        #    for pool in Environment.pools:
-        #        assert page.delete_pool(pool) == \
-        #               aeolus_msg['delete_pool'] % pool["name"]
-
+        assert page.new_pool_by_id(cloud_id, resource_zone) == \
+            aeolus_msg['add_pool']
 
     @pytest.mark.setup
-    def test_create_catalogs(self, mozwebqa):
+    def test_create_catalog(self, catalog):
         '''
-        create new catalogs
+        create new catalog
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        for catalog in Content.catalogs:
-            assert page.new_catalog(catalog) == aeolus_msg['add_catalog']
-
-        # test cleanup
-        #if self.testsetup.test_cleanup:
-        #    for catalog in Content.catalogs:
-        #        assert page.delete_catalog(catalog) == aeolus_msg['delete_catalog']
-
+        assert page.new_catalog(catalog) == aeolus_msg['add_catalog']
