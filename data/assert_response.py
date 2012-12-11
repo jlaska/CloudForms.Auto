@@ -29,6 +29,7 @@ aeolus_msg = {
     'add_cluster_mapping' : 'Cloud Resource Cluster mapping was added.',
     'update_blueprint' : 'Application Blueprint updated successfully',
     'launch_ready' : 'All Images are pushed and recent.',
+    'launch_success' : 'Application launched.',
     'running' : 'Running',
     'kernel' : 'Linux'
     }
