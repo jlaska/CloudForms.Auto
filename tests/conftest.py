@@ -50,7 +50,7 @@ def setup_logger(verbose=False, debug=False, logfile=None):
     if logfile:
         filelogger = logging.getLogger("filelogging")
         filelogger.propagate = False
-        filehandler = logging.FileHandler(logfile, 'a')
+        filehandler = logging.FileHandler(logfile, 'w+')
         formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%b %d %H:%M:%S")
         filehandler.setFormatter(formatter)
         filelogger.addHandler(filehandler)
