@@ -481,18 +481,19 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         edit component outline textbox
         '''
-        data = self.selenium.find_element(*self.locators.new_image_textbox).text
+        text_area = self.selenium.find_element(*self.locators.new_image_textbox)
+        data = text_area.text
         tree = xmltree.fromstring(data)
         for match in tree.findall("./os[arch='i386']/arch"):
             match.text = 'x86_64'
-        tree = xmltree.tostring(tree, 'utf-8')
-        self.selenium.find_element(*self.locators.new_image_textbox).clear()
-        # Firefox is hanging on large text input so do one character at a time
-        # Chrome is working fine with send_text
-        if self.browsername == 'firefox':
-            self.send_characters(tree, *self.locators.new_image_textbox)
-        else:
-            self.send_text(tree, *self.locators.new_image_textbox)
+
+        # Clear the <textarea>
+        text_area.clear()
+
+        # Note, this is a large amount of text, and using send_text() or
+        # send_characters() is too slow.
+        self.selenium.execute_script("arguments[0].value = arguments[1]",
+                text_area, xmltree.tostring(tree, 'utf-8'))
 
     def clean_app_name(self, app_name):
         '''
@@ -609,12 +610,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
             # Clear the <textarea>
             text_area.clear()
 
-            # Add custom XML
-            text_area = self.selenium.find_element(*self.locators.deployable_xml)
-            if self.browsername == 'firefox':
-                self.send_characters(xmltree.tostring(current_root), *self.locators.new_image_textbox)
-            else:
-                self.send_text(xmltree.tostring(current_root), *self.locators.deployable_xml)
+            # Add custom XML to <textarea>
+            # Note, this is a large amount of text, and using send_text() or
+            # send_characters() is too slow
+            self.selenium.execute_script("arguments[0].value = arguments[1]",
+                    text_area, xmltree.tostring(blueprint_root))
 
             # Click the save button
             self.selenium.find_element(*self.locators.save_button).submit()
