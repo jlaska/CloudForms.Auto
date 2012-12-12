@@ -505,7 +505,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         app_name = "%s-%s" % (image['name'], cloud['name'])
         return self.clean_app_name(app_name)
 
-    def create_custom_blueprint(self, cloud, image, blueprint_name, blueprint_file, catalogs=[]):
+    def create_custom_blueprint(self, cloud, image, blueprint_name, custom_blueprint_xml, catalogs=[]):
 
         logging.info("Creating custom blueprint '%s' for image '%s' (%s) in cloud '%s'" % \
             (blueprint_name, image['name'], image['profile'], cloud['name']))
@@ -514,10 +514,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         # TODO - Discover image uuid, assembly hwp and name.
         # self.go_to_page_view("catalogs")
-        # self.click_by_text("a", catalog)
+        # self.click_by_text("a", catalog[0]['name'])
         # self.selenium.find_element(*self.locators.new_deployable).click()
         # self.send_text(blueprint_name, *self.locators.blueprint_name)
-        # self.send_text(blueprint_file, *self.locators.deployable_xml)
+        # self.send_text(custom_blueprint_xml, *self.locators.deployable_xml)
         # self.selenium.find_element(*self.locators.save_button).submit()
         # self.click_by_text("a", blueprint_name)
         # locator = (By.ID, "catalog_entry_deployable_id")
@@ -561,7 +561,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.selenium.find_element(*self.locators.save_button).submit()
 
         # If a custom blueprint was provided ... use it
-        if blueprint_file is not None:
+        if custom_blueprint_xml is not None:
             '''
             uses data from api to create custom blueprint
             based on blueprint template found in dataset
@@ -575,38 +575,39 @@ class Aeolus(apps.aeolus.Conductor_Page):
             # Edit the XML
             self.click(*self.locators.edit_xml_button)
 
-            # Obtain existing XML
+            # Obtain existing XML from <textarea>
             assert self.is_element_visible(*self.locators.deployable_xml), \
                     "Unable to obtain deployment XML from <textarea>"
-            current_blueprint_xml = self.selenium.find_element(*self.locators.deployable_xml).text
-            current_root = xmltree.fromstring(current_blueprint_xml)
+            text_area = self.selenium.find_element(*self.locators.deployable_xml)
+            blueprint_root = xmltree.fromstring(text_area.text)
 
-            # Obtain custom XML
-            fd = open(blueprint_file, 'r')
-            custom_blueprint_xml = fd.read()
-            fd.close()
-            custom_root = xmltree.fromstring(custom_blueprint_xml)
+            # Coerce the custom_blueprint_xml argument into a xmltree.Element object
+            if isinstance(custom_blueprint_xml, xmltree.ElementTree):
+                custom_root = custom_blueprint_xml.getroot()
+            elif isinstance(custom_blueprint_xml, xmltree.Element):
+                custom_root = custom_blueprint_xml
+            else:
+                custom_root = xmltree.fromstring(custom_blueprint_xml)
 
-            # If the current_root already has services, append to them
-            if current_root.find(".//assembly/services"):
+            # If the blueprint_root already has <services>, append custom
+            # <service>'s to it
+            if blueprint_root.find(".//assembly/services"):
                 # For each <assembly> in the current blueprint
-                for current_services in current_root.findall('.//assembly/services'):
+                for current_services in blueprint_root.findall('.//assembly/services'):
                     # Add custom <services>
                     for custom_service in custom_root.findall('.//service'):
                         current_services.append(custom_service)
 
-            # Otherwise, add our custom <services>
+            # Otherwise, add a new <services> element to each <assembly>
             else:
                 # For each <assembly> in the current blueprint
-                for current_assembly in current_root.findall('.//assembly'):
+                for current_assembly in blueprint_root.findall('.//assembly'):
                     # Add custom <services>
                     for custom_services in custom_root.findall('.//services'):
                         current_assembly.append(custom_services)
 
-            # TODO - customize XML further
-
             # Clear the <textarea>
-            self.selenium.find_element(*self.locators.deployable_xml).clear()
+            text_area.clear()
 
             # Add custom XML
             text_area = self.selenium.find_element(*self.locators.deployable_xml)
@@ -615,7 +616,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             else:
                 self.send_text(xmltree.tostring(current_root), *self.locators.deployable_xml)
 
-            # Save
+            # Click the save button
             self.selenium.find_element(*self.locators.save_button).submit()
 
         return self.get_text(*self.locators.response)

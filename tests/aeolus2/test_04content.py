@@ -5,7 +5,8 @@ import apps
 import pytest
 import yaml, shutil
 import copy
-from data.dataset import Environment
+import xml.etree.ElementTree as xmltree
+import urlparse
 from data.dataset import Content
 from data.assert_response import *
 from tests.aeolus2 import Aeolus_Test
@@ -287,11 +288,52 @@ class Test_Content(Aeolus_Test):
             logging.warning("Adjusting blueprint ('%s') profile ('%s') for cloud '%s' to account for RHEV support" % \
                     (blueprint_name, image['profile'], cloud['name']))
 
+        # Helper method to set XML parameters
+        def set_parameter_value(xml_root, param_name, value):
+            found = False
+            expr = ".//parameter[@name='%s']/value" % param_name
+            for match in xml_root.findall(expr):
+                match.text = value
+                found = True
+            assert found, "No matches found for: %s" % expr
+
+        # Customize application blueprint XML using .cfg values
+        # Attempt to load the custom blueprint XML
+        blueprint_file = pytest.config.getvalue('aeolus-custom-blueprint')
+        assert os.path.isfile(blueprint_file), "File not found: %s" % \
+                blueprint_file
+        blueprint_tree = xmltree.parse(blueprint_file)
+        root = blueprint_tree.getroot()
+        # Replace KATELLO_HOST
+        katello_host = urlparse.urlparse(pytest.config.getvalue('katello-url')).hostname
+        set_parameter_value(root, 'KATELLO_HOST', katello_host)
+        # Replace KATELLO_ORG
+        set_parameter_value(root, 'KATELLO_ORG', pytest.config.getvalue('katello-org'))
+        # Replace KATELLO_ENV
+        set_parameter_value(root, 'KATELLO_ENV', pytest.config.getvalue('katello-env'))
+
+        # Replace RELEASEVER
+        set_parameter_value(root, 'RELEASEVER', image.get('releasever','Auto'))
+
+        # Load and validate katello credentials
+        assert self.testsetup.credentials.has_key('katello-user'), \
+                "Missing credentials section for 'katello-user'"
+        creds = self.testsetup.credentials.get('katello-user', {})
+        assert creds.has_key('username'), \
+                "Missing 'username' for 'katello-user'"
+        assert creds.has_key('password'), \
+                "Missing 'password' for 'katello-user'"
+
+        # Replace KATELLO_USER
+        set_parameter_value(root, 'KATELLO_USER', creds.get('username'))
+        # Replace KATELLO_PASS
+        set_parameter_value(root, 'KATELLO_PASS', creds.get('password'))
+
+        # FIXME - replace SSH_TUNNEL_IP
+
         # Create custom blueprint
-        msg = page.create_custom_blueprint(cloud,
-                image,
-                blueprint_name,
-                pytest.config.getvalue('aeolus-custom-blueprint'),
+        msg = page.create_custom_blueprint(cloud, image, blueprint_name,
+                blueprint_tree,
                 catalogs=catalogs)
 
         assert msg == aeolus_msg['update_blueprint']
