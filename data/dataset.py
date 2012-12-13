@@ -157,7 +157,7 @@ class Provider(object):
     cloud_resource_clusters = [
             dict(name=a['provider_account_name'],
                  description='Cluster %s' % a['provider_account_name'],
-                 provider=a['provider_account_name']) for a in accounts]
+                 provider=a['provider_name']) for a in accounts]
 
 class Environment(object):
     '''
