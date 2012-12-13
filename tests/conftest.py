@@ -6,6 +6,7 @@ import logging
 import ConfigParser
 import requests
 import re
+import fnmatch
 import string
 import pytest
 from distutils.version import StrictVersion
@@ -121,6 +122,18 @@ def pytest_configure(config):
                 and test_config.has_option('general', opt):
             setattr(config.option, opt, test_config.getboolean('general', opt))
 
+    # In case --aeolus-provider includes regexp's, find matches
+    from data.dataset import Provider
+    all_provider_accounts = [a['provider_account_name'] for a in Provider.accounts]
+    enabled_accounts = list()
+    # For each configured account ...
+    for account in all_provider_accounts:
+        # Determine if a fnmatch-style expression was used ... and expand any matches
+        if any ([True for expr in config.getvalue('aeolus-providers') \
+                if fnmatch.fnmatch(account, expr)]):
+            enabled_accounts.append(account)
+    setattr(config.option, 'aeolus-providers', enabled_accounts)
+
     # Setup test logging
     setup_logger(config.option.verbose, \
             config.option.debug, \
@@ -164,6 +177,7 @@ def pytest_addoption(parser):
             opt.help = opt.help + " (default: %default)" #% opt.default
             break
 
+    # Callback helper for list-style parameters
     def list_callback(option, opt_str, value, parser, *args, **kwargs):
         '''
         Alters the built-in action='append' behavior by replacing the
@@ -244,15 +258,15 @@ def pytest_addoption(parser):
             default=test_config.get('aeolus', 'aeolus-url', raw=True),
             help="Specify URL for aeolus (default: %default)")
 
-    optgrp.addoption("--aeolus-provider", dest='providers', type="string",
+    optgrp.addoption("--aeolus-provider", dest='aeolus-providers', type="string",
             action="callback", callback=list_callback,
             default=test_config.getlist('aeolus', 'providers'),
             help="Specify which cloud providers will be tested (default: %default)")
 
-    optgrp.addoption("--aeolus-configserver", dest='configservers', type="string",
-            action="callback", callback=list_callback,
-            default=test_config.getlist('aeolus', 'configserver'),
-            help="Specify which providers to build a configserver in (default: %default)")
+    #optgrp.addoption("--aeolus-configserver", dest='aeolus-configservers', type="string",
+    #        action="callback", callback=list_callback,
+    #        default=test_config.getlist('aeolus', 'configserver'),
+    #        help="Specify which providers to build a configserver in (default: %default)")
 
     optgrp.addoption("--aeolus-template-url", action="store",
             dest='aeolus-template-url', default=test_config.get('aeolus', 'template-url'),
@@ -330,9 +344,16 @@ def pytest_generate_tests(metafunc):
         from data.dataset import Environment, Provider
         test_set = list()
         id_list = list()
+
+        # List of providers already included
         account_providers_seen = list()
+
         for c in Environment.clouds:
             for a in Provider.accounts:
+                # Skip provider account if not enabled
+                if a.get('provider_account_name') not in metafunc.config.getoption('aeolus-providers'):
+                    continue
+                # Skip provider account if we've already included it
                 if a.get('type') in account_providers_seen:
                     '''ignore if we've already seen this provider account type'''
                     continue
@@ -350,6 +371,9 @@ def pytest_generate_tests(metafunc):
         id_list = list()
         for c in Environment.clouds:
             for a in Provider.accounts:
+                # Skip provider account if not enabled
+                if a.get('provider_account_name') not in metafunc.config.getoption('aeolus-providers'):
+                    continue
                 if a.get('provider_account_name') in c.get('enabled_provider_accounts', []):
                     id_list.append("%s-%s" % (c.get('name'), a.get('provider_account_name')))
                     test_set.append((c, a))
@@ -362,9 +386,16 @@ def pytest_generate_tests(metafunc):
         # ids=[rp.get('name') for rp in Provider.cloud_resource_clusters])
         test_set = list()
         id_list = list()
+
         for cat in Content.catalogs:
+            # Skip if catalog if the associated cluster isn't an enabled provider account
+            # NOTE: this requires that resource_cluster and provider account names match
+            if cat['resource_cluster'] not in metafunc.config.getoption('aeolus-providers'):
+                continue
+
             for pool in Environment.pools:
                 for cloud in Environment.clouds:
+                    # If the cloud is the parent of both the pool *and* category ...
                     if cat.get('pool_parent') == pool.get('name') \
                             and cat.get('cloud_parent') == cloud.get('name'):
                         id_list.append("%s-%s-%s" % (cloud.get('name'), pool.get('name'), cat.get('name')))
@@ -373,10 +404,22 @@ def pytest_generate_tests(metafunc):
 
     # If *just* cloud is used, enumerate
     if 'cloud' in metafunc.funcargnames:
-        from data.dataset import Environment
-        metafunc.parametrize("cloud", \
-                Environment.clouds, \
-                ids=[c.get('name') for c in Environment.clouds])
+        ''' parametrize clouds that include enabled provider accounts'''
+        from data.dataset import Environment, Provider
+        test_list = list()
+        id_list = list()
+
+        # List of enabled provider account names (e.g. ec2-us-east-1, or rhevm etc...)
+        enabled_providers = [a.get('provider_account_name') for a in Provider.accounts if a.get('provider_account_name') in metafunc.config.getoption('aeolus-providers')]
+
+        # Parametrize clouds that include enabled_provider_types
+        for c in Environment.clouds:
+            # Include cloud if any of the provider accounts are enabled
+            # The following performs a union of two lists
+            if filter(c['enabled_provider_accounts'].__contains__, enabled_providers):
+                test_list.append(c)
+                id_list.append(c['name'])
+        metafunc.parametrize("cloud", test_list, ids=id_list)
 
     # If *just* resource_zone is used, enumerate
     if 'resource_zone' in metafunc.funcargnames:
