@@ -22,4 +22,4 @@ aeolus-url = %(baseurl)s/conductor
 providers = ec2 rhevm vsphere
 custom-blueprint = data/blueprint_templates/test_cfse_registration.xml
 configserver = ec2 rhevm vsphere
-template-url = https://localhost/templates/Dev/rhel-{basearch}-{releasever}-cf-{type}.xml
+template-url = {katello-url}/templates/{env}/rhel-{basearch}-{releasever}-cf-{type}.xml

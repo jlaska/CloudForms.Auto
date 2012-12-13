@@ -27,13 +27,16 @@ class Test_ConfigServer(Aeolus_Test):
         page.login()
 
         # Prepare the template URL
+        fmt_args = {'katello-url': pytest.config.getvalue('katello-url'),
+                    'env': pytest.config.getvalue('katello-env'),
+                    'releasever': configserver.get('releasever'),
+                    'basearch': configserver.get('basearch'),
+                    'type': 'configserver',}
         image_url = pytest.config.getvalue('aeolus-template-url').format( \
-                type='configserver',
-                releasever=configserver.get('releasever', '6Server'),
-                basearch=configserver.get('basearch', 'x86_64'))
-
+                        **fmt_args)
         configserver['template'] = image_url
 
+        # Create image
         page.create_image(cloud, configserver)
 
     def test_build(self, cloud_by_account_type, configserver):
@@ -209,12 +212,16 @@ class Test_Content(Aeolus_Test):
         page.login()
 
         # Prepare the template URL
+        fmt_args = {'katello-url': pytest.config.getvalue('katello-url'),
+                    'env': pytest.config.getvalue('katello-env'),
+                    'releasever': image.get('releasever'),
+                    'basearch': image.get('basearch'),
+                    'type': 'tools',}
         image_url = pytest.config.getvalue('aeolus-template-url').format( \
-                type='tools',
-                releasever=image.get('releasever'),
-                basearch=image.get('basearch'))
+                        **fmt_args)
         image['template'] = image_url
 
+        # Create image
         page.create_image(cloud, image)
 
     @pytest.mark.content
