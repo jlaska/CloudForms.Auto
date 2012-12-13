@@ -21,11 +21,11 @@ aeolus_msg = {
     'add_provider_acct' : 'Account %s was added.',
     'delete_provider_acct' : 'Provider account was deleted',
     'update_settings' : 'Settings Updated',
-    # partial string, invalid assert
-    'add_provider_accts' : 'These Cloud Resource Provider Account have been added',
+    'add_provider_accts' : 'These Cloud Resource Provider Account have been added: %s',
     # partial string, invalid assert
     'add_blueprint' : 'Application Blueprint added to Catalog %s.',
     'add_configserver' : 'Config Server added.',
+    'add_cluster' : 'Cloud Resource Cluster was added',
     'add_cluster_mapping' : 'Cloud Resource Cluster mapping was added.',
     'update_blueprint' : 'Application Blueprint updated successfully',
     'launch_ready' : 'All Images are pushed and recent.',

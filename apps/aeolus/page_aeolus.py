@@ -393,12 +393,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(cluster["name"], *self.locators.cluster_name)
         self.send_text(cluster["description"], *self.locators.cluster_desc)
         self.selenium.find_element(*self.locators.cluster_save).submit()
-        logging.info("Adding mapping to cloud resource cluster '%s'" % \
-            cluster['name'])
-        response = self.add_cloud_resource_cluster_mapping(cluster)
-        return response
+        return self.get_text(*self.locators.response)
 
     def add_cloud_resource_cluster_mapping(self, cluster):
+        logging.info("Adding mapping to cloud resource cluster '%s'" % \
+            cluster['name'])
         self.go_to_page_view("realms")
         self.click_by_text("a", cluster['name'])
         self.selenium.find_element(*self.locators.cluster_map_provider).click()

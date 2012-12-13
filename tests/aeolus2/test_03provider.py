@@ -63,7 +63,9 @@ class TestProvider(Aeolus_Test):
         page = self.aeolus.load_page('Aeolus')
         page.login()
 
-        page.add_provider_accounts_cloud(cloud)
+        response = page.add_provider_accounts_cloud(cloud)
+        assert response == aeolus_msg['add_provider_accts'] \
+                % ", ".join(cloud['enabled_provider_accounts'])
 
     @pytest.mark.setup
     def test_create_resource_profile(self, resource_profile):
@@ -74,8 +76,7 @@ class TestProvider(Aeolus_Test):
         page.login()
 
         page.new_cloud_resource_profile(resource_profile)
-
-        # FIXME - assert?
+        # FIXME - aeolus conductor offers no response for this action
 
     @pytest.mark.setup
     def test_create_cloud_resource_cluster(self, resource_cluster):
@@ -86,4 +87,7 @@ class TestProvider(Aeolus_Test):
         page.login()
 
         assert page.new_cloud_resource_cluster(resource_cluster) == \
+            aeolus_msg['add_cluster']
+
+        assert page.add_cloud_resource_cluster_mapping(resource_cluster) == \
             aeolus_msg['add_cluster_mapping']
