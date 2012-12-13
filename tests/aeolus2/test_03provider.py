@@ -5,7 +5,6 @@ from data.dataset import Provider
 from data.dataset import Environment
 from data.assert_response import *
 
-@pytest.mark.setup
 class TestProvider(Aeolus_Test):
     '''
     Test provider connections, create provider accounts and test connection,
@@ -13,6 +12,7 @@ class TestProvider(Aeolus_Test):
     '''
 
     @pytest.mark.provider
+    @pytest.mark.setup
     def test_connection(self, provider_account):
         '''
         test provider connection
@@ -24,6 +24,7 @@ class TestProvider(Aeolus_Test):
         assert response == aeolus_msg['connect_provider']
 
     @pytest.mark.provider
+    @pytest.mark.setup
     def test_create_account(self, provider_account):
         '''
         Create provider account and test provider account connection
@@ -41,6 +42,7 @@ class TestProvider(Aeolus_Test):
             provider_account["provider_account_name"]
 
     @pytest.mark.provider
+    @pytest.mark.setup
     def test_account_connection(self, provider_account):
         '''
         Test provider account connection
@@ -53,6 +55,7 @@ class TestProvider(Aeolus_Test):
         assert response == aeolus_msg['connect_provider_acct']
 
     @pytest.mark.provider
+    @pytest.mark.setup
     def test_add_accounts_to_cloud(self, cloud):
         '''
         Add provider accounts to clouds
@@ -62,6 +65,7 @@ class TestProvider(Aeolus_Test):
 
         page.add_provider_accounts_cloud(cloud)
 
+    @pytest.mark.setup
     def test_create_resource_profile(self, resource_profile):
         '''
         create cloud resource profiles
@@ -73,6 +77,7 @@ class TestProvider(Aeolus_Test):
 
         # FIXME - assert?
 
+    @pytest.mark.setup
     def test_create_cloud_resource_cluster(self, resource_cluster):
         '''
         create cloud resource clusters

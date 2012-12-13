@@ -16,8 +16,7 @@ class Test_ConfigServer(Aeolus_Test):
     Create configserver images, build, push, launch
     '''
 
-    pytestmark = [pytest.mark.configserver, pytest.mark.setup]
-
+    @pytest.mark.configserver
     def test_create(self, cloud, configserver):
         '''
         Create component outlines for configserver images
@@ -39,6 +38,7 @@ class Test_ConfigServer(Aeolus_Test):
         # Create image
         page.create_image(cloud, configserver)
 
+    @pytest.mark.configserver
     def test_build(self, cloud_by_account_type, configserver):
         '''
         Build configserver images
@@ -50,6 +50,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert page.build_image(cloud, account, configserver), \
                 "Unable to initiate image build"
 
+    @pytest.mark.configserver
     def test_verify_build(self, cloud_by_account_type, configserver):
         '''
         Verify images build successfully
@@ -62,6 +63,7 @@ class Test_ConfigServer(Aeolus_Test):
 
         assert page.verify_image_build(cloud, account, configserver)
 
+    @pytest.mark.configserver
     def test_push(self, cloud_by_account, configserver):
         '''
         Push configserver images
@@ -74,6 +76,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert page.push_image(cloud, account, configserver),\
                 "Unable to initiate image push"
 
+    @pytest.mark.configserver
     def test_verify_push(self, cloud_by_account, configserver):
         '''
         Verify a successful image push
@@ -85,6 +88,7 @@ class Test_ConfigServer(Aeolus_Test):
 
         assert page.verify_image_push(cloud, account, configserver)
 
+    @pytest.mark.configserver
     def test_blueprint(self, cloud, configserver, catalogs):
         '''
         create default configserver blueprints
@@ -100,6 +104,7 @@ class Test_ConfigServer(Aeolus_Test):
                 catalogs)
         assert msg == aeolus_msg['add_blueprint']
 
+    @pytest.mark.configserver
     def test_launch(self, zone_by_catalog, configserver):
         '''
         Launch configserver to enabled provider accounts
@@ -113,6 +118,7 @@ class Test_ConfigServer(Aeolus_Test):
         msg = page.launch_app(cloud, zone, catalog, app_name, app_name)
         assert msg == aeolus_msg['launch_success']
 
+    @pytest.mark.configserver
     def test_verify_launch(self, zone_by_catalog, configserver):
         '''
         verify configserver launch
@@ -125,6 +131,7 @@ class Test_ConfigServer(Aeolus_Test):
 
         assert page.verify_launch(cloud, zone, app_name)
 
+    @pytest.mark.configserver
     def test_setup(self, zone_by_catalog, configserver):
         '''
         Run aeolus-configserver-setup and add to provider
@@ -158,6 +165,7 @@ class Test_ConfigServer(Aeolus_Test):
         yaml.safe_dump(data, file('credentials.yaml', 'w+'),
                 default_flow_style=False)
 
+    @pytest.mark.configserver
     def test_add_to_provider_account(self, cloud_by_account, configserver):
         '''
         Enable configserver for configured provider accounts
@@ -182,6 +190,7 @@ class Test_ConfigServer(Aeolus_Test):
 
         assert msg == aeolus_msg['add_configserver']
 
+    @pytest.mark.configserver
     @pytest.mark.skipif("True")
     def test_setup_ec2_tunnel(self, cloud_by_account, configserver):
         '''

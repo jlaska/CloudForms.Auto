@@ -6,16 +6,15 @@ from tests.aeolus2 import Aeolus_Test
 
 # FIXME - the following causes pytest to skip all methods in 'Aeolus_Test'
 ## @pytest.mark.skipif("config.getvalue('enable-ldap')")
-@pytest.mark.nonldap
-@pytest.mark.setup
 class TestUsers(Aeolus_Test):
     '''
     Create users and groups, then add users to those groups
     Use default credentials until users, groups and permissions are defined
     '''
 
-    pytestmark = pytest.mark.skipif("config.getvalue('enable-ldap')")
-
+    @pytest.mark.nonldap
+    @pytest.mark.setup
+    @pytest.mark.skipif("config.getvalue('enable-ldap')")
     def test_create_users(self):
         '''
         Create users
@@ -26,7 +25,10 @@ class TestUsers(Aeolus_Test):
         for user in Admin.users:
             assert page.create_user(user) == aeolus_msg['add_user']
 
-    @pytest.mark.skipif("config.getvalue('project-version') == '1.0.1'")
+    @pytest.mark.nonldap
+    @pytest.mark.setup
+    @pytest.mark.skipif("pytest.config.version_cmp('1.0.1') < 0")
+    @pytest.mark.skipif("config.getvalue('enable-ldap')")
     def test_create_user_groups(self):
         '''
         create user groups
@@ -37,7 +39,10 @@ class TestUsers(Aeolus_Test):
         for user_group in Admin.user_groups:
             assert page.create_user_group(user_group) == "User Group added"
 
-    @pytest.mark.skipif("config.getvalue('project-version') == '1.0.1'")
+    @pytest.mark.nonldap
+    @pytest.mark.setup
+    @pytest.mark.skipif("pytest.config.version_cmp('1.0.1') < 0")
+    @pytest.mark.skipif("config.getvalue('enable-ldap')")
     def test_add_users_to_user_groups(self):
         page = self.aeolus.load_page('Aeolus')
         page.login()
@@ -58,7 +63,9 @@ class TestUsers(Aeolus_Test):
                         aeolus_msg['add_user_to_group'] % \
                             user['fname'] + ' ' + user['lname']
 
+    @pytest.mark.nonldap
     @pytest.mark.setup
+    @pytest.mark.skipif("config.getvalue('enable-ldap')")
     def test_add_permissions(self):
         page = self.aeolus.load_page('Aeolus')
         page.login()
@@ -69,7 +76,9 @@ class TestUsers(Aeolus_Test):
             page.grant_permissions("user", user)
 
 
+    @pytest.mark.nonldap
     @pytest.mark.setup
+    @pytest.mark.skipif("config.getvalue('enable-ldap')")
     def test_add_selfservice_quota(self):
         page = self.aeolus.load_page('Aeolus')
         page.login()
