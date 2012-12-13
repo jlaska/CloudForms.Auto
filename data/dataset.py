@@ -49,7 +49,7 @@ class Admin(object):
         "lname" : "User",
         "email" : "juser@example.com",
         "username" : "juser",
-        "passwd" : "password",
+        "passwd" : "jpassword",
         "max_instances" : "20",
         "user_groups" : ['qe','cfmanagers'],
         "permissions" : [] },
