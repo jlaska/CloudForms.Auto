@@ -11,7 +11,6 @@ import time
 import re
 import subprocess
 
-from unittestzero import Assert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -371,8 +370,8 @@ class BasePage(object):
         """
         if self.locators.page_title:
             WebDriverWait(self.selenium, 10).until(lambda s: self.selenium.title)
-        Assert.equal(self.selenium.title, self.locators.page_title,
-                     "Expected page title: %s. Actual page title: %s" % (self.locators.page_title, self.selenium.title))
+        assert self.selenium.title == self.locators.page_title, \
+                "Expected page title: %s. Actual page title: %s" % (self.locators.page_title, self.selenium.title)
         return True
 
     def jquery_wait(self, timeout=20):
