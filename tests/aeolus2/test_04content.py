@@ -158,6 +158,7 @@ class Test_ConfigServer(Aeolus_Test):
             logging.debug("Backup credentials saved to 'credentials.orig'")
 
         # FIXME - Check whether credentials.yaml exists?
+        # TODO - use mozwebqa.credentials instead
         data = yaml.load(file('credentials.yaml', 'r'))
         if not data.has_key('configservers') or data['configservers'] is None:
             data['configservers'] = dict()
