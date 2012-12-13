@@ -15,12 +15,11 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 * pytest-mozwebqa==1.0
 
 1. Clone this project and install dependencies. Dependencies may be installed by running `pip-python install -r ./requirements.txt` from the root of the project.
-2. Rename `cloudforms.template` to `cloudforms.cfg`.
-3. Update `cloudforms.cfg` file as desired.  Use `scripts/generate_password.py` to encode passwords.
-4. Update `tests/aeolus2/pytest.ini` if needed.
-5. Update `data/dataset.py` if needed.
-6. Run tests from project root dir: `py.test`. See `py.test -h` for options.
-7. Monitor log: `tail -f cloudforms_test.log`.
+2. Copy `cloudforms.template` to `cloudforms.cfg`
+3. Copy `credentials.template` to `credentials.yml`
+4. Update `cloudforms.cfg` file as desired.
+5. Update `credentials.yml` file as desired.
+6. Run tests from project root dir: `py.test`. Consult `py.test --help` for additional options.
 
 ## Requirements
 The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `cloudforms.cfg`.
