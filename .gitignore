@@ -9,7 +9,7 @@ results/
 *.log*
 *.ini
 cloudforms.cfg
-credentials.yaml
+credentials.yml
 sauce_labs.yaml
 Sauce-Connect.jar
 *.egg*

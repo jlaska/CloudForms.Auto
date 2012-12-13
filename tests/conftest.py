@@ -165,7 +165,7 @@ def pytest_addoption(parser):
     group = parser.getgroup('credentials', 'credentials')
     for opt in group.options:
         if opt.dest == 'credentials_file' and opt.default == optparse.NO_DEFAULT:
-            opt.default = 'credentials.yaml'
+            opt.default = 'credentials.yml'
             opt.help = opt.help + " (default: %default)"
 
     # Update .default and .help for '--baseurl' option

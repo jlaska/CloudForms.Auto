@@ -154,20 +154,20 @@ class Test_ConfigServer(Aeolus_Test):
             page.get_configserver_version(instance.ip_address)
 
         # Save credentials to a local .yaml file
-        logging.debug("Adding configserver credentials to 'credentials.yaml'")
+        logging.debug("Adding configserver credentials to 'credentials.yml'")
 
-        # Backup existing credentials.yaml
-        if os.path.isfile('credentials.yaml') and not os.path.isfile('credentials.orig'):
-            shutil.copyfile('credentials.yaml', 'credentials.orig')
+        # Backup existing credentials.yml
+        if os.path.isfile('credentials.yml') and not os.path.isfile('credentials.orig'):
+            shutil.copyfile('credentials.yml', 'credentials.orig')
             logging.debug("Backup credentials saved to 'credentials.orig'")
 
-        # FIXME - Check whether credentials.yaml exists?
+        # FIXME - Check whether credentials.yml exists?
         # TODO - use mozwebqa.credentials instead
-        data = yaml.load(file('credentials.yaml', 'r'))
+        data = yaml.load(file('credentials.yml', 'r'))
         if not data.has_key('configservers') or data['configservers'] is None:
             data['configservers'] = dict()
         data['configservers'][instance.provider_account] = credentials
-        yaml.safe_dump(data, file('credentials.yaml', 'w+'),
+        yaml.safe_dump(data, file('credentials.yml', 'w+'),
                 default_flow_style=False)
 
     @pytest.mark.configserver
@@ -182,10 +182,10 @@ class Test_ConfigServer(Aeolus_Test):
 
         # Gather information about configserver instance
         assert self.testsetup.credentials.has_key('configservers'), \
-                "No configservers defined in credentials.yaml"
+                "No configservers defined in credentials.yml"
         provider_name = provider_account.get('provider_name')
         if not self.testsetup.credentials['configservers'].has_key(provider_name):
-            pytest.skip("No configservers defined for provider '%s' in credentials.yaml" \
+            pytest.skip("No configservers defined for provider '%s' in credentials.yml" \
                     % provider_name)
 
         # Add credentials to each provider account
