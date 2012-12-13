@@ -114,12 +114,6 @@ class Provider(object):
         "provider_account_quota" : "32" },
 
         {"type" : "ec2",
-        "provider_name" : "ec2-ap-southeast-2",
-        "provider_account_name" : "ec2-ap-southeast-2",
-        "provider_account_priority" : "",
-        "provider_account_quota" : "32" },
-
-        {"type" : "ec2",
         "provider_name" : "ec2-eu-west-1",
         "provider_account_name" : "ec2-eu-west-1",
         "provider_account_priority" : "",
