@@ -153,11 +153,11 @@ class Provider(object):
         "arch" : "i386"}
         ]
 
-    # Create a cluster for each provider
+    # Create a cluster for each provider account name
     cloud_resource_clusters = [
-            dict(name=a['provider_name'],
-                 description='Cluster %s' % a['provider_name'],
-                 provider=a['provider_name']) for a in accounts]
+            dict(name=a['provider_account_name'],
+                 description='Cluster %s' % a['provider_account_name'],
+                 provider=a['provider_account_name']) for a in accounts]
 
 class Environment(object):
     '''
@@ -167,20 +167,14 @@ class Environment(object):
         {"name" : "Private",
         "max_running_instances" : "24",
         "enabled_provider_accounts" : \
+            # All provider_account_name's where type is either rhevm or vsphere
             [a['provider_account_name'] for a in Provider.accounts if a['type'] in ['rhevm','vsphere']]
-            #[
-            #    Provider.accounts[0]['provider_account_name'],
-            #    Provider.accounts[1]['provider_account_name']
-            #]
             },
         {"name" : "Public_EC2",
         "max_running_instances" : "24",
         "enabled_provider_accounts" : \
+            # All provider_account_name's where type is ec2
             [a['provider_account_name'] for a in Provider.accounts if a['type'] in ['ec2']]
-            #[
-            #    Provider.accounts[4]['provider_account_name'],
-            #    Provider.accounts[6]['provider_account_name']
-            #]
             }
         ]
 
