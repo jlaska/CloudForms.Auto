@@ -270,72 +270,7 @@ class Content(object):
     configserver = {"name" : "ConfigServer",
         "template" : "rhel-x86_64-6Server-cf-configserver.xml",
         "version" : "0.4.11",
+        "releasever" : "6Server",
+        "basearch" : "x86_64",
         "profile" : "small-x86_64"}
-
-    images = [
-        # RHEL-6Server
-        {"name" : "rhel-i386-6Server",
-        "template" : "rhel-i386-6Server-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-6Server",
-        "template" : "rhel-x86_64-6Server-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-6.3
-        {"name" : "rhel-i386-6.3",
-        "template" : "rhel-i386-6.3-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-6.3",
-        "template" : "rhel-x86_64-6.3-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-6.2
-        {"name" : "rhel-i386-6.2",
-        "template" : "rhel-i386-6.2-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-6.2",
-        "template" : "rhel-x86_64-6.2-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-5Server
-        {"name" : "rhel-i386-5Server",
-        "template" : "rhel-i386-5Server-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-5Server",
-        "template" : "rhel-x86_64-5Server-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-5.9
-        {"name" : "rhel-i386-5.9",
-        "template" : "rhel-i386-5.9-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-5.9",
-        "template" : "rhel-x86_64-5.9-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-5.8
-        {"name" : "rhel-i386-5.8",
-        "template" : "rhel-i386-5.8-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-5.8",
-        "template" : "rhel-x86_64-5.8-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        # RHEL-5.7
-        {"name" : "rhel-i386-5.7",
-        "template" : "rhel-i386-5.7-cf-tools.xml",
-        "profile" : "small-i386"},
-
-        {"name" : "rhel-x86_64-5.7",
-        "template" : "rhel-x86_64-5.7-cf-tools.xml",
-        "profile" : "small-x86_64"},
-
-        ]
-
 
