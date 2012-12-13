@@ -38,6 +38,10 @@ class Test_ConfigServer(Aeolus_Test):
         # Create image
         page.create_image(cloud, configserver)
 
+        # FIXME: conductor offers no response upon successful image creation.
+        # We should request fixing conductor, or inspect to ensure the created
+        # image is available.
+
     @pytest.mark.configserver
     def test_build(self, cloud_by_account_type, configserver):
         '''
