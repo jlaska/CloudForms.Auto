@@ -15,8 +15,3 @@ class Home(apps.aeolus.Conductor_Page):
         '''
         apps.aeolus.Conductor_Page.__init__(self, **kwargs)
         self.go_to_home_page()
-
-    #def login(self, user="admin", password="password"):
-    #    self.send_text(user, *self.locators.username_text_field)
-    #    self.send_text(password, *self.locators.password_text_field)
-    #    self.click(*self.locators.login_locator)
