@@ -263,7 +263,7 @@ class BasePage(object):
 
         self.send_text(user, *self.locators.username_text_field)
         self.send_text(password, *self.locators.password_text_field)
-        self.click(*self.locators.login_locator)
+        self.click_and_wait(*self.locators.login_locator)
 
     # method per http://sauceio.com/index.php/2011/04/how-to-lose-races-and-win-at-selenium/
     def spin_assert(self, msg, assertion):

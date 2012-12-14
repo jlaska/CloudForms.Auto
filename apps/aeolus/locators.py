@@ -10,7 +10,7 @@ class AeolusLocators(apps.locators.BaseLocators):
     page_title = "Aeolus Conductor"
     username_text_field = (By.NAME, "username")
     password_text_field = (By.ID, "password-input")
-    login_locator = (By.NAME, "commit")
+    login_locator = (By.ID, "login_btn")
     login_logo = (By.XPATH, "//img[@alt='Login-card-logo-upstream']")
     logo_link = (By.XPATH, "//a[contains(text(),'Aeolus Conductor')]")
     select_all = (By.ID, "select_all")
