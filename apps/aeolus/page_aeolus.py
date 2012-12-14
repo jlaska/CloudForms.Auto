@@ -248,20 +248,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.click_by_text("a", "Test Connection")
         return self.get_text(*self.locators.response)
 
-    def get_credentials_from_config(self, section):
-        '''
-        get credentials from data/.ini file
-        '''
-        # FIXME: move to apps/__init__.py as cross-project helper method
-        config_file = 'data/private_data.ini'
-        from ConfigParser import SafeConfigParser
-        parser = SafeConfigParser()
-        parser.read(config_file)
-        credentials = dict()
-        for (key, val) in parser.items(section):
-            credentials[key] = val
-        return credentials
-
     ###
     # clouds/pool families/environments and cloud resource zones/pools
     ###
