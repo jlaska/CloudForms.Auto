@@ -21,12 +21,18 @@ cfg_file = 'cloudforms.cfg'
 
 # Determine if an alternate .cfg file was requested via --config.
 # Configuration is loaded prior to inspection of command-line options.
+# NOTE: Despite being coded properly, this won't work when calling:
+#   $ py.test --config <foo>.
+# But will work using ...
+#   $ py.test --config=<foo>.
+# There appears to be some pre-parsing in the former case.
 for i,arg in enumerate(sys.argv):
     if re.search(r'^--config\b', arg):
         try:
-            cfg_file = arg.split('=',1)[1]
+            cfg_file = sys.argv[i].split('=',1)[1]
         except IndexError:
-            cfg_file = sys.argv[i+1]
+            if len(sys.argv) > i+1:
+                cfg_file = sys.argv[i+1]
         break
 
 # Read configuration, fail is missing
@@ -198,8 +204,8 @@ def pytest_addoption(parser):
 
     # Create a general test options
     optgrp = parser.getgroup('general_options', "General Test Options")
-    optgrp.addoption("--config", action="store", dest='cfg_file',
-            default=cfg_file,
+    optgrp.addoption("--config", action="store", dest="cfg_file",
+            default=cfg_file, type="string",
             help="Specify test configuration file (default: %default)")
 
     # TODO - Move to app-specific optgrp
