@@ -106,7 +106,9 @@ class Test_ConfigServer(Aeolus_Test):
                 configserver,
                 blueprint_name,
                 catalogs)
-        assert msg == aeolus_msg['add_blueprint']
+
+        assert msg == aeolus_msg['add_blueprint'] % \
+                ', '.join([cat.get('name') for cat in catalogs])
 
     @pytest.mark.configserver
     def test_launch(self, zone_by_catalog, configserver):
