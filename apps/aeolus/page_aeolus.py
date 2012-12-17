@@ -852,13 +852,30 @@ class Aeolus(apps.aeolus.Conductor_Page):
             is_valid_ip_address
         '''
         # FIXME - what about multi-instance applications
-        instances = self.list_application_instances(resource_zone, app_name)
-        assert len(instances) == 1, "Unexpected number of instances"
-        for instance in instances:
-            logging.info("Instance '%s' (state:'%s', ip:'%s', provider_account:'%s')" %
-                    (instance.name, instance.state, instance.ip_address, instance.provider_account))
-            assert instance.is_running, "Unexpected instance state: %s" % instance.state
-            assert instance.is_valid_ip_address, "Unexpected instance IP Address: %s" % instance.ip_address
+        max_attempts = 10
+        sleep_interval = 30
+        for attempt in range(1,max_attempts+1):
+            try:
+                # FIXME - don't reload the page, rely in ajax updates
+                instances = self.list_application_instances(resource_zone, app_name)
+                assert len(instances) == 1, "Unexpected number of instances"
+                for instance in instances:
+                    logging.info("Instance:'%s', state:'%s', ip:'%s', provider_account:'%s'" %
+                            (instance.name, instance.state, instance.ip_address, instance.provider_account))
+                    assert instance.is_running, "Unexpected instance state: %s" % instance.state
+                    assert instance.is_valid_ip_address, "Unexpected instance IP Address: %s" % instance.ip_address
+            except AssertionError as e:
+                logging.warn("Unable to verify application launch (%s/%s): %s" % (attempt, max_attempts, e))
+                # Sleep more ...
+                if attempt < max_attempts:
+                    time.sleep(sleep_interval) # sleep for 30 seconds
+                    pass
+                # Enough sleeping, something went wrong
+                else:
+                    raise e
+            else:
+                # No exceptions raised
+                break
 
         return True
 
@@ -1137,32 +1154,16 @@ class Instance(apps.aeolus.Conductor_Page):
         kwargs['open_url'] = False # don't reload this page
         apps.BasePage.__init__(self, **kwargs)
 
-        # Populate data
+        # Add kwargs
         for key in ['resource_zone', 'app_name']:
             setattr(self, key, kwargs.get(key, None))
 
+        # Populate data
         for attr in ['name', 'state', 'uptime', 'ip_address',]:
             locator = getattr(self, '_%s_locator' % attr)
             setattr(self, attr, self._root_element.find_element(*locator).text)
-
         self.key_url = self._get_key_url()
         self.provider_account = self._get_provider_account()
-
-    @property
-    def _name(self):
-        return self._root_element.find_element(*self._name_locator).text
-
-    @property
-    def _state(self):
-        return self._root_element.find_element(*self._state_locator).text
-
-    @property
-    def _uptime(self):
-        return self._root_element.find_element(*self._uptime_locator).text
-
-    @property
-    def _ip_address(self):
-        return self._root_element.find_element(*self._ip_locator).text
 
     @property
     def is_running(self):
