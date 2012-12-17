@@ -433,8 +433,12 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(image['template'], *self.locators.new_image_url_field)
 
         # Determine <arch> value by inspecting template
-        import urllib2
-        fd = urllib2.urlopen(image['template'])
+        try:
+            fd = urllib2.urlopen(image['template'])
+        except Exception as e:
+            logging.exception("Unable to open image template: %s" % image['template'])
+            raise Exception
+
         xml = xmltree.fromstring(fd.read())
         fd.close()
         template_arch = xml.find("./os/arch").text
