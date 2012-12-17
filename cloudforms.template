@@ -24,4 +24,4 @@ providers = ec2-us-east-1 rhevm vsphere
 custom-blueprint = data/blueprint_templates/test_cfse_registration.xml
 # Supports fnmatch-style expressions
 configserver = ec2-us-east-1 rhevm vsphere
-template-url = {katello-url}/templates/{env}/rhel-{basearch}-{releasever}-cf-{type}.xml
+template-url = {katello-url}/../templates/{env}/rhel-{basearch}-{releasever}-cf-{type}.xml
