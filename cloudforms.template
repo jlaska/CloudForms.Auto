@@ -20,7 +20,7 @@ custom_repos = cfse-1.1-puddle cfce-1.1-puddle
 [aeolus]
 aeolus-url = %(baseurl)s/conductor
 # Supports fnmatch-style expressions
-providers = ec2-us-east-1 rhevm vsphere
+providers = ec2-us-east-1 rhevm-31 vsphere
 custom-blueprint = data/blueprint_templates/test_cfse_registration.xml
 # Supports fnmatch-style expressions
 configserver = ec2-us-east-1 rhevm vsphere
