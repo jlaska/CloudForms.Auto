@@ -852,7 +852,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
             is_valid_ip_address
         '''
         # FIXME - what about multi-instance applications
-        max_attempts = 10
+        max_attempts = 15
         sleep_interval = 30
         for attempt in range(1,max_attempts+1):
             try:
