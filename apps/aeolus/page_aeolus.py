@@ -709,7 +709,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 % provider_account['type'].lower())
         # return self.is_element_present(*locator, wait=900).get_attribute('value').lower() == 'delete'
         # return self.is_text_present("Delete", *locator, wait=900)
-        return self.is_attribute_present('value', 'Delete', *locator, wait=900)
+
+        # Wait up to 20 minutes ...
+        return self.is_attribute_present('value', 'Delete', *locator, wait=1200)
 
     def push_all_images(self, cloud, image_name):
         '''
@@ -764,6 +766,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 % provider_account['provider_account_name'].lower())
 
         # return self.is_element_visible(*locator, wait=900)
+        # Wait up to 15 minutes ...
         return self.is_attribute_present('class', 'delete_image', *locator, wait=900)
 
     def launch_app(self, cloud, resource_zone, catalog, blueprint_name, app_name):
