@@ -56,7 +56,10 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 ## About the Files
 `tests/` Test code goes here. These are typically simple calls to the more complex operations in `apps/`. Update pytest.ini file to simplify test runs.
 
+* `tests/conftest.py` Customize pytest for processing CloudForms.Auto tests.  Includes provide custom pytest command-line arguments, as well as adding pytest plugins and hooks.
+
 `apps/`:
+
 * `__init__.py` Provides base objects for use inherited projects and convenience methods to initialize projects.  Setup methods to use throughout the page objects. By inheritance these methods are accessible in other page objects. It is important not to include locators or site specific functions in this file.  The functions in this file are common across our projects and don't change often.
 
 * `locators.py` Base locator object inherited by project-specific locators.  It's rare to have locators that work across applications.  However, if any exist they'll live here.
@@ -74,14 +77,13 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 
 * `manifests/` Content provider manifest.zip files.
 
+
 ### Configuration
-* `cloudforms.cfg` Main configuration file for credentials, product parameters and general preferences.
+* `cloudforms.cfg` Main configuration file for product parameters and general preferences.
 
-* `credentials.yaml` Not currently in use. Update `cloudforms.cfg` instead.
+* `credentials.yaml` Used to store aeolus provider credentials, and application usernames and passwords.
 
-* `tests/conftest.py` Specify custom command-line options and argument handling.
-
-* `mozwebqa.cfg` The mozwebqa plugin will read the parameters in this file and automatically add them onto the py.test command line. It is handy for parameters that are constant like --browsername=firefox.
+* `mozwebqa.cfg` (optional) The mozwebqa plugin will read the parameters in this file and automatically add them onto the py.test command line. It is handy for parameters that are constant like --browsername=firefox.
 
 * `requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
 
