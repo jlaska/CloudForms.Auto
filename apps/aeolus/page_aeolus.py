@@ -932,30 +932,36 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         return ec2_key_file.name
 
-    def setup_ec2_tunnel_proxy(self, app_name):
+    def setup_ssh_tunnel_proxy(self, resource_zone, app_name, ports):
         '''
         Run commands to enable configserver SSH tunnel proxy
         '''
-        ip_addr = self.get_ip_addr(app_name)
-        ec2_key_file = self.download_ec2_key(app_name)
-        ports = self.cfgfile.getlist('general', 'ec2_tunnel_ports')
+        # Gather information about instance
+        instance = self.list_application_instances(resource_zone, app_name)[0]
 
-        # 'iptables-save' prints running config to stdout
-        # 'service iptables save' makes changes permanent
-        cmds = ["sed -i \"s/GatewayPorts no/GatewayPorts yes/g\" /etc/ssh/sshd_config",
-            "grep -i gatewa /etc/ssh/sshd_config",
-            "service sshd restart",
-            "iptables-save",
-            "iptables -A INPUT -p tcp --dport %s -j ACCEPT" % ports[0],
-            "iptables -A INPUT -p tcp --dport %s -j ACCEPT" % ports[1],
-            "iptables -A INPUT -p tcp --dport 8080 -j ACCEPT",
-            "iptables-save",
-            "service iptables save",
-            "service iptables restart"]
+        # Download EC2 SSH key (optional)
+        ec2_key_file = None
+        if instance.key_url is not None:
+            ec2_key_file = instance.download_ssh_key()
+            logging.debug("Download ssh key: %s" % ec2_key_file)
+
+        # Enable GatewayPorts
+        cmds = list()
+        cmds.append("sed -i -e 's/^[#\s]*GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config")
+        cmds.append("service sshd restart")
+
+        # Open up ports
+        lokkit_cmd = "lokkit --verbose --enabled --update -p 8080:tcp"
+        for p in ports:
+            lokkit_cmd += " -p %s:tcp" % p
+        cmds.append(lokkit_cmd)
+
+        # Run commands ...
         for cmd in cmds:
-            print "Running '%s'" % cmd
-            self.run_shell_command(cmd, ip_addr, ec2_key_file)
-        # TODO: how to confirm changes? Probe ports?
+            cmd = self.get_ssh_cmd_template(instance.ip_address,
+                    ec2_key_file) + cmd
+            logging.debug(cmd)
+            subprocess.check_call(cmd, shell=True)
 
     def bind_cfse_ports(self, app_name):
         '''
