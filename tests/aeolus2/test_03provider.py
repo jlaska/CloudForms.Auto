@@ -64,6 +64,10 @@ class TestProvider(Aeolus_Test):
         page.login()
 
         response = page.add_provider_accounts_cloud(cloud)
+
+        # FIXME - the order of the response message matters
+        #   e.g. rhevm-30, vsphere, rhevm-31
+        #    vs. rhevm-30, rhevm-31, vsphere
         assert response == aeolus_msg['add_provider_accts'] \
                 % ", ".join(cloud['enabled_provider_accounts'])
 
