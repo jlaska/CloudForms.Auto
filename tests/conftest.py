@@ -423,6 +423,8 @@ def pytest_generate_tests(metafunc):
             # Include cloud if any of the provider accounts are enabled
             # The following performs a union of two lists
             if filter(c['enabled_provider_accounts'].__contains__, enabled_providers):
+                # Prune enabled provider accounts to only those requested on the cli/cfg
+                c['enabled_provider_accounts'] = filter(c['enabled_provider_accounts'].__contains__, enabled_providers)
                 test_list.append(c)
                 id_list.append(c['name'])
         metafunc.parametrize("cloud", test_list, ids=id_list)
@@ -441,10 +443,19 @@ def pytest_generate_tests(metafunc):
                 ids=[c.get('name') for c in Content.catalogs])
 
     if 'resource_cluster' in metafunc.funcargnames:
+        # Limit resource cluster to only requested providers
+        enabled_providers = metafunc.config.getoption('aeolus-providers')
+
         from data.dataset import Provider
-        metafunc.parametrize("resource_cluster", \
-                Provider.cloud_resource_clusters, \
-                ids=[rp.get('name') for rp in Provider.cloud_resource_clusters])
+        test_list = list()
+        id_list = list()
+        for rcluster in Provider.cloud_resource_clusters:
+            # Include cloud if any of the provider accounts are enabled
+            # The following performs a union of two lists
+            if rcluster.get('name') in enabled_providers:
+                test_list.append(rcluster)
+                id_list.append(rcluster.get('name'))
+        metafunc.parametrize("resource_cluster", test_list, ids=id_list)
 
     if 'resource_profile' in metafunc.funcargnames:
         from data.dataset import Provider
@@ -453,10 +464,20 @@ def pytest_generate_tests(metafunc):
                 ids=[rp.get('name') for rp in Provider.resource_profiles])
 
     if 'provider_account' in metafunc.funcargnames:
+        # Limit resource cluster to only requested providers
+        enabled_providers = metafunc.config.getoption('aeolus-providers')
+
         from data.dataset import Provider
-        metafunc.parametrize("provider_account", \
-                Provider.accounts, \
-                ids=[p.get('provider_account_name') for p in Provider.accounts])
+        test_list = list()
+        id_list = list()
+        # Parametrize clouds that include enabled_provider_types
+        for pa in Provider.accounts:
+            # Include cloud if any of the provider accounts are enabled
+            # The following performs a union of two lists
+            if pa.get('provider_account_name') in enabled_providers:
+                test_list.append(pa)
+                id_list.append(pa.get('provider_account_name'))
+        metafunc.parametrize("provider_account", test_list, ids=id_list)
 
     if 'provider' in metafunc.funcargnames:
         metafunc.parametrize("provider", metafunc.config.getoption('providers'))
