@@ -212,10 +212,10 @@ class Test_ConfigServer(Aeolus_Test):
         # TODO - It would be nice to more dynamically determine if tunnelling
         # between the configserver and katello was required
         if any(['ec2' in pa for pa in cloud['enabled_provider_accounts']]):
-            pytest.skip("SSH Tunnel not needed for provider account: %s" % \
-                    provider_account.get("provider_account_name"))
-        else:
             page.setup_ssh_tunnel_proxy(zone, app_name, [5674, 1443])
+        else:
+            pytest.skip("SSH Tunnel not needed for cloud: %s" % \
+                    cloud.get("name"))
 
 class Test_Content(Aeolus_Test):
     '''
