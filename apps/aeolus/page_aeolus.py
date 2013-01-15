@@ -963,7 +963,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # Run commands ...
         for cmd in cmds:
             cmd = self.get_ssh_cmd_template(instance.ip_address,
-                    ec2_key_file) + cmd
+                    ec2_key_file) + ' ' + cmd
             logging.debug(cmd)
             subprocess.check_call(cmd, shell=True)
 
