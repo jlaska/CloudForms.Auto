@@ -406,8 +406,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.send_text(image['name'], *self.locators.new_image_name_field)
         template = template_base_url + image['template']
         self.send_text(template, *self.locators.new_image_url_field)
-        if "rhevm" in cloud['enabled_provider_accounts'] and \
-            "i386" in image['profile']:
+        # If any of the provider_accounts for this cloud include RHEV ... 
+        is_rhev_account = any(['rhevm' in pa for pa in cloud['enabled_provider_accounts']])
+        if is_rhev_account and "i386" in image['profile']:
+            logging.info("Customizing i386 RHEV image")
             if not self.selenium.find_element(*self.locators.new_image_edit_box).get_attribute('checked'):
                 self.selenium.find_element(*self.locators.new_image_edit_box).click()
             self.selenium.find_element(*self.locators.new_image_continue_button).click()
@@ -444,8 +446,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         template_arch = xml.find("./os/arch").text
 
         # Customize RHEVM images
-        if 'rhevm' in cloud['enabled_provider_accounts'] and template_arch:
-            logging.debug("Customizing i386 RHEV image")
+        is_rhev_account = any(['rhevm' in pa for pa in cloud['enabled_provider_accounts']])
+        if is_rhev_account and template_arch == 'i386':
+            logging.info("Customizing i386 RHEV image")
             # Check [X] Edit before saving
             if not self.selenium.find_element(*self.locators.new_image_edit_box).get_attribute('checked'):
                 self.selenium.find_element(*self.locators.new_image_edit_box).click()
@@ -527,7 +530,8 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         # FIXME - should the caller be responsible for adjusting the profile?
         # If RHEV, select x86_64 anyway
-        if 'rhevm' in cloud['enabled_provider_accounts']:
+        is_rhev_account = any(['rhevm' in pa for pa in cloud['enabled_provider_accounts']])
+        if is_rhev_account:
             logging.warning("Using alternate profile (%s) for possible rhevm deployment" % image['profile'])
             image['profile'] = 'small-x86_64'
 
