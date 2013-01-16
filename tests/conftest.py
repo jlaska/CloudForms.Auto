@@ -431,16 +431,47 @@ def pytest_generate_tests(metafunc):
 
     # If *just* resource_zone is used, enumerate
     if 'resource_zone' in metafunc.funcargnames:
-        from data.dataset import Environment
-        metafunc.parametrize("resource_zone", \
-                Environment.pools, \
-                ids=[p.get('name') for p in Environment.pools])
+        from data.dataset import Environment, Provider, Content
+
+        # List of enabled provider account names (e.g. ec2-us-east-1, or rhevm etc...)
+        enabled_providers = [a.get('provider_account_name') for a in Provider.accounts if a.get('provider_account_name') in metafunc.config.getoption('aeolus-providers')]
+
+        # Find Clouds that contain enabled_providers
+        enabled_clouds = [c.get('name') for c in Environment.clouds if filter(c['enabled_provider_accounts'].__contains__, enabled_providers)]
+
+        # List of enabled pools (by way of catalogs)
+        enabled_pools = [c.get('pool_parent') for c in Content.catalogs if c['resource_cluster'] in enabled_providers]
+
+        test_list = list()
+        id_list = list()
+        for p in Environment.pools:
+            # Optionally, filter by enabled_clouds
+            #if p['environment_parent'] in enabled_clouds:
+            # Filter by enabled_pools
+            if p['name'] in enabled_pools:
+                test_list.append(p)
+                id_list.append(p['name'])
+
+        metafunc.parametrize("resource_zone", test_list, ids=id_list)
 
     if 'catalog' in metafunc.funcargnames:
-        from data.dataset import Content
-        metafunc.parametrize("catalog", \
-                Content.catalogs, \
-                ids=[c.get('name') for c in Content.catalogs])
+        from data.dataset import Environment, Content, Provider
+
+        # List of enabled provider account names (e.g. ec2-us-east-1, or rhevm etc...)
+        enabled_providers = [a.get('provider_account_name') for a in Provider.accounts if a.get('provider_account_name') in metafunc.config.getoption('aeolus-providers')]
+
+        # Find Clouds that contain enabled_providers
+        enabled_clouds = [c.get('name') for c in Environment.clouds if filter(c['enabled_provider_accounts'].__contains__, enabled_providers)]
+
+        test_list = list()
+        id_list = list()
+        for cat in Content.catalogs:
+            #if cat['cloud_parent'] in enabled_clouds:
+            if cat['resource_cluster'] in enabled_providers:
+                test_list.append(cat)
+                id_list.append(cat['name'])
+
+        metafunc.parametrize("catalog", test_list, ids=id_list)
 
     if 'resource_cluster' in metafunc.funcargnames:
         # Limit resource cluster to only requested providers
