@@ -872,9 +872,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
                     assert instance.is_running, "Unexpected instance state: %s" % instance.state
                     assert instance.is_valid_ip_address, "Unexpected instance IP Address: %s" % instance.ip_address
             except AssertionError as e:
-                logging.warn("Unable to verify application launch (%s/%s): %s" % (attempt, max_attempts, e))
-                # Sleep more ...
-                if attempt < max_attempts:
+                # If the instance didn't fail on create, and we haven't
+                # exhausted attempts, sleep ...
+                if not instance.is_failed and attempt < max_attempts:
+                    logging.warn("Unable to verify application launch (%s/%s): %s" % (attempt, max_attempts, e))
                     time.sleep(sleep_interval) # sleep for 30 seconds
                     pass
                 # Enough sleeping, something went wrong
@@ -1177,6 +1178,10 @@ class Instance(apps.aeolus.Conductor_Page):
             setattr(self, attr, self._root_element.find_element(*locator).text)
         self.key_url = self._get_key_url()
         self.provider_account = self._get_provider_account()
+
+    @property
+    def is_failed(self):
+        return 'failed' in self.state.lower() # 'Create failed'
 
     @property
     def is_running(self):
