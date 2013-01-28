@@ -21,12 +21,10 @@ Documentation is [hosted here](http://eanxgeek.github.com/katello_challenge/inde
 5. Update `credentials.yml` file as desired.
 6. Run tests from project root dir: `py.test`. Consult `py.test --help` for additional options.
 
-## Requirements
-The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests. Aeolus tests assume a configserver is running and credentials are included in `cloudforms.cfg`.
+The end-to-end test run assumes a fresh default install of the product(s) that are accessible from the machine running the tests.
 
-## Options
-* `--driver=firefox` Allows tests to be run without a separate Selenium server running.
-* `--baseurl=...` FQDN of product under test. Include `/conductor` or `/katello`
+## Commonly used options
+* `--driver=firefox|chrome` Allows tests to be run without a separate Selenium server running.
 * `--project=katello|aeolus|katello.cfse|aeolus.cfce` Specify project under test.
 * `-q path/to/test_file.py` Point to dir to run all tests in dir, or single file
 * `-k [test_keyword]` Test keyword to run specific tests.
@@ -35,28 +33,18 @@ The end-to-end test run assumes a fresh default install of the product(s) that a
 Run `py.test -h` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation.
 
 ## Different ways to run the tests
-* End-to-end Aeolus workflow: `py.test tests/aeolus2 -m "not saucelabs"`
-* If Aeolus is already set up with users, groups, clouds and providers, omit the setup tests: `py.test tests/aeolus2 -m "not setup"`
-* To just launch apps run `py.test tests/aeolus2 -m launch`
-* To just verify apps are launched run `py.test tests/aeolus2 -m verify`
+* End-to-end Aeolus workflow: `py.test -m "aeolus and not saucelabs"`
+* If Aeolus is already set up with users, groups, clouds and providers, omit the setup tests to run complete setup of configserver(s) and apps: `py.test -m "aeolus and not setup"`
+* To just launch apps run `py.test -m "aeolus and content"`
+* To just verify apps are launched run `py.test -m "aeolus and verify"`
 * Saucelabs UI testing: `py.test -m saucelabs`
 
-## Working with Selenium
-There are two ways to run Selenium tests.
-
-1. Use the Selenium WebDriver. Executing the tests with argument `--driver=firefox` allows for simple test runs. This is the method most commonly used during development.
-2. Use the Selenium Server. Running a standalone Selenium Server supports test distribution on multiple hosts.
-
-To start the Selenium Server for local testing:
-`java -jar /path/to/your/selenium/selenium-X.Y.jar \`
-`-firefoxProfileTemplate /path/to/ff_profile/.mozilla/firefox/[profile]/`
-
-See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.html) for more details.
 
 ## About the Files
-`tests/` Test code goes here. These are typically simple calls to the more complex operations in `apps/`. Update pytest.ini file to simplify test runs.
 
-* `tests/conftest.py` Customize pytest for processing CloudForms.Auto tests.  Includes provide custom pytest command-line arguments, as well as adding pytest plugins and hooks.
+`tests/` Test code goes here. These are typically simple calls to the more complex operations in `apps/`.
+
+* `tests/conftest.py` Customize pytest for processing CloudForms.Auto tests. Includes provide custom pytest command-line arguments as well as adding pytest plugins and hooks.
 
 `apps/`:
 
@@ -88,4 +76,16 @@ See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.h
 * `requirements.txt` Lists required packages. Running `sudo pip install -r requirements.txt` (Mac/Linux) will automatically download and install the packages in this file. We recommend 'pinning' the packages to a specific version, for example pytest==2.1.3. This decreases the chance that a change to py.test will affect your test suite.
 
 * `sauce_labs.yaml` username, password, api-key for Saucelabs testing.
+
+## Working with Selenium
+There are two ways to run Selenium tests.
+
+1. Use the Selenium WebDriver. Executing the tests with argument `--driver=firefox` allows for simple test runs. This is the method most commonly used during development.
+2. Use the Selenium Server. Running a standalone Selenium Server supports test distribution on multiple hosts.
+
+To start the Selenium Server for local testing:
+`java -jar /path/to/your/selenium/selenium-X.Y.jar \`
+`-firefoxProfileTemplate /path/to/ff_profile/.mozilla/firefox/[profile]/`
+
+See [Selenium webdriver documentation](http://seleniumhq.org/docs/03_webdriver.html) for more details.
 
