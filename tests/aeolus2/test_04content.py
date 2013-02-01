@@ -338,8 +338,9 @@ class Test_Content(Aeolus_Test):
         # Replace KATELLO_ENV
         set_parameter_value(root, 'KATELLO_ENV', pytest.config.getvalue('katello-env'))
 
+        # TODO - Determine when RELEASEVER locking is needed
         # Replace RELEASEVER
-        set_parameter_value(root, 'RELEASEVER', image.get('releasever','Auto'))
+        # set_parameter_value(root, 'RELEASEVER', image.get('releasever','Auto'))
 
         # Replace SSH_TUNNEL_IP
         set_parameter_value(root, 'SSH_TUNNEL_IP', image.get('general','ec2_tunnel_host'))
