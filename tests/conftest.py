@@ -190,7 +190,7 @@ def pytest_addoption(parser):
         defaults, with any values provided on the command-line.
         '''
         # Start with a fresh-hot list
-        values = [value]
+        values = re.split('[,\s]*', value)
         # If the current option value isn't the default, append
         if getattr(parser.values, option.dest) != option.default:
             values += getattr(parser.values, option.dest)
