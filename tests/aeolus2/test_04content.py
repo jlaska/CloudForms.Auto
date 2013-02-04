@@ -198,6 +198,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert msg == aeolus_msg['add_configserver']
 
     @pytest.mark.configserver
+    @pytest.mark.skipif("True")
     def test_setup_ssh_tunnel(self, zone_by_catalog, configserver):
         '''
         Setup tunnel for configserver to communicate with katello
@@ -212,7 +213,8 @@ class Test_ConfigServer(Aeolus_Test):
         # TODO - It would be nice to more dynamically determine if tunnelling
         # between the configserver and katello was required
         if any(['ec2' in pa for pa in cloud['enabled_provider_accounts']]):
-            page.setup_ssh_tunnel_proxy(zone, app_name, [5674, 1443])
+            page.open_ssh_tunnel_ports(zone, app_name)
+            page.bind_cfse_ports(zone, app_name)
         else:
             pytest.skip("SSH Tunnel not needed for cloud: %s" % \
                     cloud.get("name"))
@@ -374,7 +376,7 @@ class Test_Content(Aeolus_Test):
         Launch configserver to enabled provider accounts
         '''
         page = self.aeolus.load_page('Aeolus')
-        page.login()
+        page.login(role="user")
 
         (cloud, zone, catalog) = zone_by_catalog
         app_name = page.get_app_name(image, cloud)
