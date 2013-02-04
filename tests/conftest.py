@@ -282,6 +282,10 @@ def pytest_addoption(parser):
             dest='aeolus-custom-blueprint', default=test_config.get('aeolus', 'custom-blueprint'),
             help="Specify custom application blueprint template (default: %default)")
 
+    optgrp.addoption("--ec2-tunnel-ports", action="store",
+            dest='ec2-tunnel-ports', default=test_config.get('general', 'ec2_tunnel_ports'),
+            help="Specify SSH tunnel ports for EC2 (default: %default)")
+
 # Add pytest function argument: mozwebqa
 def pytest_funcarg__mozwebqa(request):
     """Load mozwebqa plugin
