@@ -190,7 +190,7 @@ def pytest_addoption(parser):
         defaults, with any values provided on the command-line.
         '''
         # Start with a fresh-hot list
-        values = [value]
+        values = re.split('[,\s]*', value)
         # If the current option value isn't the default, append
         if getattr(parser.values, option.dest) != option.default:
             values += getattr(parser.values, option.dest)
@@ -330,11 +330,16 @@ def pytest_funcarg__catalogs(request):
     elif "cloud_by_account_type" in funcargnames:
         (cloud, account) = request.getfuncargvalue("cloud_by_account_type")
 
-    from data.dataset import Content
+    from data.dataset import Content, Provider
+
+    # List of enabled provider account names (e.g. ec2-us-east-1, or rhevm etc...)
+    enabled_providers = [a.get('provider_account_name') for a in Provider.accounts if a.get('provider_account_name') in pytest.config.getoption('aeolus-providers')]
+
     catalog_list = list()
     for catalog in Content.catalogs:
         if catalog.get('cloud_parent') == cloud['name']:
-            catalog_list.append(catalog)
+            if catalog.get('resource_cluster') in enabled_providers:
+                catalog_list.append(catalog)
 
     if len(catalog_list) == 0:
         logging.warn('Unable to discover funcarg__catalog')

@@ -306,7 +306,7 @@ class Content(object):
 
     configserver = {"name" : "ConfigServer",
         "template" : "rhel-x86_64-6Server-cf-configserver.xml",
-        "version" : "0.4.11",
+        "version" : "0.4.12",
         "releasever" : "6Server",
         "basearch" : "x86_64",
         "profile" : "small-x86_64"}
