@@ -972,7 +972,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         # Enable GatewayPorts
         cmds = list()
-        cmds.append("sed -i -e 's/^[#\s]*GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config")
+        cmds.append("sed -i -e 's|^[# ]*GatewayPorts.*|GatewayPorts yes|' /etc/ssh/sshd_config")
         cmds.append("service sshd restart")
 
         # Open up ports
@@ -984,7 +984,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # Run commands ...
         for cmd in cmds:
             cmd = self.get_ssh_cmd_template(instance.ip_address,
-                    ec2_key_file) + ' ' + cmd
+                    ec2_key_file) + ' "' + cmd + '"'
             logging.debug(cmd)
             subprocess.check_call(cmd, shell=True)
 
