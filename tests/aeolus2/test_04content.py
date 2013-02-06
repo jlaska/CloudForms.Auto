@@ -434,4 +434,31 @@ class Test_Content(Aeolus_Test):
 
         # FIXME - The following won't work yet ... need to revise arguments
         cmd = "subscription-manager identity"
-        page.run_shell_command(cmd, instance)
+
+    @pytest.mark.destructive
+    @pytest.mark.content
+    def test_stop_app(self, zone_by_catalog, image):
+        '''
+        Launch configserver to enabled provider accounts
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        (cloud, zone, catalog) = zone_by_catalog
+        app_name = page.get_app_name(image, cloud)
+        msg = page.stop_app(cloud, zone, catalog, app_name)
+        assert msg == aeolus_msg['stop_queued']
+
+    @pytest.mark.destructive
+    @pytest.mark.content
+    def test_delete_app(self, zone_by_catalog, image):
+        '''
+        Launch configserver to enabled provider accounts
+        '''
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        (cloud, zone, catalog) = zone_by_catalog
+        app_name = page.get_app_name(image, cloud)
+        msg = page.delete_app(cloud, zone, catalog, app_name)
+        assert msg == aeolus_msg['delete_queued'] % app_name

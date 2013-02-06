@@ -828,6 +828,59 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         return self.get_text(*self.locators.response)
 
+    def stop_app(self, cloud, resource_zone, catalog, app_name):
+        logging.info("Stopping app '%s' into cloud '%s'" % \
+            (app_name, cloud['name']))
+
+        # Start at the /pools view
+        self.go_to_page_view("pools")
+        # Click the zone
+        self.click_by_text("a", resource_zone['name'])
+
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
+        # Click the application name
+        self.click_by_text("a", app_name)
+
+        # FIXME: Instance().stop() isn't working ... find out why
+        instance_locator = (By.XPATH, "//li[@class='instance']")
+        for element in self.selenium.find_elements(*instance_locator):
+            stop_button = (By.XPATH, ".//input[@class='button' and @value='Stop']")
+            element.find_element(*stop_button).click()
+
+        return self.get_text(*self.locators.response)
+
+    def delete_app(self, cloud, resource_zone, catalog, app_name):
+        logging.info("Deleting app '%s' from cloud '%s'" % \
+            (app_name, cloud['name']))
+
+        # Start at the /pools view
+        self.go_to_page_view("pools")
+        # Click the zone
+        self.click_by_text("a", resource_zone['name'])
+
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
+        # Click the application name
+        self.click_by_text("a", app_name)
+
+        delete_button = (By.XPATH, "//input[@id='delete']")
+        self.selenium.find_element(*delete_button).click()
+
+        logging.debug('dir: %s' % dir(self.selenium))
+        alert = self.selenium.switch_to_alert()
+        alert.accept()
+
+        self.selenium.switch_to_default_content()
+
+        return self.get_text(*self.locators.response)
+
     def launch_app_by_catalog(self, cloud, catalog, blueprint_name, app_name):
         '''
         direct nav to catalogs, select catalog by name
@@ -1147,6 +1200,7 @@ class Application(apps.aeolus.Conductor_Page):
     #_instances_locator = (By.CSS_SELECTOR, "dl.statistics > ul > li.right > dd")
     _uptime_locator = (By.XPATH, ".//li[@class='uptime']/dd")
     #_uptime_locator = (By.CSS_SELECTOR, "dl.statistics > ul > li.left > dd")
+    # input class="button" type="submit" value="Stop"
 
     def __init__(self, **kwargs):
         self._root_element = kwargs.get('root_element', None)

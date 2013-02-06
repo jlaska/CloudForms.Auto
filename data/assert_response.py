@@ -30,6 +30,8 @@ aeolus_msg = {
     'update_blueprint' : 'Application Blueprint updated successfully',
     'launch_ready' : 'All Images are pushed and recent.',
     'launch_success' : 'Application launched.',
+    'stop_queued' : 'stop action was successfully queued.',
+    'delete_queued' : 'The Application %s was scheduled for deletion.',
     'running' : 'Running',
     'kernel' : 'Linux'
     }
