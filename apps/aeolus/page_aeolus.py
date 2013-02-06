@@ -523,6 +523,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Click Next page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
         self.click_by_text("a", "New Application Blueprint from Image")
         self.selenium.find_element(*self.locators.blueprint_name).clear()
@@ -670,6 +675,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Optionally, click next_page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
 
         # Return the element matching <input value='Build'> that is a child of
@@ -740,6 +750,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Optionally, click next_page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
 
         # Look through the light_table for a row matching our provider, and return the <input value='Push'>
@@ -913,6 +928,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools")
         # Click the catalog by name
         self.click_by_text("a", resource_zone['name'])
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         # Click the application name
         self.click_by_text("a", app_name)
 
