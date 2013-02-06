@@ -1224,7 +1224,9 @@ class Instance(apps.aeolus.Conductor_Page):
         provider_account = self.selenium.find_element(*locator).text
 
         # Click back
-        self.return_to_previous_page()
+        #self.return_to_previous_page()
+        locator = (By.XPATH, "//a[@id='deployments_breadcrumb']")
+        self.selenium.find_element(*locator).click()
 
         return provider_account
 
