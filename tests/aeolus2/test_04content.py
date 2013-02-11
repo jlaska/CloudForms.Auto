@@ -17,6 +17,7 @@ class Test_ConfigServer(Aeolus_Test):
     '''
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_create(self, cloud, configserver):
         '''
         Create component outlines for configserver images
@@ -43,6 +44,7 @@ class Test_ConfigServer(Aeolus_Test):
         # image is available.
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_build(self, cloud_by_account_type, configserver):
         '''
         Build configserver images
@@ -55,6 +57,7 @@ class Test_ConfigServer(Aeolus_Test):
                 "Unable to initiate image build"
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_verify_build(self, cloud_by_account_type, configserver):
         '''
         Verify images build successfully
@@ -68,6 +71,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert page.verify_image_build(cloud, account, configserver)
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_push(self, cloud_by_account, configserver):
         '''
         Push configserver images
@@ -81,6 +85,7 @@ class Test_ConfigServer(Aeolus_Test):
                 "Unable to initiate image push"
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_verify_push(self, cloud_by_account, configserver):
         '''
         Verify a successful image push
@@ -93,6 +98,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert page.verify_image_push(cloud, account, configserver)
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_blueprint(self, cloud, configserver, catalogs):
         '''
         create default configserver blueprints
@@ -107,10 +113,14 @@ class Test_ConfigServer(Aeolus_Test):
                 blueprint_name,
                 catalogs)
 
-        assert msg == aeolus_msg['add_blueprint'] % \
-                ', '.join([cat.get('name') for cat in catalogs])
+        # FIXME: we should match the response exactly, but since we create a
+        # blueprint and enable *all* catalogs, the following ensures that at
+        # *least* the requested catalogs are present in the response
+        for cat in catalogs:
+            assert cat.get('name') in msg
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_launch(self, zone_by_catalog, configserver):
         '''
         Launch configserver to enabled provider accounts
@@ -125,6 +135,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert msg == aeolus_msg['launch_success']
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_verify_launch(self, zone_by_catalog, configserver):
         '''
         verify configserver launch
@@ -138,6 +149,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert page.verify_launch(cloud, zone, app_name)
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_setup(self, zone_by_catalog, configserver):
         '''
         Run aeolus-configserver-setup and add to provider
@@ -173,6 +185,7 @@ class Test_ConfigServer(Aeolus_Test):
                 default_flow_style=False)
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_add_to_provider_account(self, cloud_by_account, configserver):
         '''
         Enable configserver for configured provider accounts
@@ -198,6 +211,7 @@ class Test_ConfigServer(Aeolus_Test):
         assert msg == aeolus_msg['add_configserver']
 
     @pytest.mark.configserver
+    @pytest.mark.nondestructive
     def test_setup_ssh_tunnel(self, zone_by_catalog, configserver):
         '''
         Setup tunnel for configserver to communicate with katello
@@ -223,6 +237,7 @@ class Test_Content(Aeolus_Test):
     '''
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_create(self, cloud, image):
         '''
         Create component outlines from images
@@ -244,6 +259,7 @@ class Test_Content(Aeolus_Test):
         page.create_image(cloud, image)
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_build(self, cloud_by_account_type, image):
         '''
         Build images
@@ -256,6 +272,7 @@ class Test_Content(Aeolus_Test):
                 "Unable to initiate image build"
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_verify_build(self, cloud_by_account_type, image):
         '''
         Verify images build successfully
@@ -270,6 +287,7 @@ class Test_Content(Aeolus_Test):
                 "Image build failed"
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_push(self, cloud_by_account, image):
         '''
         Push images
@@ -282,6 +300,7 @@ class Test_Content(Aeolus_Test):
                 "Unable to initiate image push"
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_verify_push(self, cloud_by_account, image):
         '''
         Verify a successful image push
@@ -294,6 +313,7 @@ class Test_Content(Aeolus_Test):
         assert page.verify_image_push(cloud, account, image)
 
     @pytest.mark.content
+    @pytest.mark.nondestructive
     def test_blueprint(self, cloud, catalogs, image):
         '''
         create default configserver blueprints
@@ -370,6 +390,7 @@ class Test_Content(Aeolus_Test):
 
     @pytest.mark.content
     @pytest.mark.launch
+    @pytest.mark.nondestructive
     def test_launch(self, zone_by_catalog, image):
         '''
         Launch configserver to enabled provider accounts
@@ -383,10 +404,10 @@ class Test_Content(Aeolus_Test):
         msg = page.launch_app(cloud, zone, catalog, app_name, app_name)
         assert msg == aeolus_msg['launch_success']
 
-    @pytest.mark.nondestructive
     @pytest.mark.content
     @pytest.mark.verify
     @pytest.mark.launch
+    @pytest.mark.nondestructive
     def test_verify_launch(self, zone_by_catalog, image):
         page = self.aeolus.load_page('Aeolus')
         page.login()
@@ -401,6 +422,7 @@ class Test_Content(Aeolus_Test):
     @pytest.mark.verify
     @pytest.mark.launch
     @pytest.mark.skipif("True")
+    @pytest.mark.nondestructive
     def test_remote_command(self, zone_by_catalog, image):
         '''
         Run command on remote guest
@@ -418,6 +440,7 @@ class Test_Content(Aeolus_Test):
         assert page.run_shell_command('uname -s', instance) == \
                 aeolus_msg['kernel']
 
+    @pytest.mark.nondestructive
     @pytest.mark.verify
     @pytest.mark.registration
     @pytest.mark.skipif("True")
@@ -435,9 +458,19 @@ class Test_Content(Aeolus_Test):
         # FIXME - The following won't work yet ... need to revise arguments
         cmd = "subscription-manager identity"
 
+    @pytest.mark.content
+    @pytest.mark.destructive
+    def test_unregister(self, zone_by_catalog, image):
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        (cloud, zone, catalog) = zone_by_catalog
+        app_name = page.get_app_name(image, cloud)
+        assert 0 == page.ssh_unregister(cloud, zone, app_name)
+
     @pytest.mark.destructive
     @pytest.mark.content
-    def test_stop_app(self, zone_by_catalog, image):
+    def test_stop(self, zone_by_catalog, image):
         '''
         Launch configserver to enabled provider accounts
         '''
@@ -451,10 +484,18 @@ class Test_Content(Aeolus_Test):
 
     @pytest.mark.destructive
     @pytest.mark.content
+    def test_verify_stop(self, zone_by_catalog, image):
+        page = self.aeolus.load_page('Aeolus')
+        page.login()
+
+        (cloud, zone, catalog) = zone_by_catalog
+        app_name = page.get_app_name(image, cloud)
+
+        assert page.verify_stop(cloud, zone, app_name)
+
+    @pytest.mark.destructive
+    @pytest.mark.content
     def test_delete_app(self, zone_by_catalog, image):
-        '''
-        Launch configserver to enabled provider accounts
-        '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
 

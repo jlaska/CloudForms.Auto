@@ -105,13 +105,13 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         add user to user group
         '''
-        _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
+        logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         self.go_to_page_view("user_groups/%s/add_members" % group_id)
+        _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
         if not self.selenium.find_element(*_member_checkbox).\
             get_attribute('checked'):
             self.selenium.find_element(*_member_checkbox).click()
         self.selenium.find_element(*self.locators.user_group_save).submit()
-        logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
     def delete_user_from_group(self, group_id, user_id):
@@ -853,6 +853,40 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         return self.get_text(*self.locators.response)
 
+    def verify_stop(self, cloud, resource_zone, app_name):
+        '''
+        Verifies the provided application has the following characteristics:
+            len(instances) == 1
+            state.lower() = 'stopped'
+        '''
+        # FIXME - what about multi-instance applications
+        max_attempts = 15
+        sleep_interval = 30
+        for attempt in range(1,max_attempts+1):
+            try:
+                # FIXME - don't reload the page, rely in ajax updates
+                instances = self.list_application_instances(resource_zone, app_name)
+                assert len(instances) == 1, "Unexpected number of instances"
+                for instance in instances:
+                    logging.info("Instance:'%s', state:'%s', ip:'%s', provider_account:'%s'" %
+                            (instance.name, instance.state, instance.ip_address, instance.provider_account))
+                    assert instance.is_stopped, "Unexpected instance state: %s" % instance.state
+            except AssertionError as e:
+                # If the instance didn't fail on create, and we haven't
+                # exhausted attempts, sleep ...
+                if not instance.is_failed and attempt < max_attempts:
+                    logging.warn("Unable to verify application launch (%s/%s): %s" % (attempt, max_attempts, e))
+                    time.sleep(sleep_interval) # sleep for 30 seconds
+                    pass
+                # Enough sleeping, something went wrong
+                else:
+                    raise e
+            else:
+                # No exceptions raised
+                break
+
+        return True
+
     def delete_app(self, cloud, resource_zone, catalog, app_name):
         logging.info("Deleting app '%s' from cloud '%s'" % \
             (app_name, cloud['name']))
@@ -1087,6 +1121,23 @@ class Aeolus(apps.aeolus.Conductor_Page):
                 % (ec2_key_file, ip_addr)
         return cmd_template
 
+    def ssh_unregister(self, cloud, resource_zone, app_name):
+        # Gather information about instance
+        instance = self.list_application_instances(resource_zone, app_name)[0]
+
+        # Download EC2 SSH key (optional)
+        ec2_key_file = None
+        if instance.key_url is not None:
+            ec2_key_file = instance.download_ssh_key()
+            logging.debug("Download ssh key: %s" % ec2_key_file)
+
+        # Unregister
+        cmd = "subscription-manager unregister"
+        cmd = self.get_ssh_cmd_template(instance.ip_address,
+                ec2_key_file) + ' "' + cmd + '"'
+        logging.debug(cmd)
+        return subprocess.check_call(cmd, shell=True)
+
     def setup_configserver(self, cloud, resource_zone, app_name):
         '''
         run aeolus-configserver-setup
@@ -1256,6 +1307,10 @@ class Instance(apps.aeolus.Conductor_Page):
     @property
     def is_failed(self):
         return 'failed' in self.state.lower() # 'Create failed'
+
+    @property
+    def is_stopped(self):
+        return self.state.lower() == 'stopped'
 
     @property
     def is_running(self):
