@@ -14,6 +14,7 @@ def setup_module(module):
 class TestNav(Katello_Test):
 
     @pytest.mark.saucelabs
+    @pytest.mark.katello
     def test_login_and_nav(self, mozwebqa):
         '''
         Login and cycle through select pages to test browser rendering
@@ -35,8 +36,8 @@ class TestNav(Katello_Test):
         page = self.katello.load_page('Home')
         page.login()
         #time.sleep(15)
-        page.select_org(self.testsetup.org)
-        assert not page.is_failed
+        #page.select_org(self.testsetup.org)
+        #assert not page.is_failed
 
         workflow = ['users', 'users#panel=new', 
             'users#panel=user_1&panelpage=edit',
@@ -63,6 +64,7 @@ class TestNav(Katello_Test):
             page.go_to_page_view(view)
             assert not page.is_failed
 
+    @pytest.mark.skipif("True")
     def test_error_pages(self, mozwebqa):
         '''
         Login and cycle through known error pages:
@@ -77,6 +79,7 @@ class TestNav(Katello_Test):
             page.go_to_page_view(view)
             assert not page.is_failed
 
+    @pytest.mark.skipif("True")
     def test_sauce_debug(self, mozwebqa):
         page = self.katello.load_page('Home')
         page.login()
