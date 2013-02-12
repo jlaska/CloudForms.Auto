@@ -28,7 +28,7 @@ class TestNav(Aeolus_Test):
         '''
         page = self.aeolus.load_page('Aeolus')
         page.login()
-        assert not page.is_failed
+        #assert not page.is_failed
 
         workflow = ['users', 'users/new', 'users/1', 'users/1/edit',
                     'user_groups', 'user_groups/new', 'user_groups/1', 
@@ -47,22 +47,6 @@ class TestNav(Aeolus_Test):
                     '%400_bad_request%', '404_not_found',
                     'users/1/unknown_action', 'logout', 
                     'users/403_forbidden','404_not_found']
-        for view in workflow:
-            page.go_to_page_view(view)
-            assert not page.is_failed
-
-    def test_error_pages(self, mozwebqa):
-        '''
-        Login and cycle through known error pages:
-        400 (bad request), 403 (forbidden), 404 (not found)
-        '''
-        page = self.aeolus.load_page('Aeolus')
-        page.login()
-        assert not page.is_failed
-
-        workflow = ['%400_bad_request%', '404_not_found', 
-        'users/1/unknown_action', 'logout', 'users/403_forbidden', 
-        '404_not_found']
         for view in workflow:
             page.go_to_page_view(view)
             assert not page.is_failed
