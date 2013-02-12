@@ -28,7 +28,7 @@ The end-to-end test run assumes a fresh default install of the product(s) that a
 * `-k <test_keyword>` Test keyword to run specific tests.
 * `-m <marker>` For running tests tagged with py.test markers.
 
-Run `py.test --help` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation.
+Run `py.test --help` for help or refer to [py.test documentation](http://pytest.org/) for complete documentation. Consider adding a [pytest.ini file](http://pytest.org/latest/customize.html#adding-default-options) in the test directory for options used on every test run.
 
 ## Different ways to run the tests
 * End-to-end Aeolus workflow: `py.test -m "aeolus and not saucelabs"`
