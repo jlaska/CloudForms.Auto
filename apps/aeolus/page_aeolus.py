@@ -802,9 +802,9 @@ class Aeolus(apps.aeolus.Conductor_Page):
         # If image customization was configured, proceed
         try:
             submit = self.selenium.find_element(*self.locators.submit_params)
-            submit.click()
             # sleep for manual verification, update params
             time.sleep(10)
+            submit.click()
         except Exception as e:
             pass
 
@@ -937,9 +937,10 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         return ec2_key_file.name
 
-    def setup_ssh_tunnel_proxy(self, resource_zone, app_name, ports):
+    def open_ssh_tunnel_ports(self, resource_zone, app_name):
         '''
-        Run commands to enable configserver SSH tunnel proxy
+        Open SSH tunnel ports on EC2 configserver
+        Commands run on EC2 configserver
         '''
         # Gather information about instance
         instance = self.list_application_instances(resource_zone, app_name)[0]
@@ -952,66 +953,88 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         # Enable GatewayPorts
         cmds = list()
-        cmds.append("sed -i -e 's/^[#\s]*GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config")
+        cmds.append("grep -i gatewa /etc/ssh/sshd_config")
+        cmds.append("\"sed -i -e's/^[#\s]*GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config\"")
+        cmds.append("grep -i gatewa /etc/ssh/sshd_config")
         cmds.append("service sshd restart")
 
         # Open up ports
+        cmds.append("service iptables status")
         lokkit_cmd = "lokkit --verbose --enabled --update -p 8080:tcp"
+        ports = self._mozwebqa.config.getvalue('ec2-tunnel-ports').split()
         for p in ports:
             lokkit_cmd += " -p %s:tcp" % p
         cmds.append(lokkit_cmd)
+        cmds.append("service iptables status")
+        cmds.append("netstat -tulnp | egrep '%s|%s'" % (ports[0], ports[1]))
 
         # Run commands ...
+        print "# Running on EC2 configserver:"
         for cmd in cmds:
             cmd = self.get_ssh_cmd_template(instance.ip_address,
                     ec2_key_file) + ' ' + cmd
             logging.debug(cmd)
             subprocess.check_call(cmd, shell=True)
 
-    def bind_cfse_ports(self, app_name):
+    # FIXME: not working reliably
+    def bind_cfse_ports(self, resource_zone, app_name):
         '''
-        open ssh tunnel from CFSE to EC2 configserver
+        Open SSH tunnel from CFSE to EC2 configserver
+        Commands run on CFSE host
         '''
-        # FIXME: This is... a mess (not working)
-        # We need the EC2 key on the CFSE host (scp?)
-        # and then run ssh on CFSE host to open tunnel to EC2 configserver
-        # It would probably be better to send a shell script over 
-        # to the CFSE host and execute it from there
-        ip_addr = self.get_ip_addr(app_name)
-        ec2_key_file = self.download_ec2_key(app_name)
-        se_host = self.cfgfile.get('katello', 'katello-url').replace("/katello", "")
+
+        # Gather information about instance
+        instance = self.list_application_instances(resource_zone, app_name)[0]
+
+        # Download EC2 SSH key (optional)
+        ec2_key_file = None
+        if instance.key_url is not None:
+            ec2_key_file = instance.download_ssh_key()
+            logging.debug("Download ssh key: %s" % ec2_key_file)
+        se_host = self._mozwebqa.config.getvalue('katello-url').replace("/katello", "")
         se_host = se_host.replace("https://", "")
-        # ec2_tunnel_ports = 1443 5674
-        ports = self.cfgfile.getlist('general', 'ec2_tunnel_ports')
-        cmd_template = "ssh -i {key} -o StrictHostKeyChecking=no -R :8080:{cfse}:80 -R :{port1}:{cfse}:443 -R :{port2}:{cfse}:{port2} root@{ec2_ip}"
-        bind_cmd = cmd_template.format(key=ec2_key_file, cfse=se_host, \
-            port1=ports[0], port2=ports[1], ec2_ip=ip_addr)
-        copy_ec2_cmd = "sshpass -p {passwd} scp {key} root@{host}:/tmp/\."
-        copy_ec2_cmd = copy_ec2_cmd.format(
-            passwd=self.cfgfile.get('general', 'instance_passwd'),
+        ports = self._mozwebqa.config.getvalue('ec2-tunnel-ports').split()
+        cmds = list()
+        cmd_template = "ssh -f -N -i {key} -o StrictHostKeyChecking=no -R :8080:{cfse}:80 -R :{port1}:{cfse}:443 -R :{port2}:{cfse}:{port2} root@{ec2_ip} && exit"
+        cmds.append(cmd_template.format(key=ec2_key_file, cfse=se_host, \
+            port1=ports[0], port2=ports[1], ec2_ip=instance.ip_address))
+        cp_key_template = "sshpass -p {passwd} scp {key} root@{host}:/tmp/\."
+        cp_key_2_se = cp_key_template.format(
+            passwd = self._mozwebqa.config.getvalue('instance-password'),
             key=ec2_key_file,
             host=se_host)
-        print copy_ec2_cmd
-        os.system(copy_ec2_cmd)
-        cmds = ["cat /etc/ssh/ssh_config",
-            bind_cmd,
-            "cat /etc/ssh/ssh_config"]
+        # copy downloaded key to CFSE host (run locally)
+        os.system(cp_key_2_se)
+        # Bind ports (run on katello host)
         for cmd in cmds:
-            print "Runnning '%s'" % cmd
-            self.run_shell_command(cmd, se_host)
+            if ports[0] in cmd:
+                cmd = self.get_ssh_cmd_template(se_host, background=True) + ' "' + cmd + '"'
+            else:
+                cmd = self.get_ssh_cmd_template(se_host) + ' ' + cmd
+            logging.debug(cmd)
+            subprocess.check_call(cmd, shell=True)
+            # TODO: delete run_shell_command. not needed (confirm)
+            #self.run_shell_command(cmd, se_host)
+        # verify configserver listening on ports (run on configserver)
+        net_cmd = self.get_ssh_cmd_template(instance.ip_address,
+                ec2_key_file) + ' ' + \
+                "netstat -tulnp | egrep '%s|%s'" % (ports[0], ports[1])
+        subprocess.check_call(net_cmd, shell=True)
 
-    def get_ssh_cmd_template(self, ip_addr, ec2_key_file=None):
+    def get_ssh_cmd_template(self, ip_addr, ec2_key_file=None, background=None):
         '''
         return base SSH command template
         uses 'instance_passwd' from configure.ini or ec2 ssh key if provided
         '''
         cmd_template = None
         if ec2_key_file is None:
-            cmd_template = "sshpass -p %s ssh -o StrictHostKeyChecking=no root@%s" % \
+            cmd_template = "sshpass -p %s ssh -f -o StrictHostKeyChecking=no root@%s" % \
                     (self._mozwebqa.config.getvalue('instance-password'), ip_addr)
         else:
-            cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" \
-                % (ec2_key_file, ip_addr)
+            if background is True:
+                cmd_template = "ssh -i %s -f -N -o StrictHostKeyChecking=no root@%s" % (ec2_key_file, ip_addr)
+            else:
+                cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" % (ec2_key_file, ip_addr)
         return cmd_template
 
     def setup_configserver(self, cloud, resource_zone, app_name):
