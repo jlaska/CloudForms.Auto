@@ -105,13 +105,13 @@ class Aeolus(apps.aeolus.Conductor_Page):
         '''
         add user to user group
         '''
-        _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
+        logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         self.go_to_page_view("user_groups/%s/add_members" % group_id)
+        _member_checkbox = (By.ID, "member_checkbox_%s" % user_id)
         if not self.selenium.find_element(*_member_checkbox).\
             get_attribute('checked'):
             self.selenium.find_element(*_member_checkbox).click()
         self.selenium.find_element(*self.locators.user_group_save).submit()
-        logging.info("add user '%s' to group '%s'" % (user_id, group_id))
         return self.get_text(*self.locators.response)
 
     def delete_user_from_group(self, group_id, user_id):
@@ -523,6 +523,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Click Next page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
         self.click_by_text("a", "New Application Blueprint from Image")
         self.selenium.find_element(*self.locators.blueprint_name).clear()
@@ -670,6 +675,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Optionally, click next_page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
 
         # Return the element matching <input value='Build'> that is a child of
@@ -740,6 +750,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pool_families")
         self.click_by_text("a", cloud['name'])
         self.selenium.find_element(*self.locators.image_details).click()
+        # Optionally, click next_page
+        image_link = (By.XPATH, "//a[text() = '%s']" % image['name'])
+        while not self.is_element_present(*image_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         self.click_by_text("a", image['name'])
 
         # Look through the light_table for a row matching our provider, and return the <input value='Push'>
@@ -810,6 +825,93 @@ class Aeolus(apps.aeolus.Conductor_Page):
 
         # Launch
         self.selenium.find_element(*self.locators.launch).click()
+
+        return self.get_text(*self.locators.response)
+
+    def stop_app(self, cloud, resource_zone, catalog, app_name):
+        logging.info("Stopping app '%s' into cloud '%s'" % \
+            (app_name, cloud['name']))
+
+        # Start at the /pools view
+        self.go_to_page_view("pools")
+        # Click the zone
+        self.click_by_text("a", resource_zone['name'])
+
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
+        # Click the application name
+        self.click_by_text("a", app_name)
+
+        # FIXME: Instance().stop() isn't working ... find out why
+        instance_locator = (By.XPATH, "//li[@class='instance']")
+        for element in self.selenium.find_elements(*instance_locator):
+            stop_button = (By.XPATH, ".//input[@class='button' and @value='Stop']")
+            element.find_element(*stop_button).click()
+
+        return self.get_text(*self.locators.response)
+
+    def verify_stop(self, cloud, resource_zone, app_name):
+        '''
+        Verifies the provided application has the following characteristics:
+            len(instances) == 1
+            state.lower() = 'stopped'
+        '''
+        # FIXME - what about multi-instance applications
+        max_attempts = 15
+        sleep_interval = 30
+        for attempt in range(1,max_attempts+1):
+            try:
+                # FIXME - don't reload the page, rely in ajax updates
+                instances = self.list_application_instances(resource_zone, app_name)
+                assert len(instances) == 1, "Unexpected number of instances"
+                for instance in instances:
+                    logging.info("Instance:'%s', state:'%s', ip:'%s', provider_account:'%s'" %
+                            (instance.name, instance.state, instance.ip_address, instance.provider_account))
+                    assert instance.is_stopped, "Unexpected instance state: %s" % instance.state
+            except AssertionError as e:
+                # If the instance didn't fail on create, and we haven't
+                # exhausted attempts, sleep ...
+                if not instance.is_failed and attempt < max_attempts:
+                    logging.warn("Unable to verify application launch (%s/%s): %s" % (attempt, max_attempts, e))
+                    time.sleep(sleep_interval) # sleep for 30 seconds
+                    pass
+                # Enough sleeping, something went wrong
+                else:
+                    raise e
+            else:
+                # No exceptions raised
+                break
+
+        return True
+
+    def delete_app(self, cloud, resource_zone, catalog, app_name):
+        logging.info("Deleting app '%s' from cloud '%s'" % \
+            (app_name, cloud['name']))
+
+        # Start at the /pools view
+        self.go_to_page_view("pools")
+        # Click the zone
+        self.click_by_text("a", resource_zone['name'])
+
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
+        # Click the application name
+        self.click_by_text("a", app_name)
+
+        delete_button = (By.XPATH, "//input[@id='delete']")
+        self.selenium.find_element(*delete_button).click()
+
+        logging.debug('dir: %s' % dir(self.selenium))
+        alert = self.selenium.switch_to_alert()
+        alert.accept()
+
+        self.selenium.switch_to_default_content()
 
         return self.get_text(*self.locators.response)
 
@@ -913,6 +1015,11 @@ class Aeolus(apps.aeolus.Conductor_Page):
         self.go_to_page_view("pools")
         # Click the catalog by name
         self.click_by_text("a", resource_zone['name'])
+        # Click Next page
+        app_link = (By.XPATH, "//a[text() = '%s']" % app_name)
+        while not self.is_element_present(*app_link):
+            next_page = (By.XPATH, "//a[@class='next_page']")
+            self.selenium.find_element(*next_page).click()
         # Click the application name
         self.click_by_text("a", app_name)
 
@@ -955,7 +1062,6 @@ class Aeolus(apps.aeolus.Conductor_Page):
         cmds = list()
         cmds.append("grep -i gatewa /etc/ssh/sshd_config")
         cmds.append("\"sed -i -e's/^[#\s]*GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config\"")
-        cmds.append("grep -i gatewa /etc/ssh/sshd_config")
         cmds.append("service sshd restart")
 
         # Open up ports
@@ -972,7 +1078,7 @@ class Aeolus(apps.aeolus.Conductor_Page):
         print "# Running on EC2 configserver:"
         for cmd in cmds:
             cmd = self.get_ssh_cmd_template(instance.ip_address,
-                    ec2_key_file) + ' ' + cmd
+                    ec2_key_file) + ' "' + cmd + '"'
             logging.debug(cmd)
             subprocess.check_call(cmd, shell=True)
 
@@ -1036,6 +1142,23 @@ class Aeolus(apps.aeolus.Conductor_Page):
             else:
                 cmd_template = "ssh -i %s -o StrictHostKeyChecking=no root@%s" % (ec2_key_file, ip_addr)
         return cmd_template
+
+    def ssh_unregister(self, cloud, resource_zone, app_name):
+        # Gather information about instance
+        instance = self.list_application_instances(resource_zone, app_name)[0]
+
+        # Download EC2 SSH key (optional)
+        ec2_key_file = None
+        if instance.key_url is not None:
+            ec2_key_file = instance.download_ssh_key()
+            logging.debug("Download ssh key: %s" % ec2_key_file)
+
+        # Unregister
+        cmd = "subscription-manager unregister"
+        cmd = self.get_ssh_cmd_template(instance.ip_address,
+                ec2_key_file) + ' "' + cmd + '"'
+        logging.debug(cmd)
+        return subprocess.check_call(cmd, shell=True)
 
     def setup_configserver(self, cloud, resource_zone, app_name):
         '''
@@ -1150,6 +1273,7 @@ class Application(apps.aeolus.Conductor_Page):
     #_instances_locator = (By.CSS_SELECTOR, "dl.statistics > ul > li.right > dd")
     _uptime_locator = (By.XPATH, ".//li[@class='uptime']/dd")
     #_uptime_locator = (By.CSS_SELECTOR, "dl.statistics > ul > li.left > dd")
+    # input class="button" type="submit" value="Stop"
 
     def __init__(self, **kwargs):
         self._root_element = kwargs.get('root_element', None)
@@ -1207,6 +1331,10 @@ class Instance(apps.aeolus.Conductor_Page):
         return 'failed' in self.state.lower() # 'Create failed'
 
     @property
+    def is_stopped(self):
+        return self.state.lower() == 'stopped'
+
+    @property
     def is_running(self):
         return self.state.lower() == 'running'
 
@@ -1227,7 +1355,9 @@ class Instance(apps.aeolus.Conductor_Page):
         provider_account = self.selenium.find_element(*locator).text
 
         # Click back
-        self.return_to_previous_page()
+        #self.return_to_previous_page()
+        locator = (By.XPATH, "//a[@id='deployments_breadcrumb']")
+        self.selenium.find_element(*locator).click()
 
         return provider_account
 

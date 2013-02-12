@@ -448,10 +448,10 @@ JoBKiWDrKWg2TeTJuVSJZMo=
               <value>10.84.250.89</value>
             </parameter>
             <parameter name="SSH_TUNNEL_KATELLO_PORT">
-              <value>2443</value>
+              <value>1443</value>
             </parameter>
             <parameter name="SSH_TUNNEL_GOFER_PORT">
-              <value>5671</value>
+              <value>5672</value>
             </parameter>
             <parameter name="JENKINS_SSH_KEY_LOCATION">
               <value>None</value>
