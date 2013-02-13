@@ -4,7 +4,7 @@ import tests
 
 @pytest.mark.nondestructive
 @pytest.mark.sanity
-class TestHomePage(tests.katello2.Katello_Test):
+class TestHomePage(tests.katello.Katello_Test):
 
     def test_verify_page_title(self):
         home_page = self.katello.load_page('Home')

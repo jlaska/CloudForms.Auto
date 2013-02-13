@@ -6,7 +6,7 @@ import pytest
 import apps
 import random
 import time
-from tests.katello2 import Katello_Test
+from tests.katello import Katello_Test
 
 class TestOrganizations(Katello_Test):
 

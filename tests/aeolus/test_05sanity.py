@@ -1,6 +1,6 @@
 import pytest
 import apps
-from tests.aeolus2 import Aeolus_Test
+from tests.aeolus import Aeolus_Test
 
 @pytest.mark.sanity
 class TestLogin(Aeolus_Test):

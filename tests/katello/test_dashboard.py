@@ -3,7 +3,7 @@
 import pytest
 import apps
 import time
-from tests.katello2 import Katello_Test
+from tests.katello import Katello_Test
 
 @pytest.mark.nondestructive
 class TestDashboard(Katello_Test):

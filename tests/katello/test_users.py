@@ -1,7 +1,7 @@
 import pytest
 import apps
 import logging
-from tests.katello2 import Katello_Test
+from tests.katello import Katello_Test
 
 class TestUsers(Katello_Test):
 

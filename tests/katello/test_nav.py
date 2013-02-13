@@ -4,7 +4,7 @@ import pytest
 import apps
 import time
 import logging
-from tests.katello2 import Katello_Test
+from tests.katello import Katello_Test
 
 
 def setup_module(module):

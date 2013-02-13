@@ -2,7 +2,7 @@ import pytest
 import apps
 from data.dataset import Admin
 from data.assert_response import *
-from tests.aeolus2 import Aeolus_Test
+from tests.aeolus import Aeolus_Test
 
 # FIXME - the following causes pytest to skip all methods in 'Aeolus_Test'
 ## @pytest.mark.skipif("config.getvalue('enable-ldap')")

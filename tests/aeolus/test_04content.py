@@ -9,7 +9,7 @@ import xml.etree.ElementTree as xmltree
 import urlparse
 from data.dataset import Content
 from data.assert_response import *
-from tests.aeolus2 import Aeolus_Test
+from tests.aeolus import Aeolus_Test
 
 class Test_ConfigServer(Aeolus_Test):
     '''

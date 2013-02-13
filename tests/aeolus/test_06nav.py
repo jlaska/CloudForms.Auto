@@ -3,7 +3,7 @@ import apps
 import logging
 from data.dataset import Admin
 from data.assert_response import *
-from tests.aeolus2 import Aeolus_Test
+from tests.aeolus import Aeolus_Test
 import time
 
 class TestNav(Aeolus_Test):
