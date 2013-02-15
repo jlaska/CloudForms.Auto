@@ -251,11 +251,11 @@ def pytest_addoption(parser):
             help="Specify URL for katello (default: %default)")
 
     optgrp.addoption("--katello-env", action="store", dest='katello-env',
-            default=test_config.get('katello', 'katello-env'),
+            default=test_config.get('katello', 'env'),
             help="Specify default environment (default: %default)")
 
     optgrp.addoption("--katello-org", action="store", dest='katello-org',
-            default=test_config.get('katello', 'katello-org'),
+            default=test_config.get('katello', 'org'),
             help="Specify default organization (default: %default)")
 
     # TODO - add parameters for each cloudforms.cfg [aeolus] option
